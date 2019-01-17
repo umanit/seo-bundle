@@ -8,7 +8,6 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Umanit\SeoBundle\Doctrine\Annotation\Seo;
 use Umanit\SeoBundle\Exception\NotSeoEntityException;
 use Umanit\SeoBundle\Routing\Canonical;

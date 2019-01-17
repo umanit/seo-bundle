@@ -1,0 +1,46 @@
+{
+    "name": "umanit/seo-bubdle",
+    "description": "Provides SEO features on Doctrine entities.",
+    "type": "symfony-bundle",
+    "keywords": [
+        "symfony",
+        "doctrine",
+        "SEO"
+    ],
+    "homepage": "https://github.com/umanit/seo-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "UmanIT",
+            "email": "contact@umanit.fr"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "symfony/http-kernel": "^4.2",
+        "symfony/property-access": "^4.2",
+        "symfony/config": "^4.2",
+        "symfony/dependency-injection": "^4.2",
+        "doctrine/common": "^2.10",
+        "doctrine/orm": "^2.6",
+        "psr/cache": "^1.0",
+        "symfony/routing": "^4.2"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "4.2.*",
+        "phpunit/phpunit": "7.5.*",
+        "symfony/var-dumper": "4.2.*"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Umanit\\SeoBundle\\": "/src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AppTestBundle\\": "tests/Fixtures/App/",
+            "Umanit\\SeoBundle\\Tests\\": "tests/"
+        }
+    }
+}
