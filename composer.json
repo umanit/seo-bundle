@@ -1,5 +1,5 @@
 {
-    "name": "umanit/seo-bubdle",
+    "name": "umanit/seo-bundle",
     "description": "Provides SEO features on Doctrine entities.",
     "type": "symfony-bundle",
     "keywords": [
