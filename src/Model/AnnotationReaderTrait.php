@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Umanit\SeoBundle\Model;
+namespace Umanit\SeoBundle\Model;
 
 use Umanit\SeoBundle\Doctrine\Annotation\Seo;
 use Doctrine\Common\Annotations\Reader as AnnotationsReader;
@@ -35,10 +35,10 @@ trait AnnotationReaderTrait
      * @param      $entity
      *
      * @return Seo
-     * @throws \ReflectionException
      * @throws NotSeoEntityException
+     * @throws \ReflectionException
      */
-    private function getSeoAnnotation($entity): Seo
+    public function getSeoAnnotation($entity): Seo
     {
         $seo = $this->annotationsReader->getClassAnnotation(
             new \ReflectionClass(get_class($entity)),
@@ -49,6 +49,7 @@ trait AnnotationReaderTrait
             throw new NotSeoEntityException(sprintf('Entity of type "%s" is not annotated by Seo(). Cannot use SEO features from it.', get_class($entity)));
         }
 
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $seo;
     }
 }

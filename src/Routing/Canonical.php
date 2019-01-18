@@ -2,7 +2,7 @@
 
 namespace Umanit\SeoBundle\Routing;
 
-use App\Umanit\SeoBundle\Model\AnnotationReaderTrait;
+use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;

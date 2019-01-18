@@ -1,1 +1,31 @@
 services:
+    # Url Pool
+    umanit_seo.url_history.url_pool:
+        class: Umanit\SeoBundle\UrlHistory\UrlPool
+        # TODO : make @cache.app configurable
+        arguments: ['@cache.app', '@doctrine.orm.entity_manager']
+    Umanit\SeoBundle\UrlHistory\UrlPool: '@umanit_seo.url_history.url_pool'
+
+    # Canonical url generator
+    umanit_seo.routing.canonical:
+        class: Umanit\SeoBundle\Routing\Canonical
+        arguments: ['@router']
+        calls:
+            - [setAnnotationReader, ['@annotations.cached_reader']]
+    Umanit\SeoBundle\Routing\Canonical: '@umanit_seo.routing.canonical'
+
+    # Url History Writer
+    umanit_seo.event_subscriber.url_history_writer:
+        class: Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter
+        arguments: ['@umanit_seo.url_history.url_pool', '@umanit_seo.routing.canonical']
+        calls:
+            - [setAnnotationReader, ['@annotations.cached_reader']]
+        tags: ['doctrine.event_subscriber']
+    Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
+
+    umanit_seo.event_subscriber.url_redirector:
+        class: Umanit\SeoBundle\EventSubscriber\UrlRedirector
+        arguments: ['@umanit_seo.url_history.url_pool', '%umanit_seo.redirect_code%']
+        tags:
+            - { name: kernel.event_subscriber }
+    Umanit\SeoBundle\EventSubscriber\UrlRedirector: '@umanit_seo.event_subscriber.url_redirector'

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Umanit\SeoBundle\UrlHistory;
+namespace Umanit\SeoBundle\UrlHistory;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -16,7 +16,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 class UrlPool
 {
-    private const CACHE_KEY = 'umanit.seo.url_history';
+    private const         CACHE_KEY      = 'umanit.seo.url_history.';
+    private const         CACHE_DURATION = 'P1M'; // One month
 
     /** @var CacheItemPoolInterface */
     private $pool;
@@ -50,7 +51,7 @@ class UrlPool
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function add(string $oldPath, string $newPath, $entity)
+    public function add(string $oldPath, string $newPath, $entity): void
     {
         // Find the primary key
         $class           = get_class($entity);
@@ -58,16 +59,59 @@ class UrlPool
         $identifierField = $meta->getSingleIdentifierFieldName();
         $identifierValue = $this->propAccess->getValue($entity, $identifierField);
 
-        $cacheItem = $this->pool->getItem(static::CACHE_KEY);
+        $cacheItem = $this->pool->getItem($this->formatCacheKey($oldPath));
+
         // Add the value to the cache item
-        $cacheItem->set(
-            ($cacheItem->get() ?? []) + [
-                [
-                    'old_path' => $oldPath,
-                    'new_path' => $newPath,
-                    'entity'  => $class.';'.$identifierValue,
-                ],
-            ]
-        );
+        $cacheItem->set([
+            'old_path' => $oldPath,
+            'new_path' => $newPath,
+            'entity'   => $class.';'.$identifierValue,
+        ]);
+        $cacheItem->expiresAfter(new \DateInterval(static::CACHE_DURATION));
+        $this->pool->save($cacheItem);
+    }
+
+    /**
+     * Checks that the path is saved in the pool.
+     *
+     * @param string $path
+     *
+     * @return bool
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function has(string $path): bool
+    {
+        $cacheItem = $this->pool->getItem($this->formatCacheKey($path));
+
+        return null !== $cacheItem->get();
+    }
+
+    /**
+     * Return an item in the cache
+     *
+     * @param string $path
+     *
+     * @return mixed|null
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function get(string $path)
+    {
+        if (false === $this->has($path)) {
+            return null;
+        }
+
+        return $this->pool->getItem($this->formatCacheKey($path))->get();
+    }
+
+    /**
+     * Formats the cache item key from a path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    private function formatCacheKey(string $path): string
+    {
+        return static::CACHE_KEY.str_replace('/', '-', $path);
     }
 }

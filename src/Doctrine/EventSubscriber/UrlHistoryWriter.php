@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Umanit\SeoBundle\Doctrine\EventSubscriber;
+namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
-use App\Umanit\SeoBundle\Model\AnnotationReaderTrait;
-use App\Umanit\SeoBundle\UrlHistory\UrlPool;
+use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
+use Umanit\SeoBundle\Model\AnnotationReaderTrait;
+use Umanit\SeoBundle\UrlHistory\UrlPool;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
@@ -59,13 +60,34 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
-        $entity = $args->getEntity();
+        $entity    = $args->getEntity();
+        $changeSet = $args->getEntityChangeSet();
 
         try {
-            // Build the old path
-            $oldPath = $this->urlBuilder->path($entity);
+            $seoAnnotation = $this->getSeoAnnotation($entity);
             // Build the new path
-            $newPath = $this->urlBuilder->path($entity, $args->getEntityChangeSet()); // Todo check what's in getEntityChangeSet()
+            $newPath = $this->urlBuilder->path($entity);
+            // Get old values
+            array_walk(
+                $changeSet,
+                function (array &$changedFieldValue, string $changedFieldKey) use ($changeSet, $seoAnnotation) {
+                    foreach ($seoAnnotation->getRouteParameters() as $routeParameter) {
+                        /** @var RouteParameter $routeParameter */
+                        if ($routeParameter->getProperty() === $changedFieldKey) {
+                            $changedFieldValue = $changedFieldValue[0];
+
+                            return true;
+                        }
+                    }
+
+                    unset($changeSet[$changedFieldKey]);
+
+                    return false;
+                }
+            );
+            // Build the old path
+            $oldPath = $this->urlBuilder->path($entity, $changeSet);
+
             // Add the redirection to the pool
             $this->urlPool->add($oldPath, $newPath, $entity);
         } catch (NotSeoEntityException $e) {

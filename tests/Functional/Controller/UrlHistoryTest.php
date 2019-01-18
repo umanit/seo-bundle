@@ -35,14 +35,12 @@ class UrlHistoryTest extends WebTestCase
     {
         // Create a SeoPage with a slug
         $page = (new SeoPage())->setSlug('former-slug');
-        // Persist...
         $this->saveSeoPage($page);
         // Change the slug
         $page->setSlug('new-slug');
-        // Persist...
         $this->saveSeoPage($page);
         // Try and access the old route
-        $this->client->request('GET', '/page/former-url');
+        $this->client->request('GET', '/page/former-slug');
         // Assert redirect to the new one
         $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
     }

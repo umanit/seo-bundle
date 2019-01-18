@@ -6,7 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Umanit\SeoBundle\SeoBundle;
+use Umanit\SeoBundle\UmanitSeoBundle;
 
 /**
  * The kernel used in the application of most functional tests.
@@ -18,7 +18,7 @@ class AppKernel extends Kernel
         return [
             new FrameworkBundle(),
             new DoctrineBundle(),
-            new SeoBundle(),
+            new UmanitSeoBundle(),
         ];
     }
 

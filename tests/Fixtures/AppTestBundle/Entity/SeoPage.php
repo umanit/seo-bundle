@@ -13,7 +13,7 @@ use Umanit\SeoBundle\Doctrine\Annotation\Seo;
  * @Seo(
  *     routeName="app_test_page_show",
  *     routeParameters={
- *         @RouteParameter(property="slug", parameter="slug")
+ *         @RouteParameter(parameter="slug", property="slug")
  * })
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
