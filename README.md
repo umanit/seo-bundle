@@ -17,7 +17,7 @@ This bundle adds SEO capabilities for Doctrine entities.
 
 ## Usage
 
-1. [Preparing your entities](#Preparing your entities)
+1. [Preparing your entities](#preparing-your-entities)
 
 ### Preparing your entities
 
