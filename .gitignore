@@ -1,2 +1,7 @@
-vendor/*
-composer.lock
+tests/phpunit.xml
+tests/Fixtures/App/cache
+tests/build
+/vendor
+/bin
+/composer.lock
+/build

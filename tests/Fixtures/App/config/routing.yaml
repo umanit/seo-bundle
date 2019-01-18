@@ -1,0 +1,3 @@
+app_test_controllers:
+    resource: '../../AppTestBundle/Controller/'
+    type:     annotation

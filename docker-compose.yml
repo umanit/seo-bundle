@@ -1,16 +1,10 @@
 version: '3.6'
 
-networks:
-  project:
-    driver: bridge
-
 services:
   php:
     image: umanit/web:7.2
     restart: on-failure
     volumes:
       - .:/var/www/html:cached
-      - ./tests/fixtures/var/logs/php:/var/log/php:cached
+      - ./build/php_log:/var/log/php:cached
       - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
-    networks:
-      - project
