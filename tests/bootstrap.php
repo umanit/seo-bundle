@@ -36,13 +36,13 @@ include __DIR__.'/Fixtures/App/AppKernel.php';
 $application = new Application(new AppKernel('test', true));
 $application->setAutoExit(false);
 // Drop database schema
-$input = new ArrayInput(['command' => 'doctrine:database:drop', '--force' => true]);
+$input = new ArrayInput(['command' => 'doctrine:database:drop', '--force' => true, '--quiet' => true]);
 $application->run($input, new ConsoleOutput());
 // Create database
-$input = new ArrayInput(['command' => 'doctrine:database:create']);
+$input = new ArrayInput(['command' => 'doctrine:database:create', '--quiet' => true]);
 $application->run($input, new ConsoleOutput());
 // Create database schema
-$input = new ArrayInput(['command' => 'doctrine:schema:create']);
+$input = new ArrayInput(['command' => 'doctrine:schema:update', '--force' => true, '--no-interaction' => true, '--quiet' => true]);
 $application->run($input, new ConsoleOutput());
 
 // Make a copy of the original SQLite database to use the same unmodified database in every test

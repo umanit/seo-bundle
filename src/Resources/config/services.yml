@@ -2,8 +2,7 @@ services:
     # Url Pool
     umanit_seo.url_history.url_pool:
         class: Umanit\SeoBundle\UrlHistory\UrlPool
-        # TODO : make @cache.app configurable
-        arguments: ['@cache.app', '@doctrine.orm.entity_manager']
+        arguments: ["@=service(parameter('umanit_seo.cache_service'))", '@doctrine.orm.entity_manager']
     Umanit\SeoBundle\UrlHistory\UrlPool: '@umanit_seo.url_history.url_pool'
 
     # Canonical url generator

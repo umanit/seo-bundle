@@ -11,6 +11,9 @@ class SeoPageController extends AbstractController
 {
     /**
      * @Route("/page/{slug}", name="app_test_page_show")
+     * @param string $slug
+     *
+     * @return Response
      */
     public function show(string $slug)
     {

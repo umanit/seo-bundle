@@ -24,7 +24,8 @@
         "doctrine/common": "^2.10",
         "doctrine/orm": "^2.6",
         "psr/cache": "^1.0",
-        "symfony/routing": "^4.2"
+        "symfony/routing": "^4.2",
+        "symfony/expression-language": "^4.2"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "4.2.*",
