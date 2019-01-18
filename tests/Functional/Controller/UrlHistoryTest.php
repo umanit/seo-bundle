@@ -33,6 +33,20 @@ class UrlHistoryTest extends WebTestCase
 
     public function testUrlHistory()
     {
+
+        // Create a SeoPage with a slug
+        $pages = (new SeoPage())->setSlug('qsd-slug');
+        $this->saveSeoPage($pages);
+        // Change the slug
+        $pages->setSlug('qsd-slug');
+        $this->saveSeoPage($pages);
+
+
+
+
+
+
+
         // Create a SeoPage with a slug
         $page = (new SeoPage())->setSlug('former-slug');
         $this->saveSeoPage($page);
