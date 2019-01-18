@@ -8,7 +8,7 @@ use Umanit\SeoBundle\Model\AutoSetterConstructorTrait;
 
 /**
  * @Annotation
- * @Target({CLASS})
+ * @Target("CLASS")
  *
  * Annotation class for @Seo().
  *
