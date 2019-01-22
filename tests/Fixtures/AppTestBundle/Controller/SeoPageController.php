@@ -22,6 +22,8 @@ class SeoPageController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        return new Response('Page : '.$page->getSlug());
+        return $this->render('@AppTestBundle/seo_page/show.html.twig', [
+            'page' => $page,
+        ]);
     }
 }

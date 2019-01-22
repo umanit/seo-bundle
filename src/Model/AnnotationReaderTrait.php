@@ -40,6 +40,9 @@ trait AnnotationReaderTrait
      */
     public function getSeoAnnotation($entity): Seo
     {
+        if (!is_object($entity)) {
+            throw new NotSeoEntityException(sprintf('A scalar cannot be annotated by Seo(). Cannot use SEO features from it.'));
+        }
         $seo = $this->annotationsReader->getClassAnnotation(
             new \ReflectionClass(get_class($entity)),
             Seo::class

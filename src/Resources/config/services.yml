@@ -22,9 +22,31 @@ services:
         tags: ['doctrine.event_subscriber']
     Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
 
+    # Current Entity Resolver
+    umanit_seo.doctrine_event_subscriber.current_entity_resolver:
+        class: Umanit\SeoBundle\Doctrine\EventSubscriber\CurrentEntityResolver
+        arguments: ['@umanit_seo.runtime.current_seo_entity', '@umanit_seo.routing.canonical', '@request_stack']
+        tags:
+            - { name: doctrine.event_subscriber }
+
     umanit_seo.event_subscriber.url_redirector:
         class: Umanit\SeoBundle\EventSubscriber\UrlRedirector
         arguments: ['@umanit_seo.url_history.url_pool', '%umanit_seo.redirect_code%']
         tags:
             - { name: kernel.event_subscriber }
     Umanit\SeoBundle\EventSubscriber\UrlRedirector: '@umanit_seo.event_subscriber.url_redirector'
+
+    # Twig Extension
+    umanit_seo.runtime_twig.seo_extension:
+        class: Umanit\SeoBundle\Runtime\Twig\SeoExtension
+        arguments: ['@umanit_seo.routing.canonical', '@umanit_seo.runtime.current_seo_entity']
+        calls:
+            - [setAnnotationReader, ['@annotations.cached_reader']]
+        tags:
+            - { name: twig.extension }
+    Umanit\SeoBundle\Runtime\Twig\SeoExtension: '@umanit_seo.runtime_twig.seo_extension'
+
+    # CurrentSeo Entity
+    umanit_seo.runtime.current_seo_entity:
+        class: Umanit\SeoBundle\Runtime\CurrentSeoEntity
+    Umanit\SeoBundle\Runtime\CurrentSeoEntity: '@umanit_seo.runtime.current_seo_entity'

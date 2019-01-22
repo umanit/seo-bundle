@@ -25,3 +25,6 @@ doctrine:
                 alias: 'Entity'
                 prefix: 'AppTestBundle\Entity'
                 is_bundle: false
+twig:
+    paths:
+        '%kernel.root_dir%/../AppTestBundle/Resource/views/': AppTestBundle
