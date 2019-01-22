@@ -6,6 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Umanit\SeoBundle\Exception\NotSeoEntityException;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
 
@@ -52,8 +53,6 @@ class CurrentEntityResolver implements EventSubscriber
 
     /**
      * @param LifecycleEventArgs $args
-     *
-     * @throws \Umanit\SeoBundle\Exception\NotSeoEntityException
      */
     public function postLoad(LifecycleEventArgs $args)
     {
@@ -63,8 +62,12 @@ class CurrentEntityResolver implements EventSubscriber
         }
 
         $entity = $args->getEntity();
-        if (null === $this->currentSeoEntity->get() && $this->canonical->path($entity) === $request->getPathInfo()) {
-            $this->currentSeoEntity->set($entity);
+        try {
+            if (null === $this->currentSeoEntity->get() && $this->canonical->path($entity) === $request->getPathInfo()) {
+                $this->currentSeoEntity->set($entity);
+            }
+        } catch (NotSeoEntityException $e) {
+            // Do nothing
         }
     }
 }
