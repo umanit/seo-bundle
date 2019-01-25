@@ -23,8 +23,11 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('redirect_code')->defaultValue(301)->end()
                 ->scalarNode('cache_service')->defaultValue('cache.app')->end()
                 ->arrayNode('metadata')->info('Defines the default metadata')
-                    ->scalarNode('default_title')->defaultValue('Umanit Seo - Customize this default title to your needs.')->end()
-                    ->scalarNode('default_description')->defaultValue('Umanit Seo - Customize this default description to your needs.')->end()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('default_title')->defaultValue('Umanit Seo - Customize this default title to your needs.')->end()
+                        ->scalarNode('default_description')->defaultValue('Umanit Seo - Customize this default description to your needs.')->end()
+                    ->end()
                 ->end()
             ->end()
         ;
