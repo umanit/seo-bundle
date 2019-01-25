@@ -44,4 +44,22 @@ class SeoPageController extends AbstractController
             'page' => $page,
         ]);
     }
+
+    /**
+     * @Route("/test/metadata/{slug}", name="app_test_metadata")
+     * @param string $slug
+     *
+     * @return Response
+     */
+    public function testMetadata(string $slug)
+    {
+        $page = $this->getDoctrine()->getRepository(SeoPage::class)->findOneBy(['slug' => $slug]);
+        if (null === $page) {
+            throw $this->createNotFoundException();
+        }
+
+        return $this->render('@AppTestBundle/seo_page/show_metadata.html.twig', [
+            'page' => $page,
+        ]);
+    }
 }

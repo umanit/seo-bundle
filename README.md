@@ -81,9 +81,15 @@ Usually, you'll want to use the `canonical()` function directly within your main
 
 ### Seo Metadata
 
-#### Set-up
+Use the `seo_metadata(your_entity)` twig function in your templates.
 
-In order to use Seo Metadata, you'll need again to tune-up your entity.
+SeoBundle will automatically find the most pertinent fields in your entity to deduct title and description.
+
+Again, `seo_metadata()` can be used without passing it any entity.
+
+#### Administrating metadata
+
+In order to administrate Seo Metadata, you'll need again to tune-up your entity.
 
 Make your entity implement the `HasSeoMetadataInterface` and use the `SeoMetadataTrait`
 
@@ -92,8 +98,8 @@ Make your entity implement the `HasSeoMetadataInterface` and use the `SeoMetadat
 
 namespace App\Entity;
 
-use Umanit\Bundle\TreeBundle\Model\HasSeoMetadataInterface;
-use Umanit\Bundle\TreeBundle\Model\SeoMetadataTrait;
+use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
+use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 
 class page implements HasSeoMetadataInterface
 {
@@ -103,18 +109,12 @@ class page implements HasSeoMetadataInterface
 }
 ```
 
-You can now use the `seo_metadata(your_entity)` twig function in your templates.
-
-SeoBundle will automatically find the most pertinent fields in your entity to deduct title and description if those are null.
-
-Again, `seo_metadata()` can be used without passing it any entity.
-
-#### Administrate metadata
-
-To administrate `title` and `description` metadata, use the `SeoMetadataType` form type.
+Next in your admin form, use the `SeoMetadataType` form type.
 
 ```php
 use Umanit\SeoBundle\Form\Type\SeoMetadataType;
 
 $builder->add('seoMetadata', SeoMetadataType::class);
 ```
+
+This will add a subform with two fields, `title` and `description`.
