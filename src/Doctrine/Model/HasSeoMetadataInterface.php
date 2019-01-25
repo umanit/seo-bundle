@@ -16,7 +16,7 @@ interface HasSeoMetadataInterface
      *
      * @return SeoMetadata
      */
-    public function getSeoMetadata(): SeoMetadata;
+    public function getSeoMetadata(): ?SeoMetadata;
 
     /**
      * Set the value of Seo Metadata.

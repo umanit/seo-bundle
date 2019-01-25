@@ -24,7 +24,7 @@ trait SeoMetadataTrait
      *
      * @return SeoMetadata
      */
-    public function getSeoMetadata(): SeoMetadata
+    public function getSeoMetadata(): ?SeoMetadata
     {
         return $this->seoMetadata;
     }
