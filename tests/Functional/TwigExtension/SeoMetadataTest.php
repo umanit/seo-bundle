@@ -5,6 +5,7 @@ namespace Umanit\SeoBundle\Tests\functional\TwigExtension;
 use AppTestBundle\Entity\SeoPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Umanit\SeoBundle\Entity\SeoMetadata;
 use Umanit\SeoBundle\Tests\WebTestCase;
 
 /**
@@ -72,6 +73,29 @@ HTML;
         $content = <<<HTML
 <meta name="title" content="seo-name" />
 <meta name="description" content="seo-introduction" />\n
+HTML;
+
+        $this->assertContains($content, $this->client->getResponse()->getContent());
+    }
+
+    public function testAdminedSeoMetadata()
+    {
+        $page        = (new SeoPage())->setSlug('test-seo-metadata-admined');
+        $sepMetadata = (new SeoMetadata())
+            ->setTitle('seo-title')
+            ->setDescription('seo-description')
+        ;
+        $page->setSeoMetadata($sepMetadata);
+        $this->em->persist($page);
+        $this->em->flush();
+        $this->em->refresh($page);
+        $this->em->clear();
+
+        $this->client->request('GET', '/page/test-seo-metadata-admined');
+
+        $content = <<<HTML
+<meta name="title" content="seo-title" />
+<meta name="description" content="seo-description" />\n
 HTML;
 
         $this->assertContains($content, $this->client->getResponse()->getContent());
