@@ -45,13 +45,35 @@ class SeoMetadataTest extends WebTestCase
         $this->em->refresh($page);
         $this->em->clear();
 
-        $this->client->request('GET', '/test/metadata/test-seo-metadata');
+        $this->client->request('GET', '/page/test-seo-metadata');
 
         $content = <<<HTML
 <meta name="title" content="Umanit Seo - Customize this default title to your needs." />
 <meta name="description" content="Umanit Seo - Customize this default description to your needs." />\n
 HTML;
 
-        $this->assertEquals($content, $this->client->getResponse()->getContent());
+        $this->assertContains($content, $this->client->getResponse()->getContent());
+    }
+
+    public function testDeductedSeoMetadata()
+    {
+        $page = (new SeoPage())
+            ->setSlug('test-seo-metadata-deducted')
+            ->setName('seo-name')
+            ->setIntroduction('seo-introduction')
+        ;
+        $this->em->persist($page);
+        $this->em->flush();
+        $this->em->refresh($page);
+        $this->em->clear();
+
+        $this->client->request('GET', '/page/test-seo-metadata-deducted');
+
+        $content = <<<HTML
+<meta name="title" content="seo-name" />
+<meta name="description" content="seo-introduction" />\n
+HTML;
+
+        $this->assertContains($content, $this->client->getResponse()->getContent());
     }
 }

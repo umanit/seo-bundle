@@ -51,7 +51,7 @@ class CanonicalTest extends WebTestCase
 <link rel="canonical" href="http://localhost/page/test-canonical"/>\n
 HTML;
 
-        $this->assertEquals($expected, $this->client->getResponse()->getContent());
+        $this->assertContains($expected, $this->client->getResponse()->getContent());
     }
 
     public function testCanonicalWithParameters()
@@ -64,8 +64,9 @@ HTML;
 
         $this->em->clear();
         $this->client->request('GET', '/test/canonical/with/parameters/test-canonical-params');
-
-        $this->assertEquals($this->client->getResponse()->getContent(), '<link rel="canonical" href="http://localhost/page/test-canonical-params"/>
-'); // Keep the line break like this
+        $expected = <<<HTML
+<link rel="canonical" href="http://localhost/page/test-canonical-params"/>
+HTML;
+        $this->assertContains($expected, $this->client->getResponse()->getContent());
     }
 }

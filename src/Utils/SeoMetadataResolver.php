@@ -67,7 +67,7 @@ class SeoMetadataResolver
      * @param object|null $entity
      * @param string      $metatype
      *
-     * @return string
+     * @return string string
      */
     private function meta(?object $entity, string $metatype): string
     {
@@ -83,6 +83,6 @@ class SeoMetadataResolver
         }
 
         // Otherwise, deduct the appropriate field
-        return $this->$metatype->fromEntity($entity);
+        return $this->$metatype->fromEntity($entity) ?? $this->metadataConfig['default_'.$metatype];
     }
 }

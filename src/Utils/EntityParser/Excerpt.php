@@ -62,10 +62,10 @@ class Excerpt
      * @param object $entity The object from which the excerpt is generated.
      * @param int    $length The max length of the excerpt.
      *
-     * @return string
+     * @return string|null ?string
      * @throws \ReflectionException
      */
-    public function fromEntity($entity, $length = 150): string
+    public function fromEntity($entity, $length = 150): ?string
     {
         $values = '';
         $refl   = new \ReflectionClass($entity);
@@ -74,13 +74,14 @@ class Excerpt
         $properties = $refl->getProperties();
 
         // Consider favourite keys first
-        uasort($properties, function(\ReflectionProperty $a, \ReflectionProperty $b) {
+        uasort($properties, function (\ReflectionProperty $a, \ReflectionProperty $b) {
             if (\in_array($a->getName(), $this::FAV_KEYS, true)) {
                 return -1;
             }
             if (\in_array($b->getName(), $this::FAV_KEYS, true)) {
                 return 1;
             }
+
             return 0;
         });
 
@@ -118,7 +119,9 @@ class Excerpt
             $values .= ' '.$value;
         }
 
-        return Html::trimText($values, $length);
+        $trim = Html::trimText($values, $length);
+
+        return '' === $trim ? null : $trim;
     }
 
 }
