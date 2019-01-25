@@ -50,3 +50,21 @@ services:
     umanit_seo.runtime.current_seo_entity:
         class: Umanit\SeoBundle\Runtime\CurrentSeoEntity
     Umanit\SeoBundle\Runtime\CurrentSeoEntity: '@umanit_seo.runtime.current_seo_entity'
+
+    # Utils
+    umanit_seo.utils_entity_parser.excerpt:
+        class: Umanit\SeoBundle\Utils\EntityParser\Excerpt
+        arguments: ['@property_accessor']
+    Umanit\SeoBundle\Utils\EntityParser\Excerpt: '@umanit_seo.utils_entity_parser.excerpt'
+
+    umanit_seo.utils_entity_parser.title:
+        class: Umanit\SeoBundle\Utils\EntityParser\Title
+        arguments: ['@property_accessor']
+    Umanit\SeoBundle\Utils\EntityParser\Title: '@umanit_seo.utils_entity_parser.title'
+
+    # Forms
+    umanit_seo.form_type.seo_metadata_type:
+        class: Umanit\SeoBundle\Form\Type\SeoMetadataType
+        arguments: ['@umanit_seo.utils_entity_parser.excerpt', '@umanit_seo.utils_entity_parser.title', '@translator', '%umanit_seo.metadata%']
+        tags:
+            - { name: form.type, alias: Umanit\SeoBundle\Form\Type\SeoMetadataType }
