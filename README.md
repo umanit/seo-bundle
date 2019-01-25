@@ -20,7 +20,7 @@ This bundle adds SEO capabilities for Doctrine entities.
 1. [Canonical and 301 redirects](#canonical-and-301-redirects)
 1. [Seo Metadata](#seo-metadate)
 
-### Canonical and 30 redirects
+### Canonical and 301 redirects
 
 In order to function properly, SeoBundle must be able to generate a URL for a given entity.
 
