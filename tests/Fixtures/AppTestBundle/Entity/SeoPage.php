@@ -3,6 +3,8 @@
 namespace AppTestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
+use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Annotation\Seo;
 
@@ -17,8 +19,10 @@ use Umanit\SeoBundle\Doctrine\Annotation\Seo;
  * })
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
-class SeoPage
+class SeoPage implements HasSeoMetadataInterface
 {
+    use SeoMetadataTrait;
+
     /**
      * The identifier of SeoPage.
      *
@@ -29,6 +33,22 @@ class SeoPage
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
+    /**
+     * The name of the SeoPage
+     *
+     * @var string
+     * @ORM\Column(nullable=true)
+     */
+    private $name;
+
+    /**
+     * The introduction of the SeoPage
+     *
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $introduction;
 
     /**
      * The slug of the SeoPage
@@ -62,6 +82,46 @@ class SeoPage
     public function setSlug(?string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return self
+     */
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntroduction(): ?string
+    {
+        return $this->introduction;
+    }
+
+    /**
+     * @param string $introduction
+     *
+     * @return self
+     */
+    public function setIntroduction(?string $introduction): self
+    {
+        $this->introduction = $introduction;
 
         return $this;
     }

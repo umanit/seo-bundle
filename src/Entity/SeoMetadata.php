@@ -1,6 +1,6 @@
 <?php
 
-namespace Umanit\SeoBundle\Doctrine\Entity;
+namespace Umanit\SeoBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

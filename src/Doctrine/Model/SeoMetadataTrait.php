@@ -1,8 +1,8 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Model;
+namespace Umanit\SeoBundle\Doctrine\Model;
 
-use Umanit\SeoBundle\Doctrine\Entity\SeoMetadata;
+use Umanit\SeoBundle\Entity\SeoMetadata;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -15,7 +15,7 @@ trait SeoMetadataTrait
     /**
      * @var SeoMetadata
      *
-     * @ORM\Embedded(class="Umanit\Bundle\TreeBundle\Entity\SeoMetadata", columnPrefix="seo_meta_")
+     * @ORM\Embedded(class="Umanit\SeoBundle\Entity\SeoMetadata", columnPrefix="seo_meta_")
      */
     protected $seoMetadata;
 

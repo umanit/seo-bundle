@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Umanit\SeoBundle\Doctrine\Entity\SeoMetadata;
+use Umanit\SeoBundle\Entity\SeoMetadata;
 use Umanit\SeoBundle\Utils\EntityParser\Excerpt;
 use Umanit\SeoBundle\Utils\EntityParser\Title;
 

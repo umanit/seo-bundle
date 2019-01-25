@@ -1,8 +1,8 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Model;
+namespace Umanit\SeoBundle\Doctrine\Model;
 
-use Umanit\SeoBundle\Doctrine\Entity\SeoMetadata;
+use Umanit\SeoBundle\Entity\SeoMetadata;
 
 /**
  * Class HasSeoMetadataInterface
