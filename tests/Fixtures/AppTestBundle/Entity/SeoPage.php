@@ -6,18 +6,20 @@ use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
-use Umanit\SeoBundle\Doctrine\Annotation\Seo;
+use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 
 /**
  * Class SeoPage
  *
  * @ORM\Entity()
- * @Seo(
+ * @Seo\Seo(
  *     routeName="app_test_page_show",
  *     routeParameters={
  *         @RouteParameter(parameter="slug", property="slug"),
  *         @RouteParameter(parameter="category", property="category.slug")
  * })
+ * @Seo\SchemaOrgBuilder("AppTestBundle\Service\SeoPageSchemaOrgBuilder")
+ *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class SeoPage implements HasSeoMetadataInterface

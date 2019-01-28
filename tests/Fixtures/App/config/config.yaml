@@ -28,3 +28,7 @@ doctrine:
 twig:
     paths:
         '%kernel.root_dir%/../AppTestBundle/Resource/views/': AppTestBundle
+
+services:
+    AppTestBundle\Service\SeoPageSchemaOrgBuilder:
+        public: true
