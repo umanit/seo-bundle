@@ -3,6 +3,7 @@
 
 namespace Umanit\SeoBundle\Tests\functional\TwigExtension;
 
+use AppTestBundle\Entity\Category;
 use AppTestBundle\Entity\SeoPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -52,5 +53,23 @@ HTML;
 
         $this->assertContains($expected, $this->client->getResponse()->getContent());
     }
+    /**
+     * Tests @SchemaOrgBuilder() annotation with method.
+     */
+    public function testSchemaOrgMethod()
+    {
+        $cat = (new Category())->setSlug('test-schema-org');
+        $this->em->persist($cat);
+        $this->em->flush();
+        $this->em->refresh($cat);
+        $this->em->clear();
 
+        $this->client->request('GET', '/category/test-schema-org');
+
+        $expected = <<<HTML
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"MensClothingStore","name":"Test","email":"test@umanit.fr","contactPoint":{"@type":"ContactPoint","areaServed":"Worldwide"}}</script>\n
+HTML;
+
+        $this->assertContains($expected, $this->client->getResponse()->getContent());
+    }
 }

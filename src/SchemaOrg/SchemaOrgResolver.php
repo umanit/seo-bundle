@@ -37,7 +37,29 @@ class SchemaOrgResolver implements ContainerAwareInterface
         try {
             $service = $this->container->get($serviceId);
         } catch (ServiceNotFoundException $e) {
-            throw new \ErrorException(sprintf('The SchemaBuilder "%s" must be declared public.', $serviceId));
+            if (class_exists($serviceId)) {
+                throw new \ErrorException(sprintf('The SchemaBuilder "%s" must be declared public.', $serviceId));
+            }
+            // Try to access via method
+            /** @noinspection GetClassUsageInspection */
+            $className = get_class($entity);
+            try {
+                $reflMethod = new \ReflectionMethod($className, $serviceId);
+            } catch (\ReflectionException $e) {
+                throw new \ErrorException(sprintf('Method "%s" of class "%s" does not exist.', $serviceId, $className));
+            }
+
+            if (!$reflMethod->isPublic()) {
+                throw new \ErrorException(sprintf('Method "%s" of class "%s" must be public.', $serviceId, $className));
+            }
+
+            $schema = $entity->{$serviceId}();
+
+            if (!$schema instanceof BaseType) {
+                throw new \ErrorException(sprintf('Return of "%s" must be of type "%s".', $className.'::'.$serviceId, BaseType::class));
+            }
+
+            return $schema;
         }
 
         if (!$service instanceof SchemaBuilderInterface) {

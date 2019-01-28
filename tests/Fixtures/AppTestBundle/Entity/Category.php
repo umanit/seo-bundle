@@ -3,15 +3,21 @@
 namespace AppTestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
-use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
+use Spatie\SchemaOrg\BaseType;
+use Spatie\SchemaOrg\Schema;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
-use Umanit\SeoBundle\Doctrine\Annotation\Seo;
+use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 
 /**
  * Class Category
  *
  * @ORM\Entity()
+ * @Seo\Seo(
+ *     routeName="app_test_category_show",
+ *     routeParameters={
+ *         @RouteParameter(parameter="slug", property="slug")
+ * })
+ * @Seo\SchemaOrgBuilder("buildSchemaOrg")
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class Category
@@ -62,5 +68,20 @@ class Category
         $this->slug = $slug;
 
         return $this;
+    }
+
+    /**
+     * Builds the schema.org.
+     *
+     * @return BaseType
+     */
+    public function buildSchemaOrg() : BaseType
+    {
+        return
+            Schema::mensClothingStore()
+                  ->name('Test')
+                  ->email('test@umanit.fr')
+                  ->contactPoint(Schema::contactPoint()->areaServed('Worldwide'))
+            ;
     }
 }
