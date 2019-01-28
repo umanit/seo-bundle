@@ -4,10 +4,12 @@ namespace Umanit\SeoBundle\Runtime\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
 use Umanit\SeoBundle\Exception\NotSeoEntityException;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
+use Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver;
 use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 /**
@@ -28,17 +30,27 @@ class SeoExtension extends AbstractExtension
     /** @var SeoMetadataResolver */
     private $metadataResolver;
 
+    /** @var SchemaOrgResolver */
+    private $schemaOrgResolver;
+
     /**
      * SeoExtension constructor.
      *
-     * @param Canonical        $canonical
-     * @param CurrentSeoEntity $currentSeoEntity
+     * @param Canonical           $canonical
+     * @param CurrentSeoEntity    $currentSeoEntity
+     * @param SeoMetadataResolver $metadataResolver
+     * @param SchemaOrgResolver   $schemaOrgResolver
      */
-    public function __construct(Canonical $canonical, CurrentSeoEntity $currentSeoEntity, SeoMetadataResolver $metadataResolver)
-    {
-        $this->canonical        = $canonical;
-        $this->currentSeoEntity = $currentSeoEntity;
-        $this->metadataResolver = $metadataResolver;
+    public function __construct(
+        Canonical $canonical,
+        CurrentSeoEntity $currentSeoEntity,
+        SeoMetadataResolver $metadataResolver,
+        SchemaOrgResolver $schemaOrgResolver
+    ) {
+        $this->canonical         = $canonical;
+        $this->currentSeoEntity  = $currentSeoEntity;
+        $this->metadataResolver  = $metadataResolver;
+        $this->schemaOrgResolver = $schemaOrgResolver;
     }
 
     public function getFunctions()
@@ -46,6 +58,7 @@ class SeoExtension extends AbstractExtension
         return [
             new TwigFunction('canonical', [$this, 'canonical'], ['is_safe' => ['html']]),
             new TwigFunction('seo_metadata', [$this, 'seoMetadata'], ['is_safe' => ['html']]),
+            new TwigFunction('seo_schema_org', [$this, 'seoSchemaOrg'], ['is_safe' => ['html', 'javascript']]),
         ];
     }
 
@@ -73,6 +86,13 @@ class SeoExtension extends AbstractExtension
         return '';
     }
 
+    /**
+     * Generates and displays the seo metadata.
+     *
+     * @param object|null $entity
+     *
+     * @return string
+     */
     public function seoMetadata(?object $entity = null)
     {
         return strtr(<<<HTML
@@ -83,5 +103,30 @@ HTML
                 '%title%'       => $this->metadataResolver->metaTitle($entity ?? $this->currentSeoEntity->get()),
                 '%description%' => $this->metadataResolver->metaDescription($entity ?? $this->currentSeoEntity->get()),
             ]);
+    }
+
+    /**
+     * Display the seo schema org from an entity or the current one.
+     *
+     * @param object|null $entity
+     *
+     * @return string
+     * @throws NotSchemaOrgEntityException
+     * @throws \ReflectionException
+     */
+    public function seoSchemaOrg(?object $entity = null): string
+    {
+        try {
+            return $this->schemaOrgResolver->getSchemaBuilder(
+                $entity ?? $this->currentSeoEntity->get()
+            )->toScript()
+                ;
+        } catch (NotSchemaOrgEntityException $e) {
+            if (null !== $entity) {
+                throw $e;
+            }
+        }
+
+        return '<script>console.error("Unable generate microdata schema.")</script>';
     }
 }

@@ -39,7 +39,7 @@ services:
     # Twig Extension
     umanit_seo.runtime_twig.seo_extension:
         class: Umanit\SeoBundle\Runtime\Twig\SeoExtension
-        arguments: ['@umanit_seo.routing.canonical', '@umanit_seo.runtime.current_seo_entity', '@umanit_seo.utils.seo_metadata_resolver']
+        arguments: ['@umanit_seo.routing.canonical', '@umanit_seo.runtime.current_seo_entity', '@umanit_seo.utils.seo_metadata_resolver', '@umanit_seo.schema_org.schema_org_resolver']
         calls:
             - [setAnnotationReader, ['@annotations.cached_reader']]
         tags:
@@ -75,3 +75,11 @@ services:
         class: Umanit\SeoBundle\Utils\SeoMetadataResolver
         arguments: ['@umanit_seo.utils_entity_parser.title', '@umanit_seo.utils_entity_parser.excerpt', '%umanit_seo.metadata%']
     Umanit\SeoBundle\Utils\SeoMetadataResolver: '@umanit_seo.utils.seo_metadata_resolver'
+
+    # SchemaOrg Resolver
+    umanit_seo.schema_org.schema_org_resolver:
+        class: Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver
+        calls:
+            - [setAnnotationReader, ['@annotations.cached_reader']]
+            - [setContainer, ['@service_container']]
+    Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver: '@umanit_seo.schema_org.schema_org_resolver'
