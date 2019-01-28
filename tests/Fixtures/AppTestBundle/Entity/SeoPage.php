@@ -15,7 +15,8 @@ use Umanit\SeoBundle\Doctrine\Annotation\Seo;
  * @Seo(
  *     routeName="app_test_page_show",
  *     routeParameters={
- *         @RouteParameter(parameter="slug", property="slug")
+ *         @RouteParameter(parameter="slug", property="slug"),
+ *         @RouteParameter(parameter="category", property="category.slug")
  * })
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
@@ -57,6 +58,17 @@ class SeoPage implements HasSeoMetadataInterface
      * @ORM\Column()
      */
     private $slug;
+
+    /**
+     * @var Category
+     * @ORM\ManyToOne(targetEntity="AppTestBundle\Entity\Category", cascade={"all"})
+     */
+    private $category;
+
+    public function __construct()
+    {
+        $this->category = (new Category())->setSlug('my-category');
+    }
 
     /**
      * @return int
@@ -122,6 +134,26 @@ class SeoPage implements HasSeoMetadataInterface
     public function setIntroduction(?string $introduction): self
     {
         $this->introduction = $introduction;
+
+        return $this;
+    }
+
+    /**
+     * @return Category
+     */
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param Category $category
+     *
+     * @return self
+     */
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }

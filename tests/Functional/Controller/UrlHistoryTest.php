@@ -40,7 +40,7 @@ class UrlHistoryTest extends WebTestCase
         $page->setSlug('new-slug');
         $this->saveSeoPage($page);
         // Try and access the old route
-        $this->client->request('GET', '/page/former-slug');
+        $this->client->request('GET', '/page/my-category/former-slug');
         // Assert redirect to the new one
         $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
     }

@@ -46,7 +46,7 @@ class SeoMetadataTest extends WebTestCase
         $this->em->refresh($page);
         $this->em->clear();
 
-        $this->client->request('GET', '/page/test-seo-metadata');
+        $this->client->request('GET', '/page/my-category/test-seo-metadata');
 
         $content = <<<HTML
 <meta name="title" content="Umanit Seo - Customize this default title to your needs." />
@@ -68,7 +68,7 @@ HTML;
         $this->em->refresh($page);
         $this->em->clear();
 
-        $this->client->request('GET', '/page/test-seo-metadata-deducted');
+        $this->client->request('GET', '/page/my-category/test-seo-metadata-deducted');
 
         $content = <<<HTML
 <meta name="title" content="seo-name" />
@@ -91,7 +91,7 @@ HTML;
         $this->em->refresh($page);
         $this->em->clear();
 
-        $this->client->request('GET', '/page/test-seo-metadata-admined');
+        $this->client->request('GET', '/page/my-category/test-seo-metadata-admined');
 
         $content = <<<HTML
 <meta name="title" content="seo-title" />

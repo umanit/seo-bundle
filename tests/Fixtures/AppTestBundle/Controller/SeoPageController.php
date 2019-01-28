@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class SeoPageController extends AbstractController
 {
     /**
-     * @Route("/page/{slug}", name="app_test_page_show")
+     * @Route("/page/{category}/{slug}", name="app_test_page_show")
      * @param string $slug
      *
      * @return Response
