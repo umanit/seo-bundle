@@ -12,6 +12,6 @@ use Umanit\SeoBundle\Doctrine\Annotation\Seo;
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
-class NotSeoEntityException extends \Exception
+class NotSeoEntityException extends \ErrorException
 {
 }
