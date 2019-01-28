@@ -10,11 +10,11 @@ use Umanit\SeoBundle\Model\AutoSetterConstructorTrait;
  * @Annotation
  * @Target("CLASS")
  *
- * Annotation class for @Seo().
+ * Annotation class for @Route().
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
-class Seo
+class Route
 {
     use AutoSetterConstructorTrait;
 

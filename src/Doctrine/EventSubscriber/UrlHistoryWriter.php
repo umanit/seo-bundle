@@ -9,15 +9,15 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Umanit\SeoBundle\Doctrine\Annotation\Seo;
-use Umanit\SeoBundle\Exception\NotSeoEntityException;
+use Umanit\SeoBundle\Doctrine\Annotation\Route;
+use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
 use Umanit\SeoBundle\Routing\Canonical;
 
 /**
  * Class UrlHistoryWriter
  *
  * Writes the url history log on update
- * of an entity annotated @Seo().
+ * of an entity annotated @Route().
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
@@ -64,7 +64,7 @@ class UrlHistoryWriter implements EventSubscriber
         $changeSet = $args->getEntityChangeSet();
 
         try {
-            $seoAnnotation = $this->getSeoAnnotation($entity);
+            $seoAnnotation = $this->getSeoRouteAnnotation($entity);
             // Build the new path
             $newPath = $this->urlBuilder->path($entity);
             // Get old values
@@ -90,7 +90,7 @@ class UrlHistoryWriter implements EventSubscriber
 
             // Add the redirection to the pool
             $this->urlPool->add($oldPath, $newPath, $entity);
-        } catch (NotSeoEntityException $e) {
+        } catch (NotSeoRouteEntityException $e) {
             return;
         }
 

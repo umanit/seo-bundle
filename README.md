@@ -24,9 +24,9 @@ This bundle adds SEO capabilities for Doctrine entities.
 
 In order to function properly, SeoBundle must be able to generate a URL for a given entity.
 
-**Add the `@Seo` annotation to your entity**
+**Add the `@Seo\Route` annotation to your entity**
 
-The `@Seo` annotation needs to know how to generate a url from the entity.
+The `@Seo\Route` annotation needs to know how to generate a url from the entity.
 The first argument is the route name associated to your entity, the second is the parameters needed to generate the route.
 
 `routeParameters` takes as many `@RouteParameter` as needed.
@@ -47,7 +47,7 @@ use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 /**
  * Class SeoPage
  *
- * @Seo\Seo(
+ * @Seo\Route(
  *     routeName="app_page_show",
  *     routeParameters={
  *         @RouteParameter(parameter="slug", property="slug")

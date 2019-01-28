@@ -2,11 +2,12 @@
 
 namespace Umanit\SeoBundle\Model;
 
+use Doctrine\ORM\Proxy\Proxy;
 use Umanit\SeoBundle\Doctrine\Annotation\SchemaOrgBuilder;
-use Umanit\SeoBundle\Doctrine\Annotation\Seo;
+use Umanit\SeoBundle\Doctrine\Annotation\Route;
 use Doctrine\Common\Annotations\Reader as AnnotationsReader;
 use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
-use Umanit\SeoBundle\Exception\NotSeoEntityException;
+use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
 
 /**
  * Trait AnnotationReaderTrait
@@ -32,36 +33,37 @@ trait AnnotationReaderTrait
     }
 
     /**
-     * Returns the @Seo() annotation of an entity.
+     * Returns the @Route() annotation of an entity.
      *
-     * @param      $entity
+     * @param $entity
      *
-     * @return Seo
-     * @throws NotSeoEntityException
+     * @return Route
+     * @throws NotSeoRouteEntityException
      * @throws \ReflectionException
      */
-    public function getSeoAnnotation($entity): Seo
+    public function getSeoRouteAnnotation($entity): Route
     {
         if (!is_object($entity)) {
-            throw new NotSeoEntityException(sprintf('A scalar cannot be annotated by Seo(). Cannot use SEO features from it.'));
+            throw new NotSeoRouteEntityException(sprintf('A scalar cannot be annotated by Seo\Route(). Cannot use Seo routing features from it.'));
         }
-        $seo = $this->annotationsReader->getClassAnnotation(
-            new \ReflectionClass(get_class($entity)),
-            Seo::class
+
+        $route = $this->annotationsReader->getClassAnnotation(
+            new \ReflectionClass($this->getClass($entity)),
+            Route::class
         );
 
-        if (null === $seo) {
-            throw new NotSeoEntityException(sprintf('Entity of type "%s" is not annotated by Seo(). Cannot use SEO features from it.', get_class($entity)));
+        if (null === $route) {
+            throw new NotSeoRouteEntityException(sprintf('Entity of type "%s" is not annotated by Seo\Route(). Cannot use Seo routing features from it.', $this->getClass($entity)));
         }
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $seo;
+        return $route;
     }
 
     /**
      * Returns the @SchemaOrg() annotation of an entity.
      *
-     * @param      $entity
+     * @param $entity
      *
      * @return SchemaOrgBuilder
      * @throws NotSchemaOrgEntityException
@@ -72,16 +74,31 @@ trait AnnotationReaderTrait
         if (!is_object($entity)) {
             throw new NotSchemaOrgEntityException(sprintf('A scalar cannot be annotated by SchemaOrg(). Cannot use generate schema from it.'));
         }
-        $seo = $this->annotationsReader->getClassAnnotation(
-            new \ReflectionClass(get_class($entity)),
+
+        $schemaOrgBuilder = $this->annotationsReader->getClassAnnotation(
+            new \ReflectionClass($this->getClass($entity)),
             SchemaOrgBuilder::class
         );
 
-        if (null === $seo) {
+        if (null === $schemaOrgBuilder) {
             throw new NotSchemaOrgEntityException(sprintf('Entity of type "%s" is not annotated by SchemaOrg(). Cannot use generate schema from it.', get_class($entity)));
         }
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $seo;
+        return $schemaOrgBuilder;
+    }
+
+    /**
+     * Returns the entity class.
+     *
+     * @param object $entity
+     *
+     * @return string
+     */
+    private function getClass(object $entity): string
+    {
+        return ($entity instanceof Proxy)
+            ? get_parent_class($entity)
+            : get_class($entity);
     }
 }

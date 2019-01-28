@@ -5,7 +5,7 @@ namespace Umanit\SeoBundle\Runtime\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
-use Umanit\SeoBundle\Exception\NotSeoEntityException;
+use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
@@ -73,11 +73,12 @@ class SeoExtension extends AbstractExtension
     public function canonical(?object $entity = null, array $overrides = []): string
     {
         try {
+            /** @noinspection HtmlUnknownTarget */
             return sprintf('<link rel="canonical" href="%s"/>', $this->canonical->url(
                 $entity ?? $this->currentSeoEntity->get(),
                 $overrides
             ));
-        } catch (NotSeoEntityException $e) {
+        } catch (NotSeoRouteEntityException $e) {
             if (null !== $entity) {
                 throw $e;
             }

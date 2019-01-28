@@ -6,14 +6,14 @@ use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
-use Umanit\SeoBundle\Doctrine\Annotation\Seo;
-use Umanit\SeoBundle\Exception\NotSeoEntityException;
+use Umanit\SeoBundle\Doctrine\Annotation\Route;
+use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
 
 /**
  * Class Canonical
  *
  * Used to generate links from
- * an entity annotated by @Seo().
+ * an entity annotated by @Route().
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
@@ -41,20 +41,20 @@ class Canonical
     /**
      * Returns a canonical path.
      *
-     * @param object $entity    An entity annotated by @Seo()
+     * @param object $entity    An entity annotated by @Route()
      * @param array  $overrides An associative array used to override field values if needed.
      *
      * @return string
-     * @throws NotSeoEntityException
+     * @throws NotSeoRouteEntityException
      */
     public function path($entity, array $overrides = []): string
     {
-        /** @var Seo $seo */
-        $seo = $this->getSeoAnnotation($entity);
+        /** @var Route $route */
+        $route = $this->getSeoRouteAnnotation($entity);
 
-        $params = $this->buildParams($seo, $entity, $overrides);
+        $params = $this->buildParams($route, $entity, $overrides);
 
-        return $this->urlGenerator->generate($seo->getRouteName(), $params);
+        return $this->urlGenerator->generate($route->getRouteName(), $params);
     }
 
     /**
@@ -64,28 +64,28 @@ class Canonical
      * @param array  $overrides An associative array used to override field values if needed.
      *
      * @return string
-     * @throws NotSeoEntityException
+     * @throws NotSeoRouteEntityException
      */
     public function url($entity, array $overrides = []): string
     {
-        /** @var Seo $seo */
-        $seo = $this->getSeoAnnotation($entity);
+        /** @var Route $route */
+        $route = $this->getSeoRouteAnnotation($entity);
 
-        $params = $this->buildParams($seo, $entity, $overrides);
+        $params = $this->buildParams($route, $entity, $overrides);
 
-        return $this->urlGenerator->generate($seo->getRouteName(), $params, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate($route->getRouteName(), $params, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**
      * Builds the route params.
      *
-     * @param Seo    $seo
-     * @param object $entity    An entity annotated by @Seo()
+     * @param Route    $seo
+     * @param object $entity    An entity annotated by @Route()
      * @param array  $overrides An associative array used to override field values if needed.
      *
      * @return array
      */
-    private function buildParams(Seo $seo, $entity, array $overrides = []): array
+    private function buildParams(Route $seo, $entity, array $overrides = []): array
     {
         $params = [];
         foreach ($seo->getRouteParameters() as $routeParam) {

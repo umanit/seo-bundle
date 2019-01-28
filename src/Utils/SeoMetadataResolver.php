@@ -75,11 +75,8 @@ class SeoMetadataResolver
             return $this->metadataConfig['default_'.$metatype];
         }
 
-        if ($entity instanceof HasSeoMetadataInterface) {
-            // Look if the attribute is null
-            if (null !== $entity->getSeoMetadata()->{'get'.ucfirst($metatype)}()) {
-                return $entity->getSeoMetadata()->{'get'.ucfirst($metatype)}();
-            }
+        if (($entity instanceof HasSeoMetadataInterface) && null !== $entity->getSeoMetadata()->{'get'.ucfirst($metatype)}()) {
+            return $entity->getSeoMetadata()->{'get'.ucfirst($metatype)}();
         }
 
         // Otherwise, deduct the appropriate field

@@ -12,7 +12,7 @@ use Umanit\SeoBundle\Doctrine\Annotation as Seo;
  * Class Category
  *
  * @ORM\Entity()
- * @Seo\Seo(
+ * @Seo\Route(
  *     routeName="app_test_category_show",
  *     routeParameters={
  *         @RouteParameter(parameter="slug", property="slug")

@@ -6,7 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Umanit\SeoBundle\Exception\NotSeoEntityException;
+use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
 
@@ -66,7 +66,7 @@ class CurrentEntityResolver implements EventSubscriber
             if (null === $this->currentSeoEntity->get() && $this->canonical->path($entity) === $request->getPathInfo()) {
                 $this->currentSeoEntity->set($entity);
             }
-        } catch (NotSeoEntityException $e) {
+        } catch (NotSeoRouteEntityException $e) {
             // Do nothing
         }
     }

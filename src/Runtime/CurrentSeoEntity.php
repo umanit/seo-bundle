@@ -2,11 +2,13 @@
 
 namespace Umanit\SeoBundle\Runtime;
 
+use Umanit\SeoBundle\Doctrine\Annotation\Route;
+
 /**
  * Class CurrentSeoEntity
  *
  * Represents the currently requested
- * Seo entity on the current route.
+ * Seo @Route() entity on the current route.
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
