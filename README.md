@@ -7,8 +7,8 @@ This bundle adds SEO capabilities for Doctrine entities.
 - [x] 301 Redirects when accessing an old URL
 - [x] SEO Metadata (title and description)
 - [x] Canonical URL
+- [x] Schema.org
 - [ ] Sitemap
-- [ ] Schema.org
 
 ## Installation
 
@@ -42,12 +42,12 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
-use Umanit\SeoBundle\Doctrine\Annotation\Seo;
+use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 
 /**
  * Class SeoPage
  *
- * @Seo(
+ * @Seo\Seo(
  *     routeName="app_page_show",
  *     routeParameters={
  *         @RouteParameter(parameter="slug", property="slug")
@@ -118,3 +118,68 @@ $builder->add('seoMetadata', SeoMetadataType::class);
 ```
 
 This will add a subform with two fields, `title` and `description`.
+
+### Schema.org implementation
+
+To generate valid [schema.org](https://schema.org/) json microdata, add the `@Seo\SchemaOrgBuilder` annotation to your entity.
+
+This annotation takes either a service id or a method of the entity.
+
+Use the library [spatie/schema-org](https://github.com/spatie/schema-org) to generate your schema.
+
+__Example:__
+
+```php
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Umanit\SeoBundle\Doctrine\Annotation as Seo;
+use Spatie\SchemaOrg\BaseType;
+use Spatie\SchemaOrg\Schema;
+
+/**
+ * @ORM\Entity()
+ * @Seo\SchemaOrgBuilder("buildSchemaOrg")
+ */
+class page
+{
+    // ...
+    
+    /**
+     * Builds the schema.org.
+     *
+     * @return BaseType
+     */
+    public function buildSchemaOrg() : BaseType
+    {
+        // Build the schema.org to you needs.
+        return
+            Schema::mensClothingStore()
+                  ->name($this->getName())
+                  ->email($this->getAuthor()->getEmail())
+                  ->contactPoint(Schema::contactPoint()->areaServed('Worldwide'))
+            ;
+    }
+}
+```
+
+Next, add the twig function `seo_schema_org()` at the bottom of your layout.
+
+The function will format and display the json schema of the current entity as you defined it.
+
+```html
+<script type="application/ld+json">
+{
+    "@context": "https:\/\/schema.org",
+    "@type": "MensClothingStore",
+    "name": "Test",
+    "email": "test@umanit.fr",
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "areaServed": "Worldwide"
+    }
+}
+</script>\n
+```
