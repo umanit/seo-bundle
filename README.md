@@ -18,7 +18,9 @@ This bundle adds SEO capabilities for Doctrine entities.
 ## Usage
 
 1. [Canonical and 301 redirects](#canonical-and-301-redirects)
-1. [Seo Metadata](#seo-metadate)
+1. [Seo Metadata](#seo-metadata)
+1. [Schema.org](#schema.org-implementation)
+1. [Breadcrumb](#breadcrumb)
 
 ### Canonical and 301 redirects
 
@@ -72,7 +74,7 @@ If you wanted to generate the URL by yourself you would have done something like
 You can now do like so:
 
 ```twig
-{{ canonical(my_page) }}
+{{ seo_canonical(my_page) }}
 ```
 
 ___Note:__ You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve the entity associated to the current accessed route and generate the url from it._
@@ -182,4 +184,53 @@ The function will format and display the json schema of the current entity as yo
     }
 }
 </script>\n
+```
+
+### Breadcrumb
+
+You can easily generate your breadcrumb in 3 different formats; `Microdata`, `RDFa` or `JSON-LD` as described by [the specification](https://schema.org/BreadcrumbList).
+
+Use the `@Seo\Breadcrumb` annotation on your entity. It takes two arguments, the first one is a collection of `@Seo\BreadcrumbItem`, the second one is the format you want, default is `'microdata'`.
+
+```php
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
+use Umanit\SeoBundle\Doctrine\Annotation as Seo;
+
+/**
+ * @ORM\Entity()
+ * @Seo\Route(
+ *     routeName="app_page_show",
+ *     routeParameters={
+ *         @RouteParameter(parameter="slug", property="slug"),
+ *         @RouteParameter(parameter="category", property="category.slug")
+ * })
+ * @Seo\Breadcrumb({
+ *     @Seo\BreadcrumbItem("app_home_page", name="Home"),
+ *     @Seo\BreadcrumbItem("category", name="category.slug"),
+ *     @Seo\BreadcrumbItem(name="name"),
+ * })
+ */
+class SeoPage
+{
+    
+}
+```
+
+`@Seo\BreadcrumbItem` takes two optional arguments:
+1. `value` (the first arg) is either a route name, or the path to a child entity.
+ /!\ The child entity must also be annotated with `Seo\Route`. It is used to generate the url of the breadcrumb item.
+  **Note:** leave it blank to generate a url from `$this` (`SeoPage` in this example).
+1. `name` is either a path to a property of the current entity or a simple string.
+
+You can now use the twig function `seo_breadcrumb()` like the following examples:
+
+```twig
+{{ seo_breadcrumb() }} {# Will generate the breadcrumb from the current entity using microdata format #}
+{{ seo_breadcrumb(entity=my_entity, format='json-ld') }} {# Will generate the breadcrumb from my_entity using json-ld format #}
+{{ seo_breadcrumb(format='rdfa') }} {# Will generate the breadcrumb from the current entity using rdfa format #}
 ```
