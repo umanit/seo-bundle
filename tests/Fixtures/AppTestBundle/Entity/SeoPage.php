@@ -19,6 +19,11 @@ use Umanit\SeoBundle\Doctrine\Annotation as Seo;
  *         @RouteParameter(parameter="category", property="category.slug")
  * })
  * @Seo\SchemaOrgBuilder("AppTestBundle\Service\SeoPageSchemaOrgBuilder")
+ * @Seo\Breadcrumb({
+ *     @Seo\BreadcrumbItem("app_test_home_page", name="Home"),
+ *     @Seo\BreadcrumbItem("category", name="category.slug"),
+ *     @Seo\BreadcrumbItem(name="name"),
+ * })
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */

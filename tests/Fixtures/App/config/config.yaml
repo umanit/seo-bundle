@@ -10,6 +10,9 @@ framework:
         resource: '%kernel.root_dir%/config/routing.yaml'
         strict_requirements: ~
     test: ~
+    templating:
+        engines:
+            - twig
 doctrine:
     dbal:
         driver: pdo_sqlite
@@ -28,7 +31,6 @@ doctrine:
 twig:
     paths:
         '%kernel.root_dir%/../AppTestBundle/Resource/views/': AppTestBundle
-
 services:
     AppTestBundle\Service\SeoPageSchemaOrgBuilder:
         public: true
