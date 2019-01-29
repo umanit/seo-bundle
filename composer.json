@@ -29,7 +29,8 @@
         "twig/extensions": "^1.5",
         "symfony/form": "^4.2",
         "symfony/translation": "^4.2",
-        "spatie/schema-org": "^2.1"
+        "spatie/schema-org": "^2.1",
+        "symfony/templating": "^4.2"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "4.2.*",

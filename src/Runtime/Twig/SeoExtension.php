@@ -4,9 +4,10 @@ namespace Umanit\SeoBundle\Runtime\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder;
+use Umanit\SeoBundle\Exception\NotBreadcrumbEntityException;
 use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
 use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
-use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
 use Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver;
@@ -19,8 +20,6 @@ use Umanit\SeoBundle\Utils\SeoMetadataResolver;
  */
 class SeoExtension extends AbstractExtension
 {
-    use AnnotationReaderTrait;
-
     /** @var Canonical */
     private $canonical;
 
@@ -32,6 +31,9 @@ class SeoExtension extends AbstractExtension
 
     /** @var SchemaOrgResolver */
     private $schemaOrgResolver;
+
+    /** @var BreadcrumbBuilder */
+    private $breadcrumbBuilder;
 
     /**
      * SeoExtension constructor.
@@ -45,20 +47,24 @@ class SeoExtension extends AbstractExtension
         Canonical $canonical,
         CurrentSeoEntity $currentSeoEntity,
         SeoMetadataResolver $metadataResolver,
-        SchemaOrgResolver $schemaOrgResolver
+        SchemaOrgResolver $schemaOrgResolver,
+        BreadcrumbBuilder $breadcrumbBuilder
     ) {
+
         $this->canonical         = $canonical;
         $this->currentSeoEntity  = $currentSeoEntity;
         $this->metadataResolver  = $metadataResolver;
         $this->schemaOrgResolver = $schemaOrgResolver;
+        $this->breadcrumbBuilder = $breadcrumbBuilder;
     }
 
     public function getFunctions()
     {
         return [
-            new TwigFunction('canonical', [$this, 'canonical'], ['is_safe' => ['html']]),
-            new TwigFunction('seo_metadata', [$this, 'seoMetadata'], ['is_safe' => ['html']]),
-            new TwigFunction('seo_schema_org', [$this, 'seoSchemaOrg'], ['is_safe' => ['html', 'javascript']]),
+            new TwigFunction('seo_canonical', [$this, 'canonical'], ['is_safe' => ['html']]),
+            new TwigFunction('seo_metadata', [$this, 'metadata'], ['is_safe' => ['html']]),
+            new TwigFunction('seo_schema_org', [$this, 'schemaOrg'], ['is_safe' => ['html', 'javascript']]),
+            new TwigFunction('seo_breadcrumb', [$this, 'breadcrumb'], ['is_safe' => ['html', 'javascript']]),
         ];
     }
 
@@ -94,7 +100,7 @@ class SeoExtension extends AbstractExtension
      *
      * @return string
      */
-    public function seoMetadata(?object $entity = null)
+    public function metadata(?object $entity = null): string
     {
         return strtr(<<<HTML
 <meta name="title" content="%title%" />
@@ -115,7 +121,7 @@ HTML
      * @throws NotSchemaOrgEntityException
      * @throws \ReflectionException
      */
-    public function seoSchemaOrg(?object $entity = null): string
+    public function schemaOrg(?object $entity = null): string
     {
         try {
             return $this->schemaOrgResolver->getSchemaBuilder(
@@ -129,5 +135,32 @@ HTML
         }
 
         return '<script>console.error("Unable generate microdata schema.")</script>';
+    }
+
+    /**
+     * Display the seo schema org from an entity or the current one.
+     *
+     * @param object|null $entity
+     * @param string      $format
+     *
+     * @return string
+     * @throws NotBreadcrumbEntityException
+     * @throws NotSeoRouteEntityException
+     * @throws \ErrorException
+     */
+    public function breadcrumb(?object $entity = null, $format = null): string
+    {
+        try {
+            return $this->breadcrumbBuilder->buildBreadcrumb(
+                $entity ?? $this->currentSeoEntity->get(),
+                $format
+            );
+        } catch (NotBreadcrumbEntityException $e) {
+            if (null !== $entity) {
+                throw $e;
+            }
+        }
+
+        return '';
     }
 }
