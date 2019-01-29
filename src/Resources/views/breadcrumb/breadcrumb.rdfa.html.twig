@@ -1,0 +1,12 @@
+{# This is the template for breadcrumb in RDFa format #}
+{% if items is not empty %}
+<ol vocab="http://schema.org/" typeof="BreadcrumbList">
+{% for item in items %}
+    <li property="itemListElement" typeof="ListItem">
+        <a property="item" typeof="WebPage" href="{{ item.url }}">
+            <span property="name">{{ item.name }}</span></a>
+        <meta property="position" content="{{ loop.index }}">
+    </li>
+{% endfor %}
+</ol>
+{% endif %}

@@ -1,0 +1,13 @@
+{# This is the template for breadcrumb in Microdata format #}
+{%- if items is not empty %}
+<ol itemscope itemtype="http://schema.org/BreadcrumbList">
+{% for item in items %}
+    <li itemprop="itemListElement" itemscope
+        itemtype="http://schema.org/ListItem">
+        <a itemprop="item" href="{{ item.url }}">
+            <span itemprop="name">{{ item.name }}</span></a>
+        <meta itemprop="position" content="{{ loop.index }}"/>
+    </li>
+{% endfor %}
+</ol>
+{%- endif %}
