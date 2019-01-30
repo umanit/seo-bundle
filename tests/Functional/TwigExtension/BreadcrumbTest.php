@@ -39,12 +39,11 @@ class BreadcrumbTest extends WebTestCase
     public function testBreadcrumbMicrodata()
     {
         $page = (new SeoPage())->setSlug('test-breadcrumb-microdata');
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $category = $page->getCategory()->setSlug('category-microdata');
+        $this->save($page);
 
-        $this->client->request('GET', '/page/my-category/test-breadcrumb-microdata');
+
+        $this->client->request('GET', '/page/category-microdata/test-breadcrumb-microdata');
 
         $expected = <<<HTML
 <ol itemscope itemtype="http://schema.org/BreadcrumbList">
@@ -56,13 +55,13 @@ class BreadcrumbTest extends WebTestCase
     </li>
     <li itemprop="itemListElement" itemscope
         itemtype="http://schema.org/ListItem">
-        <a itemprop="item" href="http://localhost/category/my-category">
-            <span itemprop="name">my-category</span></a>
+        <a itemprop="item" href="http://localhost/category/category-microdata">
+            <span itemprop="name">category-microdata</span></a>
         <meta itemprop="position" content="2"/>
     </li>
     <li itemprop="itemListElement" itemscope
         itemtype="http://schema.org/ListItem">
-        <a itemprop="item" href="http://localhost/page/my-category/test-breadcrumb-microdata">
+        <a itemprop="item" href="http://localhost/page/category-microdata/test-breadcrumb-microdata">
             <span itemprop="name"></span></a>
         <meta itemprop="position" content="3"/>
     </li>
@@ -77,15 +76,14 @@ HTML;
     public function testBreadcrumbJsonLd()
     {
         $page = (new SeoPage())->setSlug('test-breadcrumb-json-ld');
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $category = $page->getCategory()->setSlug('category-json-ld');
+        $this->save($page);
 
-        $this->client->request('GET', '/page/my-category/test-breadcrumb-json-ld');
+
+        $this->client->request('GET', '/page/category-json-ld/test-breadcrumb-json-ld');
 
         $expected = <<<HTML
-<script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"BreadcrumbList","itemListElement":{"@type":"ListItem","position":3,"item":{"@id":"http:\/\/localhost\/page\/my-category\/test-breadcrumb-json-ld","name":null}}}</script>
+<script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"BreadcrumbList","itemListElement":{"@type":"ListItem","position":3,"item":{"@id":"http:\/\/localhost\/page\/category-json-ld\/test-breadcrumb-json-ld","name":null}}}</script>
 HTML;
         $this->assertContains($expected, $this->client->getResponse()->getContent());
     }
@@ -96,12 +94,11 @@ HTML;
     public function testBreadcrumbRdfa()
     {
         $page = (new SeoPage())->setSlug('test-breadcrumb-rdfa');
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $category = $page->getCategory()->setSlug('category-rdfa');
+        $this->save($page);
 
-        $this->client->request('GET', '/page/my-category/test-breadcrumb-rdfa');
+
+        $this->client->request('GET', '/page/category-rdfa/test-breadcrumb-rdfa');
 
         $expected = <<<HTML
 <ol vocab="http://schema.org/" typeof="BreadcrumbList">
@@ -111,17 +108,25 @@ HTML;
         <meta property="position" content="1">
     </li>
     <li property="itemListElement" typeof="ListItem">
-        <a property="item" typeof="WebPage" href="http://localhost/category/my-category">
-            <span property="name">my-category</span></a>
+        <a property="item" typeof="WebPage" href="http://localhost/category/category-rdfa">
+            <span property="name">category-rdfa</span></a>
         <meta property="position" content="2">
     </li>
     <li property="itemListElement" typeof="ListItem">
-        <a property="item" typeof="WebPage" href="http://localhost/page/my-category/test-breadcrumb-rdfa">
+        <a property="item" typeof="WebPage" href="http://localhost/page/category-rdfa/test-breadcrumb-rdfa">
             <span property="name"></span></a>
         <meta property="position" content="3">
     </li>
 </ol>
 HTML;
         $this->assertContains($expected, $this->client->getResponse()->getContent());
+    }
+
+    private function save($entity)
+    {
+        $this->em->persist($entity);
+        $this->em->flush();
+        $this->em->refresh($entity);
+        $this->em->clear();
     }
 }

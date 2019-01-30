@@ -38,7 +38,7 @@ class Category
      * The slug of the SeoPage
      *
      * @var string
-     * @ORM\Column()
+     * @ORM\Column(unique=true)
      */
     private $slug;
 

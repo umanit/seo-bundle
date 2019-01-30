@@ -39,13 +39,12 @@ class SchemaOrgTest extends WebTestCase
      */
     public function testSchemaOrgService()
     {
-        $page = (new SeoPage())->setSlug('test-schema-org');
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $page = (new SeoPage())->setSlug('test-schema-org-service');
+        $category = $page->getCategory()->setSlug('category-schema-org-service');
+        $this->save($page);
 
-        $this->client->request('GET', '/page/my-category/test-schema-org');
+
+        $this->client->request('GET', '/page/category-schema-org-service/test-schema-org-service');
 
         $expected = <<<HTML
 <script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"LocalBusiness","name":"Test","email":"test@umanit.fr","contactPoint":{"@type":"ContactPoint","areaServed":"Worldwide"}}</script>\n
@@ -59,10 +58,7 @@ HTML;
     public function testSchemaOrgMethod()
     {
         $cat = (new Category())->setSlug('test-schema-org');
-        $this->em->persist($cat);
-        $this->em->flush();
-        $this->em->refresh($cat);
-        $this->em->clear();
+        $this->save($cat);
 
         $this->client->request('GET', '/category/test-schema-org');
 
@@ -71,5 +67,13 @@ HTML;
 HTML;
 
         $this->assertContains($expected, $this->client->getResponse()->getContent());
+    }
+
+    private function save($entity)
+    {
+        $this->em->persist($entity);
+        $this->em->flush();
+        $this->em->refresh($entity);
+        $this->em->clear();
     }
 }

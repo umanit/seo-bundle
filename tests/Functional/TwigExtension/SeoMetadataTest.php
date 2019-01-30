@@ -40,13 +40,12 @@ class SeoMetadataTest extends WebTestCase
 
     public function testDefaultSeoMetadata()
     {
-        $page = (new SeoPage())->setSlug('test-seo-metadata');
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $page     = (new SeoPage())->setSlug('test-seo-metadata');
+        $category = $page->getCategory()->setSlug('category-test-seo-metadata');
+        $this->save($page);
 
-        $this->client->request('GET', '/page/my-category/test-seo-metadata');
+
+        $this->client->request('GET', '/page/category-test-seo-metadata/test-seo-metadata');
 
         $content = <<<HTML
 <meta name="title" content="Umanit Seo - Customize this default title to your needs." />
@@ -58,17 +57,16 @@ HTML;
 
     public function testDeductedSeoMetadata()
     {
-        $page = (new SeoPage())
+        $page     = (new SeoPage())
             ->setSlug('test-seo-metadata-deducted')
             ->setName('seo-name')
             ->setIntroduction('seo-introduction')
         ;
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $category = $page->getCategory()->setSlug('category-seo-metadata-deducted');
+        $this->save($page);
 
-        $this->client->request('GET', '/page/my-category/test-seo-metadata-deducted');
+
+        $this->client->request('GET', '/page/category-seo-metadata-deducted/test-seo-metadata-deducted');
 
         $content = <<<HTML
 <meta name="title" content="seo-name" />
@@ -80,18 +78,22 @@ HTML;
 
     public function testAdminedSeoMetadata()
     {
-        $page        = (new SeoPage())->setSlug('test-seo-metadata-admined');
+        $page        = (new SeoPage())
+            ->setSlug('test-seo-metadata-admined')
+            ->setName('seo-name')
+            ->setIntroduction('seo-introduction')
+        ;
+        $category    = $page->getCategory()->setSlug('category-seo-metadata-admined');
         $sepMetadata = (new SeoMetadata())
             ->setTitle('seo-title')
             ->setDescription('seo-description')
         ;
-        $page->setSeoMetadata($sepMetadata);
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
 
-        $this->client->request('GET', '/page/my-category/test-seo-metadata-admined');
+        $page->setSeoMetadata($sepMetadata);
+        $this->save($page);
+
+
+        $this->client->request('GET', '/page/category-seo-metadata-admined/test-seo-metadata-admined');
 
         $content = <<<HTML
 <meta name="title" content="seo-title" />
@@ -99,5 +101,13 @@ HTML;
 HTML;
 
         $this->assertContains($content, $this->client->getResponse()->getContent());
+    }
+
+    private function save($entity)
+    {
+        $this->em->persist($entity);
+        $this->em->flush();
+        $this->em->refresh($entity);
+        $this->em->clear();
     }
 }

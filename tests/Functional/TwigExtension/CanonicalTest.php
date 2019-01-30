@@ -40,15 +40,14 @@ class CanonicalTest extends WebTestCase
     public function testCanonicalWithoutParameters()
     {
         $page = (new SeoPage())->setSlug('test-canonical');
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $category = $page->getCategory()->setSlug('category-canonical');
+        $this->save($page);
 
-        $this->client->request('GET', '/page/my-category/test-canonical');
+
+        $this->client->request('GET', '/page/category-canonical/test-canonical');
 
         $expected = <<<HTML
-<link rel="canonical" href="http://localhost/page/my-category/test-canonical"/>
+<link rel="canonical" href="http://localhost/page/category-canonical/test-canonical"/>
 HTML;
 
         $this->assertContains($expected, $this->client->getResponse()->getContent());
@@ -57,16 +56,22 @@ HTML;
     public function testCanonicalWithParameters()
     {
         $page = (new SeoPage())->setSlug('test-canonical-params');
-        $this->em->persist($page);
-        $this->em->flush();
-        $this->em->refresh($page);
-        $this->em->clear();
+        $category = $page->getCategory()->setSlug('category-canonical-w-params');
+        $this->save($page);
 
         $this->em->clear();
         $this->client->request('GET', '/test/canonical/with/parameters/test-canonical-params');
         $expected = <<<HTML
-<link rel="canonical" href="http://localhost/page/my-category/test-canonical-params"/>
+<link rel="canonical" href="http://localhost/page/category-canonical-w-params/test-canonical-params"/>
 HTML;
         $this->assertContains($expected, $this->client->getResponse()->getContent());
+    }
+
+    private function save($entity)
+    {
+        $this->em->persist($entity);
+        $this->em->flush();
+        $this->em->refresh($entity);
+        $this->em->clear();
     }
 }

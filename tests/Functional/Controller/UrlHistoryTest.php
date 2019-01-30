@@ -34,13 +34,14 @@ class UrlHistoryTest extends WebTestCase
     public function testUrlHistory()
     {
         // Create a SeoPage with a slug
-        $page = (new SeoPage())->setSlug('former-slug');
+        $page = (new SeoPage())->setSlug('test-url-history-page');
+        $page->getCategory()->setSlug('test-url-history-category');
         $this->save($page);
         // Change the slug
-        $page->setSlug('new-slug');
+        $page->setSlug('test-url-history-page-new');
         $this->save($page);
         // Try and access the old route
-        $this->client->request('GET', '/page/my-category/former-slug');
+        $this->client->request('GET', '/page/test-url-history-category/test-url-history-page');
         // Assert redirect to the new one
         $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
     }
@@ -48,17 +49,17 @@ class UrlHistoryTest extends WebTestCase
     public function testUrlHistoryOfSubAttribute()
     {
         // Create a SeoPage with a slug
-        $page = (new SeoPage())->setSlug('former-slug');
+        $page = (new SeoPage())->setSlug('test-url-History-sub-attr-page');
         $this->save($page);
         // Change the slug
-        $page->setSlug('new-slug');
-        $page->getCategory()->setSlug('old-category-slug');
+        $page->setSlug('test-url-History-sub-attr-page-new');
+        $page->getCategory()->setSlug('test-url-History-sub-attr-category');
         $this->save($page);
         // Change the slug of the category
-        $page->getCategory()->setSlug('new-category-slug');
+        $page->getCategory()->setSlug('test-url-History-sub-attr-category-new');
         $this->save($page);
         // Try and access the old route
-        $this->client->request('GET', '/page/old-category-slug/new-slug');
+        $this->client->request('GET', '/page/test-url-History-sub-attr-category/test-url-History-sub-attr-page');
         // Assert redirect to the new one
         $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
     }

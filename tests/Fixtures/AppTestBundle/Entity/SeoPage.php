@@ -62,7 +62,7 @@ class SeoPage implements HasSeoMetadataInterface
      * The slug of the SeoPage
      *
      * @var string
-     * @ORM\Column()
+     * @ORM\Column(unique=true)
      */
     private $slug;
 
