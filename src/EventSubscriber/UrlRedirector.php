@@ -37,7 +37,7 @@ class UrlRedirector implements EventSubscriberInterface
      */
     public function __construct(UrlPool $pool, int $httpRedirectCode = 301)
     {
-        $this->pool = $pool;
+        $this->pool             = $pool;
         $this->httpRedirectCode = $httpRedirectCode;
     }
 
@@ -45,8 +45,6 @@ class UrlRedirector implements EventSubscriberInterface
      * Redirects an old url to a new one.
      *
      * @param GetResponseForExceptionEvent $event
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function onKernelException(GetResponseForExceptionEvent $event): void
     {
@@ -54,11 +52,13 @@ class UrlRedirector implements EventSubscriberInterface
             return;
         }
 
-        $path = $event->getRequest()->getPathInfo();
+        $path           = $event->getRequest()->getPathInfo();
+        $locale         = $event->getRequest()->getLocale();
+        $urlHistoryItem = $this->pool->get($path, $locale);
 
         // Check that url is in pool
-        if ($this->pool->has($path)) {
-            $event->setResponse(new RedirectResponse($this->pool->get($path)['new_path'], $this->httpRedirectCode));
+        if (null !== $urlHistoryItem) {
+            $event->setResponse(new RedirectResponse($urlHistoryItem->getNewPath(), $this->httpRedirectCode));
         }
     }
 

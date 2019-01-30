@@ -2,6 +2,7 @@
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
@@ -50,7 +51,7 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return [Events::preUpdate, Events::postRemove];
+        return [Events::preUpdate, Events::postRemove, Events::postFlush];
     }
 
     /**
@@ -91,9 +92,19 @@ class UrlHistoryWriter implements EventSubscriber
             // Add the redirection to the pool
             $this->urlPool->add($oldPath, $newPath, $entity);
         } catch (NotSeoRouteEntityException $e) {
-            return;
+            // Do nothing
         }
 
+        // Loop through all existing entities
+        // For each, search if an attribute is a ManyToOne associated to the current updated entity class
+        // If so, fetch all entities associated
+        // build old path and new path
+        // Add it to the pool
+    }
+
+    public function postFlush(PostFlushEventArgs $args)
+    {
+        $this->urlPool->flush();
     }
 
     public function postRemove(LifecycleEventArgs $args)

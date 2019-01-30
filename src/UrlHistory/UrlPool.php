@@ -2,9 +2,11 @@
 
 namespace Umanit\SeoBundle\UrlHistory;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Umanit\SeoBundle\Entity\UrlHistory;
+use Umanit\SeoBundle\Model\AnnotationReaderTrait;
+use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 
 /**
  * Class UrlPool
@@ -16,29 +18,29 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 class UrlPool
 {
-    private const         CACHE_KEY      = 'umanit.seo.url_history.';
-    private const         CACHE_DURATION = 'P1M'; // One month
-
-    /** @var CacheItemPoolInterface */
-    private $pool;
+    use AnnotationReaderTrait;
 
     /** @var EntityManagerInterface */
     private $em;
 
-    /** @var PropertyAccessor */
-    private $propAccess;
+    /** @var string */
+    private $defaultLocale;
+
+    /** @var array<UrlHistory> */
+    private $items = [];
 
     /**
-     * {@inheritdoc}
      * UrlPool constructor.
      *
-     * @param CacheItemPoolInterface $pool
+     * @param EntityManagerInterface $em
+     * @param string                 $defaultLocale
      */
-    public function __construct(CacheItemPoolInterface $pool, EntityManagerInterface $em)
-    {
-        $this->pool       = $pool;
-        $this->em         = $em;
-        $this->propAccess = new PropertyAccessor();
+    public function __construct(
+        EntityManagerInterface $em,
+        string $defaultLocale
+    ) {
+        $this->em            = $em;
+        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -47,71 +49,62 @@ class UrlPool
      * @param string $oldPath
      * @param string $newPath
      * @param        $entity
-     *
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function add(string $oldPath, string $newPath, $entity): void
+    public function add(string $oldPath, string $newPath, object $entity): void
     {
-        // Find the primary key
-        $class           = get_class($entity);
-        $meta            = $this->em->getClassMetadata(get_class($entity));
-        $identifierField = $meta->getSingleIdentifierFieldName();
-        $identifierValue = $this->propAccess->getValue($entity, $identifierField);
-
-        $cacheItem = $this->pool->getItem($this->formatCacheKey($oldPath));
-
-        // Add the value to the cache item
-        $cacheItem->set([
-            'old_path' => $oldPath,
-            'new_path' => $newPath,
-            'entity'   => $class.';'.$identifierValue,
-        ]);
-        $cacheItem->expiresAfter(new \DateInterval(static::CACHE_DURATION));
-        $this->pool->save($cacheItem);
+        $this->items[] = (new UrlHistory())
+            ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
+            ->setNewPath($newPath)
+            ->setOldPath($oldPath)
+            ->setRoute($this->resolveRouteFromEntity($entity))
+        ;
     }
 
     /**
-     * Checks that the path is saved in the pool.
+     * Gets an item from db.
      *
-     * @param string $path
+     * @param string      $path
+     * @param string|null $locale
      *
-     * @return bool
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @return UrlHistory|null
      */
-    public function has(string $path): bool
+    public function get(string $path, string $locale = null): ?UrlHistory
     {
-        $cacheItem = $this->pool->getItem($this->formatCacheKey($path));
-
-        return null !== $cacheItem->get();
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getUrlHistoryRepository()->findOneBy(['oldPath' => $path, 'locale' => $locale]);
     }
 
     /**
-     * Return an item in the cache
-     *
-     * @param string $path
-     *
-     * @return mixed|null
-     * @throws \Psr\Cache\InvalidArgumentException
+     * Flushes the cached items.
      */
-    public function get(string $path)
+    public function flush(): void
     {
-        if (false === $this->has($path)) {
-            return null;
+        if (!empty($this->items)) {
+            foreach ($this->items as $item) {
+                $this->em->persist($item);
+            }
+            $this->items = [];
+            $this->em->flush();
         }
-
-        return $this->pool->getItem($this->formatCacheKey($path))->get();
     }
 
     /**
-     * Formats the cache item key from a path.
-     *
-     * @param string $path
-     *
-     * @return string
+     * @return UrlHistoryRepository
      */
-    private function formatCacheKey(string $path): string
+    private function getUrlHistoryRepository(): ObjectRepository
     {
-        return static::CACHE_KEY.str_replace('/', '-', $path);
+        return $this->em->getRepository(UrlHistory::class);
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return string|null
+     * @throws \ReflectionException
+     * @throws \Umanit\SeoBundle\Exception\NotSeoRouteEntityException
+     */
+    private function resolveRouteFromEntity(object $entity): ?string
+    {
+        return $this->getSeoRouteAnnotation($entity)->getRouteName();
     }
 }
