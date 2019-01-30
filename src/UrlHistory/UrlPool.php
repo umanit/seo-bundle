@@ -12,7 +12,6 @@ use Umanit\SeoBundle\Repository\UrlHistoryRepository;
  * Class UrlPool
  *
  * Pool of historized URLs.
- * A simple wrapper to any CacheItemPoolInterface.
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
