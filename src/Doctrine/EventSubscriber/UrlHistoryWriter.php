@@ -2,7 +2,10 @@
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Proxy\Proxy;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
@@ -95,11 +98,38 @@ class UrlHistoryWriter implements EventSubscriber
             // Do nothing
         }
 
+        // Generate history for entities associated to this very entity.
         // Loop through all existing entities
-        // For each, search if an attribute is a ManyToOne associated to the current updated entity class
-        // If so, fetch all entities associated
-        // build old path and new path
-        // Add it to the pool
+        $metas = $args->getEntityManager()->getMetadataFactory()->getAllMetadata();
+        foreach ($metas as $meta) {
+            $class           = $meta->getName();
+            $reflectionClass = new \ReflectionClass($class);
+            foreach ($reflectionClass->getProperties() as $property) {
+                $reader = new AnnotationReader();
+                /** @var ManyToOne $manyToOne */
+                $manyToOne = $reader->getPropertyAnnotation($property, ManyToOne::class);
+                // Search if an attribute is a ManyToOne associated to the current updated entity class
+                if (null === $manyToOne || $manyToOne->targetEntity !== $this->getClass($entity)) {
+                    continue;
+                }
+                // If so, fetch all entities
+                $entities = $args->getEntityManager()->getRepository($class)->findBy([$property->name => $entity]);
+                foreach ($entities as $subEntity) {
+                    // Build the new path
+                    $subNewPath = $this->urlBuilder->path($subEntity);
+                    // Get old values
+                    $subChangeSet = [];
+                    foreach ($changeSet as $changeFieldKey => $changedFieldValue) {
+                        $subChangeSet[$property->name.'.'.$changeFieldKey] = $changedFieldValue;
+                    }
+                    $subOldPath = $this->urlBuilder->path($subEntity, $subChangeSet);
+
+                    // Add it to the pool
+                    $this->urlPool->add($subOldPath, $subNewPath, $subEntity);
+                }
+            }
+
+        }
     }
 
     public function postFlush(PostFlushEventArgs $args)
@@ -110,5 +140,19 @@ class UrlHistoryWriter implements EventSubscriber
     public function postRemove(LifecycleEventArgs $args)
     {
         // TODO
+    }
+
+    /**
+     * Returns the entity class.
+     *
+     * @param object $entity
+     *
+     * @return string
+     */
+    private function getClass(object $entity): string
+    {
+        return ($entity instanceof Proxy)
+            ? get_parent_class($entity)
+            : get_class($entity);
     }
 }

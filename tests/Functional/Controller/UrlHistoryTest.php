@@ -35,17 +35,35 @@ class UrlHistoryTest extends WebTestCase
     {
         // Create a SeoPage with a slug
         $page = (new SeoPage())->setSlug('former-slug');
-        $this->saveSeoPage($page);
+        $this->save($page);
         // Change the slug
         $page->setSlug('new-slug');
-        $this->saveSeoPage($page);
+        $this->save($page);
         // Try and access the old route
         $this->client->request('GET', '/page/my-category/former-slug');
         // Assert redirect to the new one
         $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
     }
 
-    private function saveSeoPage(SeoPage $page)
+    public function testUrlHistoryOfSubAttribute()
+    {
+        // Create a SeoPage with a slug
+        $page = (new SeoPage())->setSlug('former-slug');
+        $this->save($page);
+        // Change the slug
+        $page->setSlug('new-slug');
+        $page->getCategory()->setSlug('old-category-slug');
+        $this->save($page);
+        // Change the slug of the category
+        $page->getCategory()->setSlug('new-category-slug');
+        $this->save($page);
+        // Try and access the old route
+        $this->client->request('GET', '/page/old-category-slug/new-slug');
+        // Assert redirect to the new one
+        $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
+    }
+
+    private function save($page)
     {
         $this->em->persist($page);
         $this->em->flush();

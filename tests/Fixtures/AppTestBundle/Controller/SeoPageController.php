@@ -2,6 +2,7 @@
 
 namespace AppTestBundle\Controller;
 
+use AppTestBundle\Entity\Category;
 use AppTestBundle\Entity\SeoPage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,14 +12,16 @@ class SeoPageController extends AbstractController
 {
     /**
      * @Route("/page/{category}/{slug}", name="app_test_page_show")
+     * @param string $category
      * @param string $slug
      *
      * @return Response
      */
-    public function show(string $slug)
+    public function show(string $category, string $slug)
     {
-        $page = $this->getDoctrine()->getRepository(SeoPage::class)->findOneBy(['slug' => $slug]);
-        if (null === $page) {
+        $category = $this->getDoctrine()->getRepository(Category::class)->findOneBy(['slug' => $category]);
+        $page     = $this->getDoctrine()->getRepository(SeoPage::class)->findOneBy(['slug' => $slug]);
+        if (null === $page || null === $category) {
             throw $this->createNotFoundException();
         }
 
