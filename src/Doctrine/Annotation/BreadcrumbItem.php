@@ -2,6 +2,7 @@
 
 namespace Umanit\SeoBundle\Doctrine\Annotation;
 
+use Doctrine\Common\Annotations\Annotation\Required;
 use Umanit\SeoBundle\Model\AutoSetterConstructorTrait;
 
 /**
@@ -30,6 +31,7 @@ class BreadcrumbItem
      * string or the path to an attribute.
      *
      * @var string
+     * @Required()
      */
     private $name;
 
