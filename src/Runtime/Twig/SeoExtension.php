@@ -61,11 +61,24 @@ class SeoExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
+            new TwigFunction('seo_title', [$this, 'title']),
             new TwigFunction('seo_canonical', [$this, 'canonical'], ['is_safe' => ['html']]),
             new TwigFunction('seo_metadata', [$this, 'metadata'], ['is_safe' => ['html']]),
             new TwigFunction('seo_schema_org', [$this, 'schemaOrg'], ['is_safe' => ['html', 'javascript']]),
             new TwigFunction('seo_breadcrumb', [$this, 'breadcrumb'], ['is_safe' => ['html', 'javascript']]),
         ];
+    }
+
+    /**
+     * Generates and displays the page title.
+     *
+     * @param object|null $entity
+     *
+     * @return string
+     */
+    public function title(?object $entity = null): string
+    {
+        return $this->metadataResolver->metaTitle($entity ?? $this->currentSeoEntity->get());
     }
 
     /**
