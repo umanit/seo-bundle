@@ -27,7 +27,7 @@ class Route
     /**
      * @var array<RouteParameter>
      */
-    private $routeParameters;
+    private $routeParameters = [];
 
     /**
      * @return string
