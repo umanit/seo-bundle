@@ -26,7 +26,6 @@ class Route
 
     /**
      * @var array<RouteParameter>
-     * @Required
      */
     private $routeParameters;
 
