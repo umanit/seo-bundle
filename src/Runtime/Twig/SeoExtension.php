@@ -148,7 +148,7 @@ HTML
             // Do nothing
         }
 
-        return '<script>console.error("Unable generate microdata schema.")</script>';
+        return '';
     }
 
     /**
