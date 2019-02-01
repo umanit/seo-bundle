@@ -21,6 +21,7 @@ This bundle adds SEO capabilities for Doctrine entities.
 1. [Seo Metadata](#seo-metadata)
 1. [Schema.org](#schema.org-implementation)
 1. [Breadcrumb](#breadcrumb)
+1. [Twig functions reference](#twig-functions-reference)
 
 ### Canonical and 301 redirects
 
@@ -68,13 +69,13 @@ If you ever change the slug of a page, the old URL will be redirected to the new
 If you wanted to generate the URL by yourself you would have done something like the following example:
 
 ```html
-<link rel="canonical" href="{{ path('app_page_show', { 'slug': my_page.slug }) }}">
+{{ path('app_page_show', { 'slug': my_page.slug }) }}"
 ```
 
 You can now do like so:
 
 ```twig
-{{ seo_canonical(my_page) }}
+{{ path(my_page) }}
 ```
 
 ___Note:__ You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve the entity associated to the current accessed route and generate the url from it._
@@ -233,4 +234,16 @@ You can now use the twig function `seo_breadcrumb()` like the following examples
 {{ seo_breadcrumb() }} {# Will generate the breadcrumb from the current entity using microdata format #}
 {{ seo_breadcrumb(entity=my_entity, format='json-ld') }} {# Will generate the breadcrumb from my_entity using json-ld format #}
 {{ seo_breadcrumb(format='rdfa') }} {# Will generate the breadcrumb from the current entity using rdfa format #}
+```
+
+### Twig functions reference
+
+```html
+{{ path(entity) }}                                 # Path to an Seo entity
+{{ url(entity) }}                                  # Url to an Seo entity
+{{ seo_canonical(entity = null, overrides = []) }} # Canonical link of an Seo entity
+{{ seo_title(entity = null) }}                     # Title (without markup) of an Seo entity
+{{ seo_metadata(entity = null) }}                  # Metadata of an entity (title and description, with markup)
+{{ seo_schema_org(entity = null) }}                # Json schema of an entity (with markup)
+{{ seo_breadcrumb(entity = null, format = null) }} # Breadcrumb from an entity (default format to 'microdata')
 ```
