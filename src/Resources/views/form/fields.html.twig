@@ -1,0 +1,48 @@
+{% block seo_metadata_widget %}
+    {% set breadcrumb = seo_breadcrumb(form.parent.vars.value)|format %}
+    {% set schema = seo_schema_org(form.parent.vars.value)|format %}
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#seo-metadata" data-toggle="tab" aria-expanded="false">{{ 'seo.metadata'|trans(domain='UmanitSeoBundle') }}</a>
+            </li>
+            {% if breadcrumb is not empty %}
+                <li>
+                    <a href="#seo-breadcrumb" data-toggle="tab" aria-expanded="false">{{ 'seo.breadcrumb'|trans(domain='UmanitSeoBundle') }}</a>
+                </li>
+            {% endif %}
+            <li>
+                <a href="#seo-schema" data-toggle="tab" aria-expanded="false">{{ 'seo.microdata'|trans(domain='UmanitSeoBundle') }}</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="seo-metadata">
+                <div class="form-group">
+                    <label class="control-label">
+                        {{ 'seo.form.url'|trans(domain='UmanitSeoBundle') }}
+                    </label>
+                    <div>
+                        <a target="_blank" href="{{ url(form.parent.vars.value) }}">{{ url(form.parent.vars.value) }}</a>
+                    </div>
+                </div>
+                {{ form_row(form.title) }}
+                {{ form_row(form.description) }}
+            </div>
+            {% if breadcrumb is not empty %}
+                <div class="tab-pane" id="seo-breadcrumb">
+                    <pre class="prettyprint">
+                        {{- breadcrumb -}}
+                    </pre>
+                </div>
+            {% endif %}
+            {% if schema is not empty %}
+                <div class="tab-pane" id="seo-schema">
+                    <pre class="prettyprint">
+                        {{- schema -}}
+                    </pre>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock seo_metadata_widget %}

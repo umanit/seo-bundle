@@ -1,2 +1,6 @@
 seo.title: 'Title'
 seo.description: 'Description'
+seo.metadata: 'Metadata'
+seo.breadcrumb: 'Breadcrumb'
+seo.microdata: 'Microdata'
+seo.form.url: 'URL'
