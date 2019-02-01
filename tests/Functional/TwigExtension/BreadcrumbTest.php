@@ -83,7 +83,18 @@ HTML;
         $this->client->request('GET', '/page/category-json-ld/test-breadcrumb-json-ld');
 
         $expected = <<<HTML
-<script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"BreadcrumbList","itemListElement":{"@type":"ListItem","position":3,"item":{"@id":"http:\/\/localhost\/page\/category-json-ld\/test-breadcrumb-json-ld","name":null}}}</script>
+<script type="application/ld+json">{
+    "@context": "http:\/\/schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+            "@id": "http:\/\/localhost\/page\/category-json-ld\/test-breadcrumb-json-ld",
+            "name": null
+        }
+    }
+}</script>
 HTML;
         $this->assertContains($expected, $this->client->getResponse()->getContent());
     }

@@ -47,7 +47,16 @@ class SchemaOrgTest extends WebTestCase
         $this->client->request('GET', '/page/category-schema-org-service/test-schema-org-service');
 
         $expected = <<<HTML
-<script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"LocalBusiness","name":"Test","email":"test@umanit.fr","contactPoint":{"@type":"ContactPoint","areaServed":"Worldwide"}}</script>\n
+<script type="application/ld+json">{
+    "@context": "https:\/\/schema.org",
+    "@type": "LocalBusiness",
+    "name": "Test",
+    "email": "test@umanit.fr",
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "areaServed": "Worldwide"
+    }
+}</script>
 HTML;
 
         $this->assertContains($expected, $this->client->getResponse()->getContent());
@@ -63,7 +72,16 @@ HTML;
         $this->client->request('GET', '/category/test-schema-org');
 
         $expected = <<<HTML
-<script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"MensClothingStore","name":"Test","email":"test@umanit.fr","contactPoint":{"@type":"ContactPoint","areaServed":"Worldwide"}}</script>\n
+<script type="application/ld+json">{
+    "@context": "https:\/\/schema.org",
+    "@type": "MensClothingStore",
+    "name": "Test",
+    "email": "test@umanit.fr",
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "areaServed": "Worldwide"
+    }
+}</script>
 HTML;
 
         $this->assertContains($expected, $this->client->getResponse()->getContent());
