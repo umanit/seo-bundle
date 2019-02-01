@@ -5,8 +5,9 @@ namespace Umanit\SeoBundle\Sonata\AdminExtension;
 use Sonata\AdminBundle\Admin\AbstractAdminExtension;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
+use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\AdminBundle\Templating\MutableTemplateRegistryInterface;
-use Sonata\AdminBundle\Templating\TemplateRegistryInterface;
 
 /**
  * Class SeoAdminExtension
@@ -25,9 +26,6 @@ class SeoAdminExtension extends AbstractAdminExtension
         $this->templateRegistry = $templateRegistry;
     }
 
-    /**
-     * @param ListMapper $listMapper
-     */
     public function configureListFields(ListMapper $listMapper)
     {
         if ($listMapper->has('_action')) {
@@ -40,14 +38,15 @@ class SeoAdminExtension extends AbstractAdminExtension
         }
     }
 
-    /**
-     * @param AdminInterface $admin
-     *
-     * @return array
-     */
     public function getPersistentParameters(AdminInterface $admin)
     {
         $admin->setTemplate('button_show', '@UmanitSeo/admin/Button/show_button.html.twig');
         return parent::getPersistentParameters($admin);
+    }
+
+    public function configureShowFields(ShowMapper $showMapper)
+    {
+        $showMapper->add('seoMetadata');
+        parent::configureShowFields($showMapper);
     }
 }
