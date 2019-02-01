@@ -58,6 +58,12 @@ services:
             - { name: twig.extension }
     Umanit\SeoBundle\Runtime\Twig\SeoExtension: '@umanit_seo.runtime_twig.seo_extension'
 
+    twig.extension.routing:
+        class: Umanit\SeoBundle\Runtime\Twig\RoutingExtension
+        arguments: ['@router', '@umanit_seo.routing.canonical']
+        tags:
+            - { name: twig.extension }
+
     # CurrentSeo Entity
     umanit_seo.runtime.current_seo_entity:
         class: Umanit\SeoBundle\Runtime\CurrentSeoEntity
