@@ -98,9 +98,7 @@ class SeoExtension extends AbstractExtension
                 $overrides
             ));
         } catch (NotSeoRouteEntityException $e) {
-            if (null !== $entity) {
-                throw $e;
-            }
+            // Do nothing
         }
 
         return '';
@@ -137,14 +135,17 @@ HTML
     public function schemaOrg(?object $entity = null): string
     {
         try {
-            return $this->schemaOrgResolver->getSchemaBuilder(
-                $entity ?? $this->currentSeoEntity->get()
-            )->toScript()
-                ;
+            return strtr(
+<<<HTML
+<script type="application/ld+json">%json%</script>
+HTML
+                , [
+                    '%json%' => json_encode($this->schemaOrgResolver->getSchemaBuilder(
+                        $entity ?? $this->currentSeoEntity->get()
+                    )->toArray(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]);
+
         } catch (NotSchemaOrgEntityException $e) {
-            if (null !== $entity) {
-                throw $e;
-            }
+            // Do nothing
         }
 
         return '<script>console.error("Unable generate microdata schema.")</script>';
@@ -169,9 +170,7 @@ HTML
                 $format
             );
         } catch (NotBreadcrumbEntityException $e) {
-            if (null !== $entity) {
-                throw $e;
-            }
+            // Do nothing
         }
 
         return '';
