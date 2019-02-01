@@ -86,15 +86,34 @@ HTML;
 <script type="application/ld+json">{
     "@context": "http:\/\/schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": {
-        "@type": "ListItem",
-        "position": 3,
-        "item": {
-            "@id": "http:\/\/localhost\/page\/category-json-ld\/test-breadcrumb-json-ld",
-            "name": null
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+                "@id": "http:\/\/localhost\/",
+                "name": "Home"
+            }
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+                "@id": "http:\/\/localhost\/category\/category-json-ld",
+                "name": "category-json-ld"
+            }
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+                "@id": "http:\/\/localhost\/page\/category-json-ld\/test-breadcrumb-json-ld",
+                "name": null
+            }
         }
-    }
+    ]
 }</script>
+
 HTML;
         $this->assertContains($expected, $this->client->getResponse()->getContent());
     }
