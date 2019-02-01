@@ -4,6 +4,7 @@ namespace Umanit\SeoBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -12,7 +13,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  *
  * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class UmanitSeoExtension extends Extension
+class UmanitSeoExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -46,6 +47,20 @@ class UmanitSeoExtension extends Extension
             if (is_array($value)) {
                 $this->setConfigAsParameters($container, $value, $name);
             }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param ContainerBuilder $container
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $bundles = $container->getParameter('kernel.bundles');
+        // Conditionnaly load sonata_admin.yml
+        if (isset($bundles['SonataAdminBundle'])) {
+            $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+            $loader->load('sonata_admin.yml');
         }
     }
 }

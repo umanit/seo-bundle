@@ -1,0 +1,12 @@
+sonata_admin:
+    # Extension for adding "Show on site" to seo bundle admins
+    extensions:
+        umanit_seo.admin.extension.seo_admin_extension:
+            implements:
+                - Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface
+services:
+    umanit_seo.admin.extension.seo_admin_extension:
+        class: Umanit\SeoBundle\Sonata\AdminExtension\SeoAdminExtension
+        arguments: ['@sonata.admin.global_template_registry']
+        tags:
+            - { name: sonata.admin.extension }

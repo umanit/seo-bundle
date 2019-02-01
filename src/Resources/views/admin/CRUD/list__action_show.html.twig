@@ -1,0 +1,6 @@
+{% if admin.hasAccess('show', object) and admin.hasRoute('show') %}
+    <a target="_blank" href="{{ url(object) }}" class="btn btn-sm btn-default view_link" title="{{ 'action_show'|trans({}, 'SonataAdminBundle') }}">
+        <i class="fa fa-eye" aria-hidden="true"></i>
+        {{ 'action_show'|trans({}, 'SonataAdminBundle') }}
+    </a>
+{% endif %}
