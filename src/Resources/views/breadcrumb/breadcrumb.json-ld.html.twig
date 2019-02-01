@@ -3,14 +3,14 @@
     {% if items is not empty %}
         {% set json_items = [] %}
         {% for item in items %}
-            {% set json_items = json_items|merge({
+            {% set json_items = json_items|merge([{
                 "@type": "ListItem",
                 "position": loop.index,
                 "item": {
                     "@id": item.url,
                     "name": item.name
                 }
-            }) %}
+            }]) %}
         {% endfor %}
         {% set breadcrumb = {
             "@context": "http://schema.org",
