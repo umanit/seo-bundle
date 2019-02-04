@@ -52,13 +52,27 @@ class UrlPool
      */
     public function add(string $oldPath, string $newPath, UrlHistorizedInterface $entity): void
     {
-        $this->items[] = (new UrlHistory())
-            ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
-            ->setNewPath($newPath)
-            ->setOldPath($oldPath)
-            ->setRoute($this->resolveRouteFromEntity($entity))
-            ->setSeoUuid($entity->getSeoUuid())
+        $urlHistory = $this->getUrlHistoryRepository()->findOneBy([
+            'oldPath' => $oldPath,
+            'locale'  => method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale,
+            'seoUuid' => $entity->getSeoUuid(),
+        ])
         ;
+
+        if (null === $urlHistory) {
+            $urlHistory = (new UrlHistory())
+                ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
+                ->setNewPath($newPath)
+                ->setOldPath($oldPath)
+                ->setRoute($this->resolveRouteFromEntity($entity))
+                ->setSeoUuid($entity->getSeoUuid())
+            ;
+        }
+
+        $urlHistory
+            ->setNewPath($newPath);
+
+        $this->items[] = $urlHistory;
     }
 
     /**
