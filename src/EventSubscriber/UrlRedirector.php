@@ -52,7 +52,7 @@ class UrlRedirector implements EventSubscriberInterface
             return;
         }
 
-        $path           = $event->getRequest()->getPathInfo();
+        $path           = $event->getRequest()->getUri();
         $locale         = $event->getRequest()->getLocale();
         $urlHistoryItem = $this->pool->get($path, $locale);
 

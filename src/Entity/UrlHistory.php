@@ -35,13 +35,13 @@ class UrlHistory
     private $route;
 
     /**
-     * @ORM\Column(name="old_path", nullable=false)
+     * @ORM\Column(name="old_path", nullable=false, length=512)
      * @var string
      */
     private $oldPath;
 
     /**
-     * @ORM\Column(name="new_path",nullable=false)
+     * @ORM\Column(name="new_path", nullable=false, length=512)
      * @var string
      */
     private $newPath;

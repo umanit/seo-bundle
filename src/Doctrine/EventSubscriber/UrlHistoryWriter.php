@@ -75,7 +75,7 @@ class UrlHistoryWriter implements EventSubscriber
         try {
             $seoAnnotation = $this->getSeoRouteAnnotation($entity);
             // Build the new path
-            $newPath = $this->urlBuilder->path($entity);
+            $newPath = $this->urlBuilder->url($entity);
             // Get old values
             array_walk(
                 $changeSet,
@@ -95,7 +95,7 @@ class UrlHistoryWriter implements EventSubscriber
                 }
             );
             // Build the old path
-            $oldPath = $this->urlBuilder->path($entity, $changeSet);
+            $oldPath = $this->urlBuilder->url($entity, $changeSet);
 
             // Add the redirection to the pool
             $this->urlPool->add($oldPath, $newPath, $entity);
