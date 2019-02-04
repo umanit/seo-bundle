@@ -41,24 +41,36 @@
                             <a target="_blank" href="{{ url(form.parent.vars.value) }}">{{ url(form.parent.vars.value) }}</a>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label">
-                            {{ 'seo.redirects'|trans(domain='UmanitSeoBundle') }}
-                        </label>
-                        <ol>
-                            {% for url_item in url_history|default([]) %}
-                                {# @var \Umanit\SeoBundle\Entity\UrlHistory url_item #}
-                                <li>
-                                    <a href="{{ url_item.oldPath }}">{{ url_item.oldPath }}</a>
-                                    <small class="label label-primary">redirect <i class="fa fa-arrow-circle-right"></i>
-                                    </small>
-                                    <a href="{{ url_item.newPath }}">{{ url_item.newPath }}</a>
-                                </li>
-                            {% else %}
-                                <li>{{ 'seo.no_redirects'|trans(domain='UmanitSeoBundle') }}</li>
+
+                    <table class="table">
+                        <tbody>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>{{ 'seo.source_url'|trans(domain='UmanitSeoBundle') }}</th>
+                            <th></th>
+                            <th>{{ 'seo.destination_url'|trans(domain='UmanitSeoBundle') }}</th>
+                        </tr>
+                        {% for url_item in url_history|default([]) %}
+                        {# @var \Umanit\SeoBundle\Entity\UrlHistory url_item #}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                <a target="_blank" href="{{ url_item.oldPath }}">{{ url_item.oldPath }}</a>
+                            </td>
+                            <td>
+                                <span class="text-center text-green text-uppercase font-weight-bold h3">&rarr;</span>
+                            </td>
+                            <td>
+                                <a target="_blank" href="{{ url_item.newPath }}">{{ url_item.newPath }}</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4">
+                                {{ 'seo.no_redirects'|trans(domain='UmanitSeoBundle') }}
+                            </td>
                             {% endfor %}
-                        </ol>
-                    </div>
+                    </table>
                 </div>
                 {% if breadcrumb is not empty %}
                     <div class="tab-pane" id="seo-breadcrumb">
