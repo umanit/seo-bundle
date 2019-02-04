@@ -24,6 +24,12 @@ services:
         tags: ['doctrine.event_subscriber']
     Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
 
+    # Seo Uuid Setter
+    umanit_seo.doctrine_event_subscriber.seo_uuid_setter:
+        class: Umanit\SeoBundle\Doctrine\EventSubscriber\SeoUuidSetter
+        tags:
+            - { name: doctrine.event_subscriber }
+
     # Current Entity Resolver
     umanit_seo.doctrine_event_subscriber.current_entity_resolver:
         class: Umanit\SeoBundle\Doctrine\EventSubscriber\CurrentEntityResolver

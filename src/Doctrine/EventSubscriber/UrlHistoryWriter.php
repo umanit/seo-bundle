@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Proxy\Proxy;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
+use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
 use Doctrine\Common\EventSubscriber;
@@ -66,6 +67,10 @@ class UrlHistoryWriter implements EventSubscriber
     {
         $entity    = $args->getEntity();
         $changeSet = $args->getEntityChangeSet();
+
+        if (!$entity instanceof UrlHistorizedInterface) {
+            return;
+        }
 
         try {
             $seoAnnotation = $this->getSeoRouteAnnotation($entity);

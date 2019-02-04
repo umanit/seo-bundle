@@ -3,6 +3,7 @@
 namespace Umanit\SeoBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Class UrlHistory
@@ -51,6 +52,13 @@ class UrlHistory
      * @ORM\Column(name="locale", type="string", length=10, nullable=true)
      */
     private $locale;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="guid", unique=false)
+     */
+    private $seoUuid;
 
     /**
      * @return int
@@ -136,6 +144,26 @@ class UrlHistory
     public function setLocale(?string $locale): self
     {
         $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSeoUuid(): ?string
+    {
+        return $this->seoUuid;
+    }
+
+    /**
+     * @param string|null $seoUuid
+     *
+     * @return UrlHistory
+     */
+    public function setSeoUuid(?string $seoUuid): self
+    {
+        $this->seoUuid = $seoUuid;
 
         return $this;
     }

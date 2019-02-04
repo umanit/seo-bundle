@@ -7,6 +7,8 @@ use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Annotation as Seo;
+use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
+use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
 
 /**
  * Class SeoPage
@@ -27,9 +29,9 @@ use Umanit\SeoBundle\Doctrine\Annotation as Seo;
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
-class SeoPage implements HasSeoMetadataInterface
+class SeoPage implements HasSeoMetadataInterface, UrlHistorizedInterface
 {
-    use SeoMetadataTrait;
+    use SeoMetadataTrait, UrlHistorizedTrait;
 
     /**
      * The identifier of SeoPage.

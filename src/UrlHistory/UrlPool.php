@@ -4,6 +4,7 @@ namespace Umanit\SeoBundle\UrlHistory;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\UrlHistory;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Repository\UrlHistoryRepository;
@@ -49,13 +50,14 @@ class UrlPool
      * @param string $newPath
      * @param        $entity
      */
-    public function add(string $oldPath, string $newPath, object $entity): void
+    public function add(string $oldPath, string $newPath, UrlHistorizedInterface $entity): void
     {
         $this->items[] = (new UrlHistory())
             ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
             ->setNewPath($newPath)
             ->setOldPath($oldPath)
             ->setRoute($this->resolveRouteFromEntity($entity))
+            ->setSeoUuid($entity->getSeoUuid())
         ;
     }
 
