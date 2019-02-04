@@ -17,13 +17,15 @@ This bundle adds SEO capabilities for Doctrine entities.
 
 ## Usage
 
-1. [Canonical and 301 redirects](#canonical-and-301-redirects)
+1. [Basic Usage](#basic-usage)
 1. [Seo Metadata](#seo-metadata)
 1. [Schema.org](#schema.org-implementation)
 1. [Breadcrumb](#breadcrumb)
+1. [Enabling 301 redirects](#enabling-301-redirects)
 1. [Twig functions reference](#twig-functions-reference)
+1. [Full usage example](#full-usage-example)
 
-### Canonical and 301 redirects
+### Basic usage
 
 In order to function properly, SeoBundle must be able to generate a URL for a given entity.
 
@@ -48,7 +50,7 @@ use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 
 /**
- * Class SeoPage
+ * Class Page
  *
  * @Seo\Route(
  *     routeName="app_page_show",
@@ -104,7 +106,7 @@ namespace App\Entity;
 use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 
-class page implements HasSeoMetadataInterface
+class Page implements HasSeoMetadataInterface
 {
     use SeoMetadataTrait;
     
@@ -146,7 +148,7 @@ use Spatie\SchemaOrg\Schema;
  * @ORM\Entity()
  * @Seo\SchemaOrgBuilder("buildSchemaOrg")
  */
-class page
+class Page
 {
     // ...
     
@@ -216,7 +218,7 @@ use Umanit\SeoBundle\Doctrine\Annotation as Seo;
  *     @Seo\BreadcrumbItem(name="name"),
  * })
  */
-class SeoPage
+class Page
 {
     
 }
@@ -225,7 +227,7 @@ class SeoPage
 `@Seo\BreadcrumbItem` takes two optional arguments:
 1. `value` (the first arg) is either a route name, or the path to a child entity.
  /!\ The child entity must also be annotated with `Seo\Route`. It is used to generate the url of the breadcrumb item.
-  **Note:** leave it blank to generate a url from `$this` (`SeoPage` in this example).
+  **Note:** leave it blank to generate a url from `$this` (`Page` in this example).
 1. `name` is either a path to a property of the current entity or a simple string.
 
 You can now use the twig function `seo_breadcrumb()` like the following examples:
@@ -235,6 +237,10 @@ You can now use the twig function `seo_breadcrumb()` like the following examples
 {{ seo_breadcrumb(entity=my_entity, format='json-ld') }} {# Will generate the breadcrumb from my_entity using json-ld format #}
 {{ seo_breadcrumb(format='rdfa') }} {# Will generate the breadcrumb from the current entity using rdfa format #}
 ```
+
+### Enabling 301 redirects
+
+In order to enable URL history and 301 redirects on an Entity, implement the interface `UrlHistorizedInterface` and use the trait `UrlHistorizedTrait`.
 
 ### Twig functions reference
 
@@ -246,4 +252,97 @@ You can now use the twig function `seo_breadcrumb()` like the following examples
 {{ seo_metadata(entity = null) }}                  # Metadata of an entity (title and description, with markup)
 {{ seo_schema_org(entity = null) }}                # Json schema of an entity (with markup)
 {{ seo_breadcrumb(entity = null, format = null) }} # Breadcrumb from an entity (default format to 'microdata')
+```
+
+### Full usage example
+
+```php
+<?php
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
+use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
+use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
+use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
+use Umanit\SeoBundle\Doctrine\Annotation as Seo;
+use Spatie\SchemaOrg\BaseType;
+use Spatie\SchemaOrg\Schema;
+
+/**
+ * Class Page
+ *
+ * @ORM\Entity()
+ * @Seo\Route(
+ *     routeName="app_page_show",
+ *     routeParameters={
+ *         @Seo\RouteParameter(parameter="slug", property="slug"),
+ *         @Seo\RouteParameter(parameter="category", property="category.slug")
+ * })
+ * @Seo\SchemaOrgBuilder("buildSchemaOrg")
+ * @Seo\Breadcrumb({
+ *     @Seo\BreadcrumbItem("app_home_page", name="Home"),
+ *     @Seo\BreadcrumbItem("category", name="category.slug"),
+ *     @Seo\BreadcrumbItem(name="name"),
+ * })
+ */
+class Page implements HasSeoMetadataInterface, UrlHistorizedInterface
+{
+    use SeoMetadataTrait, UrlHistorizedTrait;
+
+    /**
+     * The identifier of Page.
+     *
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * The name of the Page
+     *
+     * @var string
+     * @ORM\Column(nullable=true)
+     */
+    private $name;
+
+    /**
+     * The introduction of the Page
+     *
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $introduction;
+
+    /**
+     * The slug of the Page
+     *
+     * @var string
+     * @ORM\Column(unique=true)
+     */
+    private $slug;
+
+    /**
+     * @var Category
+     * @ORM\ManyToOne(targetEntity="App\Entity\Category", cascade={"all"})
+     */
+    private $category;
+    
+    // Getters and setters...
+    
+    /**
+     * Builds the schema.org.
+     * 
+     * @return BaseType
+     */
+    public function buildSchemaOrg() : BaseType
+    {
+        return Schema::webPage()
+                       ->name($this->name);
+    }
+}
 ```
