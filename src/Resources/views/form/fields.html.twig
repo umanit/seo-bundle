@@ -24,11 +24,6 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="seo-metadata">
-                    <div class="form-group">
-                        <div>
-                            <a target="_blank" href="{{ url(form.parent.vars.value) }}">{{ url(form.parent.vars.value) }}</a>
-                        </div>
-                    </div>
                     {{ form_row(form.title) }}
                     {{ form_row(form.description) }}
                 </div>
@@ -38,14 +33,14 @@
                             {{ 'seo.main_url'|trans(domain='UmanitSeoBundle') }}
                         </label>
                         <div>
-                            <a target="_blank" href="{{ url(form.parent.vars.value) }}">{{ url(form.parent.vars.value) }}</a>
+                            <a class="text-bold" target="_blank" href="{{ url(form.parent.vars.value) }}">{{ url(form.parent.vars.value) }}</a>
                         </div>
                     </div>
 
                     <table class="table">
                         <tbody>
                         <tr>
-                            <th style="width: 10px">#</th>
+                            <th style="width: 20px">#</th>
                             <th>{{ 'seo.source_url'|trans(domain='UmanitSeoBundle') }}</th>
                             <th></th>
                             <th>{{ 'seo.destination_url'|trans(domain='UmanitSeoBundle') }}</th>
@@ -54,7 +49,7 @@
                         {# @var \Umanit\SeoBundle\Entity\UrlHistory url_item #}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td>
+                            <td class="float-right">
                                 <a target="_blank" href="{{ url_item.oldPath }}">{{ url_item.oldPath }}</a>
                             </td>
                             <td>
