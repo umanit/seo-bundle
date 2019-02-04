@@ -2,6 +2,7 @@
 
 namespace Umanit\SeoBundle\Form\Type;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -9,9 +10,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\SeoMetadata;
+use Umanit\SeoBundle\Entity\UrlHistory;
 use Umanit\SeoBundle\Utils\EntityParser\Excerpt;
 use Umanit\SeoBundle\Utils\EntityParser\Title;
 
@@ -34,6 +38,9 @@ class SeoMetadataType extends AbstractType
     /** @var Title */
     private $title;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     /**
      * SeoMetadataType constructor.
      *
@@ -46,12 +53,14 @@ class SeoMetadataType extends AbstractType
         Excerpt $excerpt,
         Title $title,
         TranslatorInterface $translator,
+        EntityManagerInterface $em,
         array $metadataConfig
     ) {
         $this->excerpt        = $excerpt;
         $this->title          = $title;
         $this->metadataConfig = $metadataConfig;
         $this->translator     = $translator;
+        $this->em             = $em;
     }
 
     /**
@@ -131,6 +140,15 @@ class SeoMetadataType extends AbstractType
             $options
         );
     }
+
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $entity = $form->getParent()->getData();
+        if ($entity instanceof UrlHistorizedInterface) {
+            $view->vars['url_history'] = $this->em->getRepository(UrlHistory::class)->findBy(['seoUuid' => $entity->getSeoUuid()], ['id' => 'ASC']);
+        }
+    }
+
 
     public function configureOptions(OptionsResolver $resolver)
     {
