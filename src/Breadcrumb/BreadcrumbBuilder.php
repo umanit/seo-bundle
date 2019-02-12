@@ -3,7 +3,6 @@
 namespace Umanit\SeoBundle\Breadcrumb;
 
 use Symfony\Bridge\Twig\TwigEngine;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -47,6 +46,8 @@ class BreadcrumbBuilder
      * @param PropertyAccessorInterface $propAccess
      * @param UrlGeneratorInterface     $urlGenerator
      * @param Canonical                 $canonical
+     * @param TranslatorInterface       $translator
+     * @param array                     $templates
      */
     public function __construct(
         TwigEngine $twig,
@@ -92,7 +93,7 @@ class BreadcrumbBuilder
             if (null === $value) {
                 $items[$i]['url'] = $this->canonical->url($entity);
             } else {
-                // Try and genenrate the url from a property
+                // Try and generate the url from a property
                 try {
                     $value            = $this->propAccess->getValue($entity, $value);
                     $items[$i]['url'] = $this->canonical->url($value);

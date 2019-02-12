@@ -42,6 +42,7 @@ class SeoExtension extends AbstractExtension
      * @param CurrentSeoEntity    $currentSeoEntity
      * @param SeoMetadataResolver $metadataResolver
      * @param SchemaOrgResolver   $schemaOrgResolver
+     * @param BreadcrumbBuilder   $breadcrumbBuilder
      */
     public function __construct(
         Canonical $canonical,
@@ -92,7 +93,6 @@ class SeoExtension extends AbstractExtension
     public function canonical(?object $entity = null, array $overrides = []): string
     {
         try {
-            /** @noinspection HtmlUnknownTarget */
             return sprintf('<link rel="canonical" href="%s"/>', $this->canonical->url(
                 $entity ?? $this->currentSeoEntity->get(),
                 $overrides
@@ -129,7 +129,6 @@ HTML
      * @param object|null $entity
      *
      * @return string
-     * @throws NotSchemaOrgEntityException
      * @throws \ReflectionException
      */
     public function schemaOrg(?object $entity = null): string
@@ -158,7 +157,6 @@ HTML
      * @param string      $format
      *
      * @return string
-     * @throws NotBreadcrumbEntityException
      * @throws NotSeoRouteEntityException
      * @throws \ErrorException
      */

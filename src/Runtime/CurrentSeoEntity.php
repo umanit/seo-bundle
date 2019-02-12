@@ -14,15 +14,21 @@ use Umanit\SeoBundle\Doctrine\Annotation\Route;
  */
 class CurrentSeoEntity
 {
-    /** @var */
+    /** @var object|null */
     private $value;
 
+    /**
+     * @return object|null
+     */
     public function get()
     {
         return $this->value;
     }
 
-    public function set($value)
+    /**
+     * @param $value
+     */
+    public function set($value): void
     {
         $this->value = $value;
     }

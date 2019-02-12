@@ -15,6 +15,9 @@ use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
  */
 class SeoUuidSetter implements EventSubscriber
 {
+    /**
+     * @return string[]
+     */
     public function getSubscribedEvents()
     {
         return [Events::prePersist];

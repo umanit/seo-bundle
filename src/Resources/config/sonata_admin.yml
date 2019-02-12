@@ -7,6 +7,5 @@ sonata_admin:
 services:
     umanit_seo.admin.extension.seo_admin_extension:
         class: Umanit\SeoBundle\Sonata\AdminExtension\SeoAdminExtension
-        arguments: ['@sonata.admin.global_template_registry']
         tags:
             - { name: sonata.admin.extension }

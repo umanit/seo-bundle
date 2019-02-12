@@ -2,10 +2,7 @@
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Mapping\ManyToOne;
-use Doctrine\ORM\Proxy\Proxy;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
@@ -63,7 +60,7 @@ class UrlHistoryWriter implements EventSubscriber
      *
      * @param PreUpdateEventArgs $args
      */
-    public function preUpdate(PreUpdateEventArgs $args)
+    public function preUpdate(PreUpdateEventArgs $args): void
     {
         $entity    = $args->getEntity();
         $changeSet = $args->getEntityChangeSet();
@@ -104,7 +101,10 @@ class UrlHistoryWriter implements EventSubscriber
         }
     }
 
-    public function postFlush(PostFlushEventArgs $args)
+    /**
+     * @param PostFlushEventArgs $args
+     */
+    public function postFlush(PostFlushEventArgs $args): void
     {
         $this->urlPool->flush();
     }

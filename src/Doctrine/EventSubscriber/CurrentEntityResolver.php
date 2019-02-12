@@ -54,7 +54,7 @@ class CurrentEntityResolver implements EventSubscriber
     /**
      * @param LifecycleEventArgs $args
      */
-    public function postLoad(LifecycleEventArgs $args)
+    public function postLoad(LifecycleEventArgs $args): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {

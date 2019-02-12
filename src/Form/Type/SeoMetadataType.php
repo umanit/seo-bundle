@@ -44,10 +44,11 @@ class SeoMetadataType extends AbstractType
     /**
      * SeoMetadataType constructor.
      *
-     * @param Excerpt             $excerpt
-     * @param Title               $title
-     * @param TranslatorInterface $translator
-     * @param array               $metadataConfig
+     * @param Excerpt                $excerpt
+     * @param Title                  $title
+     * @param TranslatorInterface    $translator
+     * @param EntityManagerInterface $em
+     * @param array                  $metadataConfig
      */
     public function __construct(
         Excerpt $excerpt,
@@ -141,6 +142,13 @@ class SeoMetadataType extends AbstractType
         );
     }
 
+    /**
+     * Finishes the form view.
+     *
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $entity = $form->getParent()->getData();
@@ -149,7 +157,11 @@ class SeoMetadataType extends AbstractType
         }
     }
 
-
+    /**
+     * Configures the options for this type.
+     *
+     * @param OptionsResolver $resolver
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

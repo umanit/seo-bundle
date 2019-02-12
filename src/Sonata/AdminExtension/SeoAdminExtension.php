@@ -16,16 +16,6 @@ use Sonata\AdminBundle\Templating\MutableTemplateRegistryInterface;
  */
 class SeoAdminExtension extends AbstractAdminExtension
 {
-    /**
-     * @var MutableTemplateRegistryInterface
-     */
-    private $templateRegistry;
-
-    public function __construct(MutableTemplateRegistryInterface $templateRegistry)
-    {
-        $this->templateRegistry = $templateRegistry;
-    }
-
     public function configureListFields(ListMapper $listMapper)
     {
         if ($listMapper->has('_action')) {

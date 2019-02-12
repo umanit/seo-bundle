@@ -3,7 +3,6 @@
 namespace Umanit\SeoBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * Class UrlHistory

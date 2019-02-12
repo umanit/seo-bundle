@@ -31,7 +31,8 @@
         "symfony/translation": "^4.2",
         "spatie/schema-org": "^2.1",
         "symfony/templating": "^4.2",
-        "ramsey/uuid": "^3.8"
+        "ramsey/uuid": "^3.8",
+        "ext-json": "*"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "4.2.*",

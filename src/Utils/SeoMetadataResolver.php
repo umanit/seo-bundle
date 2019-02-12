@@ -44,7 +44,7 @@ class SeoMetadataResolver
      *
      * @return string
      */
-    public function metaTitle(?object $entity)
+    public function metaTitle(?object $entity): string
     {
         return $this->meta($entity, 'title');
     }
@@ -56,7 +56,7 @@ class SeoMetadataResolver
      *
      * @return string
      */
-    public function metaDescription(?object $entity)
+    public function metaDescription(?object $entity): string
     {
         return $this->meta($entity, 'description');
     }
