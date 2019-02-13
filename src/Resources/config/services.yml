@@ -15,12 +15,6 @@ services:
             - [setAnnotationReader, ['@annotations.cached_reader']]
     Umanit\SeoBundle\Routing\Canonical: '@umanit_seo.routing.canonical'
 
-    # Seo Uuid Setter
-    umanit_seo.doctrine_event_subscriber.seo_uuid_setter:
-        class: Umanit\SeoBundle\Doctrine\EventSubscriber\SeoUuidSetter
-        tags:
-            - { name: doctrine.event_subscriber }
-
     # Url History Writer
     umanit_seo.event_subscriber.url_history_writer:
         class: Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter
