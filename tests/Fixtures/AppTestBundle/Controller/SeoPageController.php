@@ -21,6 +21,7 @@ class SeoPageController extends AbstractController
     {
         $category = $this->getDoctrine()->getRepository(Category::class)->findOneBy(['slug' => $category]);
         $page     = $this->getDoctrine()->getRepository(SeoPage::class)->findOneBy(['slug' => $slug]);
+
         if (null === $page || null === $category) {
             throw $this->createNotFoundException();
         }

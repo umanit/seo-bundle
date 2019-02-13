@@ -25,6 +25,7 @@ class BreadcrumbTest extends WebTestCase
     {
         $kernel       = self::bootKernel();
         $this->client = $kernel->getContainer()->get('test.client');
+        $this->client->catchExceptions(false);
         $this->em     =
             $kernel
                 ->getContainer()
@@ -41,7 +42,6 @@ class BreadcrumbTest extends WebTestCase
         $page = (new SeoPage())->setSlug('test-breadcrumb-microdata');
         $category = $page->getCategory()->setSlug('category-microdata');
         $this->save($page);
-
 
         $this->client->request('GET', '/page/category-microdata/test-breadcrumb-microdata');
 

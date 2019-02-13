@@ -2,6 +2,9 @@
 
 namespace Umanit\SeoBundle\Tests\functional\Controller;
 
+use AppTestBundle\Entity\Product;
+use AppTestBundle\Entity\ProductCategory;
+use AppTestBundle\Entity\ProductMainCategory;
 use AppTestBundle\Entity\SeoPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -61,6 +64,34 @@ class UrlHistoryTest extends WebTestCase
         // Try and access the old route
         $this->client->request('GET', '/page/test-url-History-sub-attr-category/test-url-History-sub-attr-page');
         // Assert redirect to the new one
+        $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testUrlHistoryMultiLevel()
+    {
+        $productMainCategory = (new ProductMainCategory())
+            ->setName('Main category')
+            ->setSlug('main-category')
+        ;
+        $productCategory = (new ProductCategory())
+            ->setName('Product category')
+            ->setSlug('product-category')
+            ->setParent($productMainCategory);
+        ;
+
+        $product = (new Product())
+            ->setName('Product')
+            ->setSlug('product')
+            ->addCategory($productCategory)
+        ;
+
+        $this->save($product);
+
+        $productMainCategory->setSlug('main-category-updated');
+        $this->save($productMainCategory);
+
+        $this->client->request('GET', 'product/main-category/product-category/product');
+
         $this->assertEquals(301, $this->client->getResponse()->getStatusCode());
     }
 

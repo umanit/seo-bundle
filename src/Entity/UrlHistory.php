@@ -55,7 +55,7 @@ class UrlHistory
     /**
      * @var string
      *
-     * @ORM\Column(type="guid", unique=false)
+     * @ORM\Column(name="seo_uuid", type="guid", unique=false)
      */
     private $seoUuid;
 

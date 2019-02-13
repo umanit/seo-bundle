@@ -2,9 +2,12 @@
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Psr\SimpleCache\CacheInterface;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
+use Umanit\SeoBundle\Entity\UrlRef;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
 use Doctrine\Common\EventSubscriber;
@@ -25,6 +28,8 @@ use Umanit\SeoBundle\Routing\Canonical;
  */
 class UrlHistoryWriter implements EventSubscriber
 {
+    public const ENTITY_DEPENDENCY_CACHE_KEY = 'seo.entity_dependencies';
+
     use AnnotationReaderTrait;
 
     /** @var UrlPool */
@@ -33,16 +38,26 @@ class UrlHistoryWriter implements EventSubscriber
     /** @var Canonical */
     private $urlBuilder;
 
+    /** @var CacheInterface */
+    private $cache;
+
+    /** @var string */
+    private $defaultLocale;
+
     /**
      * UrlHistoryWriter constructor.
      *
-     * @param UrlPool   $urlPool
-     * @param Canonical $urlBuilder
+     * @param UrlPool        $urlPool
+     * @param Canonical      $urlBuilder
+     * @param CacheInterface $cache
+     * @param string         $defaultLocale
      */
-    public function __construct(UrlPool $urlPool, Canonical $urlBuilder)
+    public function __construct(UrlPool $urlPool, Canonical $urlBuilder, CacheInterface $cache, string $defaultLocale)
     {
-        $this->urlPool    = $urlPool;
-        $this->urlBuilder = $urlBuilder;
+        $this->urlPool       = $urlPool;
+        $this->urlBuilder    = $urlBuilder;
+        $this->cache         = $cache;
+        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -52,7 +67,102 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return [Events::preUpdate, Events::postRemove, Events::postFlush];
+        return [
+            Events::preUpdate,
+            Events::prePersist,
+            Events::postUpdate,
+            Events::postRemove,
+            Events::postFlush,
+            Events::loadClassMetadata,
+        ];
+    }
+
+    /**
+     * Creates the cache used to match entities.
+     *
+     * @param LoadClassMetadataEventArgs $args
+     */
+    public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
+    {
+        $route = $this->annotationsReader->getClassAnnotation(
+            $args->getClassMetadata()->getReflectionClass(),
+            Route::class
+        );
+
+        if (!$route instanceof Route) {
+            return;
+        }
+
+        foreach ($route->getRouteParameters() as $routeParameter) {
+            $pathItems = explode('.', $routeParameter->getProperty());
+            if (count($pathItems) > 1) {
+                $this->walkRouteParameters($args->getClassMetadata()->rootEntityName, $args->getClassMetadata()->rootEntityName, $pathItems);
+            }
+        }
+    }
+
+    /**
+     * Walk through relations to set the cache.
+     *
+     * @param string $rootEntity
+     * @param string $subEntity
+     * @param array  $pathItems
+     *
+     * @throws \ReflectionException
+     */
+    private function walkRouteParameters(string $rootEntity, string $subEntity, array &$pathItems): void
+    {
+        $refl = new \ReflectionClass($subEntity);
+
+        foreach ($pathItems as $key => $pathItem) {
+            $pathItem = preg_replace('/\[.+\]/', '', $pathItem);
+            try {
+                $prop = $refl->getProperty($pathItem);
+            } catch (\ReflectionException $e) {
+                continue;
+            }
+            $annotations = $this->annotationsReader->getPropertyAnnotations($prop);
+            foreach ($annotations as $annotation) {
+                if (property_exists($annotation, 'targetEntity')) {
+                    $targetEntity = $annotation->targetEntity;
+                    unset($pathItems[$key]);
+                    $this->addEntitiesToCache($targetEntity, $rootEntity);
+
+                    $this->walkRouteParameters($rootEntity, $targetEntity, $pathItems);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds and association to the cache.
+     *
+     * @param string $parent
+     * @param string $child
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \ReflectionException
+     */
+    private function addEntitiesToCache(string $parent, string $child): void
+    {
+        $route = $this->annotationsReader->getClassAnnotation(
+            new \ReflectionClass($child),
+            Route::class
+        );
+
+        if (!$route instanceof Route) {
+            return;
+        }
+
+        $cache = $this->cache->get(self::ENTITY_DEPENDENCY_CACHE_KEY, []);
+        if (!isset($cache[$parent])) {
+            $cache[$parent] = [];
+        }
+
+        if (!in_array($child, $cache[$parent], true)) {
+            $cache[$parent][] = $child;
+        }
+        $this->cache->set(self::ENTITY_DEPENDENCY_CACHE_KEY, $cache);
     }
 
     /**
@@ -102,15 +212,103 @@ class UrlHistoryWriter implements EventSubscriber
     }
 
     /**
+     * Creates the url reference of an entity.
+     *
+     * @param LifecycleEventArgs $args
+     *
+     * @throws \ReflectionException
+     */
+    public function prePersist(LifecycleEventArgs $args): void
+    {
+        $entity = $args->getEntity();
+        if (!$entity instanceof UrlHistorizedInterface) {
+            return;
+        }
+
+        if ($entity->getUrlRef() !== null) {
+            return;
+        }
+        try {
+            $route  = $this->getSeoRouteAnnotation($entity);
+            $urlRef = (new UrlRef())
+                ->setSeoUuid($entity->getSeoUuid())
+                ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
+                ->setUrl($this->urlBuilder->url($entity))
+                ->setRoute($route->getRouteName())
+            ;
+
+            $entity->setUrlRef($urlRef);
+        } catch (NotSeoRouteEntityException $e) {
+            // Do nothing
+        }
+    }
+
+    /**
+     * Updates the url reference of an entity.
+     * Updates the child entities when a parent entity slug is updated.
+     *
+     * @param LifecycleEventArgs $args
+     *
+     * @throws NotSeoRouteEntityException
+     */
+    public function postUpdate(LifecycleEventArgs $args): void
+    {
+        $entity = $args->getEntity();
+
+        if ($entity instanceof UrlHistorizedInterface) {
+            try {
+                /** @var UrlRef $urlRef */
+                $urlRef = $entity->getUrlRef();
+                if (null === $urlRef) {
+                    return;
+                }
+                $newUrl = $this->urlBuilder->url($entity);
+                if ($urlRef->getUrl() !== $newUrl) {
+                    $urlRef->setUrl($newUrl);
+                    $args->getEntityManager()->persist($urlRef);
+                    $args->getEntityManager()->flush($urlRef);
+                }
+            } catch (NotSeoRouteEntityException $e) {
+                // Do nothing
+            }
+        }
+
+        // Look inside the cache if any dependent entity has to be historised
+        $cache = $this->cache->get(self::ENTITY_DEPENDENCY_CACHE_KEY, []);
+        if (!array_key_exists($this->getClass($entity), $cache)) {
+            return;
+        }
+
+        foreach ($cache[$this->getClass($entity)] as $dependantEntityClass) {
+            // Fetches the current url of the entities
+            $query = $args
+                ->getEntityManager()->createQueryBuilder()
+                ->select('dependant', 'url_ref')
+                ->from($dependantEntityClass, 'dependant')
+                ->innerJoin('dependant.urlRef', 'url_ref')
+            ;
+            // Regenerate route for all entities if different
+            foreach ($query->getQuery()->getResult() as $dependantEntity) {
+                $urlRef = $dependantEntity->getUrlRef() ?? new UrlRef();
+
+                $newUrl = $this->urlBuilder->url($dependantEntity);
+                $oldUrl = $urlRef->getUrl();
+
+                if ($newUrl !== $oldUrl) {
+                    // Add the redirection to the pool
+                    $this->urlPool->add($oldUrl, $newUrl, $dependantEntity);
+                    $urlRef->setUrl($newUrl);
+                    $args->getEntityManager()->persist($urlRef);
+                }
+            }
+        }
+    }
+
+    /**
      * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args): void
     {
         $this->urlPool->flush();
-    }
-
-    public function postRemove(LifecycleEventArgs $args)
-    {
-        // TODO
     }
 }
