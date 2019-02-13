@@ -9,10 +9,6 @@ use Umanit\SeoBundle\Entity\UrlRef;
  */
 interface UrlHistorizedInterface
 {
-    public function getSeoUuid(): ?string;
-
-    public function setSeoUuid(string $uuid): UrlHistorizedInterface;
-
     public function getUrlRef(): ?UrlRef;
 
     public function setUrlRef(?UrlRef $urlRef): UrlHistorizedInterface;

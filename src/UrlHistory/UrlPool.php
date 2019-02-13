@@ -55,7 +55,7 @@ class UrlPool
         $urlHistory = $this->getUrlHistoryRepository()->findOneBy([
             'oldPath' => $oldPath,
             'locale'  => method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale,
-            'seoUuid' => $entity->getSeoUuid(),
+            'seoUuid' => $entity->getUrlRef()->getSeoUuid(),
         ])
         ;
 
@@ -65,7 +65,7 @@ class UrlPool
                 ->setNewPath($newPath)
                 ->setOldPath($oldPath)
                 ->setRoute($this->resolveRouteFromEntity($entity))
-                ->setSeoUuid($entity->getSeoUuid())
+                ->setSeoUuid($entity->getUrlRef()->getSeoUuid())
             ;
         }
 

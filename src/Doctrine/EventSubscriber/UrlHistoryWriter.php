@@ -5,6 +5,7 @@ namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Psr\SimpleCache\CacheInterface;
+use Ramsey\Uuid\Uuid;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\UrlRef;
@@ -231,7 +232,7 @@ class UrlHistoryWriter implements EventSubscriber
         try {
             $route  = $this->getSeoRouteAnnotation($entity);
             $urlRef = (new UrlRef())
-                ->setSeoUuid($entity->getSeoUuid())
+                ->setSeoUuid(Uuid::uuid4())
                 ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
                 ->setUrl($this->urlBuilder->url($entity))
                 ->setRoute($route->getRouteName())

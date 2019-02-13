@@ -20,21 +20,21 @@ class SeoUuidSetter implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return [Events::prePersist];
+        return [];
     }
-
-    /**
-     * Generates and set the SeoUuid.
-     *
-     * @param LifecycleEventArgs $args
-     *
-     * @throws \Exception
-     */
-    public function prePersist(LifecycleEventArgs $args): void
-    {
-        $seoEntity = $args->getEntity();
-        if ($seoEntity instanceof UrlHistorizedInterface && null === $seoEntity->getSeoUuid()) {
-            $seoEntity->setSeoUuid(Uuid::uuid4());
-        }
-    }
+    //
+    // /**
+    //  * Generates and set the SeoUuid.
+    //  *
+    //  * @param LifecycleEventArgs $args
+    //  *
+    //  * @throws \Exception
+    //  */
+    // public function prePersist(LifecycleEventArgs $args): void
+    // {
+    //     $seoEntity = $args->getEntity();
+    //     if ($seoEntity instanceof UrlHistorizedInterface && null === $seoEntity->getSeoUuid()) {
+    //         $seoEntity->setSeoUuid(Uuid::uuid4());
+    //     }
+    // }
 }
