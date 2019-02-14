@@ -152,7 +152,7 @@ class SeoMetadataType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $entity = $form->getParent()->getData();
-        if ($entity instanceof UrlHistorizedInterface) {
+        if ($entity instanceof UrlHistorizedInterface && $entity->getUrlRef()) {
             $view->vars['url_history'] = $this->em->getRepository(UrlHistory::class)->findBy(['seoUuid' => $entity->getUrlRef()->getSeoUuid()], ['id' => 'ASC']);
         }
     }

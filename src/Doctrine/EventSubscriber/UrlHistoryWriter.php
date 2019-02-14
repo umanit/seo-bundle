@@ -3,6 +3,7 @@
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Psr\SimpleCache\CacheInterface;
 use Ramsey\Uuid\Uuid;
@@ -70,9 +71,8 @@ class UrlHistoryWriter implements EventSubscriber
     {
         return [
             Events::preUpdate,
+            Events::onFlush,
             Events::prePersist,
-            Events::postUpdate,
-            Events::postRemove,
             Events::postFlush,
             Events::loadClassMetadata,
         ];
@@ -213,93 +213,115 @@ class UrlHistoryWriter implements EventSubscriber
     }
 
     /**
-     * Creates the url reference of an entity.
+     * On prePersist, associate a fresh UrlRef to an entity.
      *
      * @param LifecycleEventArgs $args
      *
      * @throws \ReflectionException
      */
-    public function prePersist(LifecycleEventArgs $args): void
+    public function prePersist(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
         if (!$entity instanceof UrlHistorizedInterface) {
             return;
         }
-
-        if ($entity->getUrlRef() !== null) {
-            return;
-        }
         try {
-            $route  = $this->getSeoRouteAnnotation($entity);
-            $urlRef = (new UrlRef())
-                ->setSeoUuid(Uuid::uuid4())
-                ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
-                ->setUrl($this->urlBuilder->url($entity))
-                ->setRoute($route->getRouteName())
-            ;
-
-            $entity->setUrlRef($urlRef);
+            if (null === $entity->getUrlRef()) {
+                $route  = $this->getSeoRouteAnnotation($entity);
+                $urlRef = (new UrlRef())
+                    ->setSeoUuid(Uuid::uuid4())
+                    ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
+                    ->setRoute($route->getRouteName())
+                ;
+                $entity->setUrlRef($urlRef);
+            }
         } catch (NotSeoRouteEntityException $e) {
             // Do nothing
         }
     }
 
     /**
-     * Updates the url reference of an entity.
-     * Updates the child entities when a parent entity slug is updated.
+     * We use on flush rather than prePersist
+     * and postUpdate so the history works
+     * with DoctrineExtensions Sluggable.
      *
-     * @param LifecycleEventArgs $args
+     * @param OnFlushEventArgs $args
      *
-     * @throws NotSeoRouteEntityException
+     * @return void
      */
-    public function postUpdate(LifecycleEventArgs $args): void
+    public function onFlush(OnFlushEventArgs $args)
     {
-        $entity = $args->getEntity();
+        $em  = $args->getEntityManager();
+        $uow = $em->getUnitOfWork();
 
-        if ($entity instanceof UrlHistorizedInterface) {
+        // process all objects being inserted, using scheduled insertions instead
+        // of prePersist in case if record will be changed before flushing this will
+        // ensure correct result. No additional overhead is encountered
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
+            if (!$entity instanceof UrlHistorizedInterface) {
+                continue;
+            }
             try {
-                /** @var UrlRef $urlRef */
-                $urlRef = $entity->getUrlRef();
-                if (null === $urlRef) {
-                    return;
-                }
-                $newUrl = $this->urlBuilder->url($entity);
-                if ($urlRef->getUrl() !== $newUrl) {
-                    $urlRef->setUrl($newUrl);
-                    $args->getEntityManager()->persist($urlRef);
-                    $args->getEntityManager()->flush($urlRef);
-                }
+                $urlRef = $entity
+                    ->getUrlRef()
+                    ->setUrl($this->urlBuilder->url($entity))
+                ;
+                $uow->recomputeSingleEntityChangeSet($em->getClassMetadata($this->getClass($urlRef)), $urlRef);
+                $uow->persist($urlRef);
+
             } catch (NotSeoRouteEntityException $e) {
                 // Do nothing
             }
         }
+        // we use onFlush and not preUpdate event to let other
+        // event listeners be nested together
+        foreach ($uow->getScheduledEntityUpdates() as $entity) {
+            if ($entity instanceof UrlHistorizedInterface) {
+                try {
+                    /** @var UrlRef $urlRef */
+                    $urlRef = $entity->getUrlRef();
+                    if (null === $urlRef) {
+                        continue;
+                    }
+                    $newUrl = $this->urlBuilder->url($entity);
+                    if ($urlRef->getUrl() !== $newUrl) {
+                        $urlRef->setUrl($newUrl);
+                        $uow->recomputeSingleEntityChangeSet($em->getClassMetadata($this->getClass($urlRef)), $urlRef);
+                        $uow->persist($urlRef);
+                    }
+                } catch (NotSeoRouteEntityException $e) {
+                    // Do nothing
+                }
+            }
 
-        // Look inside the cache if any dependent entity has to be historised
-        $cache = $this->cache->get(self::ENTITY_DEPENDENCY_CACHE_KEY, []);
-        if (!array_key_exists($this->getClass($entity), $cache)) {
-            return;
-        }
+            // Look inside the cache if any dependent entity has to be historised
+            $cache = $this->cache->get(self::ENTITY_DEPENDENCY_CACHE_KEY, []);
+            if (!array_key_exists($this->getClass($entity), $cache)) {
+                continue;
+            }
 
-        foreach ($cache[$this->getClass($entity)] as $dependantEntityClass) {
-            // Fetches the current url of the entities
-            $query = $args
-                ->getEntityManager()->createQueryBuilder()
-                ->select('dependant', 'url_ref')
-                ->from($dependantEntityClass, 'dependant')
-                ->innerJoin('dependant.urlRef', 'url_ref')
-            ;
-            // Regenerate route for all entities if different
-            foreach ($query->getQuery()->getResult() as $dependantEntity) {
-                $urlRef = $dependantEntity->getUrlRef() ?? new UrlRef();
+            foreach ($cache[$this->getClass($entity)] as $dependantEntityClass) {
+                // Fetches the current url of the entities
+                $query = $args
+                    ->getEntityManager()->createQueryBuilder()
+                    ->select('dependant', 'url_ref')
+                    ->from($dependantEntityClass, 'dependant')
+                    ->innerJoin('dependant.urlRef', 'url_ref')
+                ;
+                // Regenerate route for all entities if different
+                foreach ($query->getQuery()->getResult() as $dependantEntity) {
+                    $urlRef = $dependantEntity->getUrlRef();
 
-                $newUrl = $this->urlBuilder->url($dependantEntity);
-                $oldUrl = $urlRef->getUrl();
+                    $newUrl = $this->urlBuilder->url($dependantEntity);
+                    $oldUrl = $urlRef->getUrl();
 
-                if ($newUrl !== $oldUrl) {
-                    // Add the redirection to the pool
-                    $this->urlPool->add($oldUrl, $newUrl, $dependantEntity);
-                    $urlRef->setUrl($newUrl);
-                    $args->getEntityManager()->persist($urlRef);
+                    if ($newUrl !== $oldUrl) {
+                        // Add the redirection to the pool
+                        $this->urlPool->add($oldUrl, $newUrl, $dependantEntity);
+                        $urlRef->setUrl($newUrl);
+                        $uow->recomputeSingleEntityChangeSet($em->getClassMetadata($this->getClass($urlRef)), $urlRef);
+                        $uow->persist($urlRef);
+                    }
                 }
             }
         }

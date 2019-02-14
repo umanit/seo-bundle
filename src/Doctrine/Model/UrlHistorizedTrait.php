@@ -13,6 +13,7 @@ trait UrlHistorizedTrait
     /**
      * @var UrlRef
      * @ORM\OneToOne(targetEntity="Umanit\SeoBundle\Entity\UrlRef", cascade={"all"}, orphanRemoval=true)
+     * @ORM\JoinColumn(name="seo_url_reference", nullable=false)
      */
     protected $urlRef;
 
