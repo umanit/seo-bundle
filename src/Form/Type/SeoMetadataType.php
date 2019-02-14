@@ -44,16 +44,16 @@ class SeoMetadataType extends AbstractType
     /**
      * SeoMetadataType constructor.
      *
-     * @param Excerpt                $excerpt
-     * @param Title                  $title
-     * @param TranslatorInterface    $translator
-     * @param EntityManagerInterface $em
-     * @param array                  $metadataConfig
+     * @param Excerpt                                                                $excerpt
+     * @param Title                                                                  $title
+     * @param TranslatorInterface|\Symfony\Component\Translation\TranslatorInterface $translator
+     * @param EntityManagerInterface                                                 $em
+     * @param array                                                                  $metadataConfig
      */
     public function __construct(
         Excerpt $excerpt,
         Title $title,
-        TranslatorInterface $translator,
+        $translator,
         EntityManagerInterface $em,
         array $metadataConfig
     ) {

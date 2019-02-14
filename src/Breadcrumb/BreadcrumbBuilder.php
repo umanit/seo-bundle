@@ -42,19 +42,19 @@ class BreadcrumbBuilder
     /**
      * BreadcrumbBuilder constructor.
      *
-     * @param TwigEngine                $twig
-     * @param PropertyAccessorInterface $propAccess
-     * @param UrlGeneratorInterface     $urlGenerator
-     * @param Canonical                 $canonical
-     * @param TranslatorInterface       $translator
-     * @param array                     $templates
+     * @param TwigEngine                                                             $twig
+     * @param PropertyAccessorInterface                                              $propAccess
+     * @param UrlGeneratorInterface                                                  $urlGenerator
+     * @param Canonical                                                              $canonical
+     * @param TranslatorInterface|\Symfony\Component\Translation\TranslatorInterface $translator
+     * @param array                                                                  $templates
      */
     public function __construct(
         TwigEngine $twig,
         PropertyAccessorInterface $propAccess,
         UrlGeneratorInterface $urlGenerator,
         Canonical $canonical,
-        TranslatorInterface $translator,
+        $translator,
         array $templates
     ) {
         $this->twig         = $twig;
