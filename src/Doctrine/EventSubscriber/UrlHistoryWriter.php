@@ -85,6 +85,10 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
     {
+        if (null === $args->getClassMetadata()->getReflectionClass()) {
+            return;
+        }
+
         $route = $this->annotationsReader->getClassAnnotation(
             $args->getClassMetadata()->getReflectionClass(),
             Route::class
