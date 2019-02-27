@@ -1,7 +1,7 @@
 {% block seo_metadata_widget %}
     {% if form.parent.vars.value.id is not null %}
-        {% set breadcrumb = seo_breadcrumb(form.parent.vars.value)|format %}
-        {% set schema = seo_schema_org(form.parent.vars.value)|format %}
+        {% set breadcrumb = seo_breadcrumb(form.parent.vars.value) %}
+        {% set schema = seo_schema_org(form.parent.vars.value) %}
         <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
