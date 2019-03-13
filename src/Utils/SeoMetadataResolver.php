@@ -46,7 +46,7 @@ class SeoMetadataResolver
      */
     public function metaTitle(?object $entity): string
     {
-        return $this->meta($entity, 'title');
+        return $this->metadataConfig['title_prefix'].$this->meta($entity, 'title').$this->metadataConfig['title_suffix'];
     }
 
     /**
