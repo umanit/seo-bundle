@@ -8,6 +8,7 @@ This bundle adds SEO capabilities for Doctrine entities.
 - [x] SEO Metadata (title and description)
 - [x] Canonical URL
 - [x] Schema.org
+- [x] Breadcrumb
 - [ ] Sitemap
 
 ## Installation
