@@ -18,6 +18,7 @@ use Umanit\SeoBundle\Entity\SeoMetadata;
 use Umanit\SeoBundle\Entity\UrlHistory;
 use Umanit\SeoBundle\Utils\EntityParser\Excerpt;
 use Umanit\SeoBundle\Utils\EntityParser\Title;
+use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 /**
  * Class SeoMetadataType
@@ -40,25 +41,26 @@ class SeoMetadataType extends AbstractType
 
     /** @var EntityManagerInterface */
     private $em;
+    /**
+     * @var SeoMetadataResolver
+     */
+    private $seoMetadataResolver;
 
     /**
      * SeoMetadataType constructor.
      *
-     * @param Excerpt                                                                $excerpt
-     * @param Title                                                                  $title
+     * @param SeoMetadataResolver $seoMetadataResolver
      * @param TranslatorInterface|\Symfony\Component\Translation\TranslatorInterface $translator
-     * @param EntityManagerInterface                                                 $em
-     * @param array                                                                  $metadataConfig
+     * @param EntityManagerInterface $em
+     * @param array $metadataConfig
      */
     public function __construct(
-        Excerpt $excerpt,
-        Title $title,
+        SeoMetadataResolver $seoMetadataResolver,
         $translator,
         EntityManagerInterface $em,
         array $metadataConfig
     ) {
-        $this->excerpt        = $excerpt;
-        $this->title          = $title;
+        $this->seoMetadataResolver = $seoMetadataResolver;
         $this->metadataConfig = $metadataConfig;
         $this->translator     = $translator;
         $this->em             = $em;
@@ -94,12 +96,7 @@ class SeoMetadataType extends AbstractType
             $locale          = method_exists($parentModelData, 'getLocale') ? $parentModelData->getLocale() : null;
             // Title
             if (null === $seoMetadata->getTitle()) {
-                $title = $this->title->fromEntity($parentModelData) ?? $this->translator->trans(
-                        $this->metadataConfig['default_title'],
-                        [],
-                        $options['translation_domain'],
-                        $locale
-                    );
+                $title = $this->seoMetadataResolver->metaTitle($parentModelData);
 
                 $this->setSubFormOption($seoForm, 'title', 'attr', [
                     'placeholder' => html_entity_decode($title),
@@ -107,12 +104,7 @@ class SeoMetadataType extends AbstractType
             }
             // Description
             if (null === $seoMetadata->getDescription()) {
-                $description = $this->excerpt->fromEntity($parentModelData) ?? $this->translator->trans(
-                        $this->metadataConfig['default_description'],
-                        [],
-                        $options['translation_domain'],
-                        $locale
-                    );
+                $description = $this->seoMetadataResolver->metaDescription($parentModelData);
 
                 $this->setSubFormOption($seoForm, 'description', 'attr', [
                     'placeholder' => html_entity_decode($description),

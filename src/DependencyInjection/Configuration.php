@@ -34,6 +34,8 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('default_title')->defaultValue('Umanit Seo - Customize this default title to your needs.')->end()
+                        ->scalarNode('title_prefix')->defaultValue('')->end()
+                        ->scalarNode('title_suffix')->defaultValue('')->end()
                         ->scalarNode('default_description')->defaultValue('Umanit Seo - Customize this default description to your needs.')->end()
                     ->end()
                 ->end()
