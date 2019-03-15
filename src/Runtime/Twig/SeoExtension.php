@@ -118,7 +118,7 @@ class SeoExtension extends AbstractExtension
 <meta name="description" content="%description%" />
 HTML
             , [
-                '%title%'       => $this->metadataResolver->metaTitle($entity ?? $this->currentSeoEntity->get()),
+                '%title%'       => $this->metadataResolver->metaTitle($entity ?? $this->currentSeoEntity->get(), true, true),
                 '%description%' => $this->metadataResolver->metaDescription($entity ?? $this->currentSeoEntity->get()),
             ]);
     }
