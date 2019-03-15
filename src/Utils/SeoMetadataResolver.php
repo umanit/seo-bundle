@@ -46,7 +46,7 @@ class SeoMetadataResolver
      * @param bool $includeSuffix
      * @return string
      */
-    public function metaTitle(?object $entity, bool $includePrefix, bool $includeSuffix): string
+    public function metaTitle(?object $entity, bool $includePrefix = true, bool $includeSuffix = true): string
     {
         if ($includePrefix && $includeSuffix) {
             return $this->metadataConfig['title_prefix'].$this->meta($entity, 'title').$this->metadataConfig['title_suffix'];
