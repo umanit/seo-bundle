@@ -1,6 +1,7 @@
 seo.title: 'Titre'
 seo.description: 'Description'
 seo.metadata: 'Metadata'
+seo.metatitle.help: "Le metatitle s'affichera de la manière suivante : "
 seo.breadcrumb: 'Breadcrumb'
 seo.microdata: 'Microdata'
 seo.form.url: 'URL'

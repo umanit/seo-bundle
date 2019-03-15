@@ -96,7 +96,7 @@ class SeoMetadataType extends AbstractType
             $locale          = method_exists($parentModelData, 'getLocale') ? $parentModelData->getLocale() : null;
             // Title
             if (null === $seoMetadata->getTitle()) {
-                $title = $this->seoMetadataResolver->metaTitle($parentModelData);
+                $title = $this->seoMetadataResolver->metaTitle($parentModelData, false, false);
 
                 $this->setSubFormOption($seoForm, 'title', 'attr', [
                     'placeholder' => html_entity_decode($title),
