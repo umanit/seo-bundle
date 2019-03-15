@@ -79,7 +79,7 @@ class SeoExtension extends AbstractExtension
      */
     public function title(?object $entity = null): string
     {
-        return $this->metadataResolver->metaTitle($entity ?? $this->currentSeoEntity->get());
+        return $this->metadataResolver->metaTitle($entity ?? $this->currentSeoEntity->get(), true, true);
     }
 
     /**

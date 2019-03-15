@@ -42,11 +42,25 @@ class SeoMetadataResolver
      *
      * @param object|null $entity
      *
+     * @param bool $includePrefix
+     * @param bool $includeSuffix
      * @return string
      */
-    public function metaTitle(?object $entity): string
+    public function metaTitle(?object $entity, bool $includePrefix, bool $includeSuffix): string
     {
-        return $this->metadataConfig['title_prefix'].$this->meta($entity, 'title').$this->metadataConfig['title_suffix'];
+        if ($includePrefix && $includeSuffix) {
+            return $this->metadataConfig['title_prefix'].$this->meta($entity, 'title').$this->metadataConfig['title_suffix'];
+        }
+
+        if ($includePrefix) {
+            return $this->metadataConfig['title_prefix'].$this->meta($entity, 'title');
+        }
+
+        if ($includeSuffix) {
+            return $this->meta($entity, 'title').$this->metadataConfig['title_suffix'];
+        }
+
+        return $this->meta($entity, 'title');
     }
 
     /**
