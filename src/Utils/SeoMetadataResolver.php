@@ -48,19 +48,17 @@ class SeoMetadataResolver
      */
     public function metaTitle(?object $entity, bool $includePrefix = true, bool $includeSuffix = true): string
     {
-        if ($includePrefix && $includeSuffix) {
-            return $this->metadataConfig['title_prefix'].$this->meta($entity, 'title').$this->metadataConfig['title_suffix'];
+        $title = $this->meta($entity, 'title');
+
+        if (true === $includePrefix) {
+            $title = $this->metadataConfig['title_prefix'].$title;
         }
 
-        if ($includePrefix) {
-            return $this->metadataConfig['title_prefix'].$this->meta($entity, 'title');
+        if (true === $includeSuffix) {
+            $title .= $this->metadataConfig['title_suffix'];
         }
 
-        if ($includeSuffix) {
-            return $this->meta($entity, 'title').$this->metadataConfig['title_suffix'];
-        }
-
-        return $this->meta($entity, 'title');
+        return $title;
     }
 
     /**
