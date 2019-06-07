@@ -175,9 +175,6 @@ Next, add the twig function `seo_schema_org()` at the bottom of your layout.
 
 The function will format and display the json schema of the current entity as you defined it.
 
-In case your schema needs more than the entity to build-up, you can pass a service id to `SchemaOrgBuilder`.
-This service must implement `Umanit\SeoBundle\SchemaOrg\SchemaBuilderInterface` and must be declared `public`.
-
 ```html
 <script type="application/ld+json">
 {
@@ -192,6 +189,9 @@ This service must implement `Umanit\SeoBundle\SchemaOrg\SchemaBuilderInterface` 
 }
 </script>\n
 ```
+**Note:**
+In case your schema needs more than the entity to build-up, you can pass a service id to `SchemaOrgBuilder`.
+This service must implement `Umanit\SeoBundle\SchemaOrg\SchemaBuilderInterface` and must be declared `public`.
 
 ### Breadcrumb
 
