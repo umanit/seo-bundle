@@ -20,7 +20,7 @@ This bundle adds SEO capabilities for Doctrine entities.
 
 1. [Basic Usage](#basic-usage)
 1. [Seo Metadata](#seo-metadata)
-1. [Schema.org](#schema.org-implementation)
+1. [Schema.org](#schemaorg-implementation)
 1. [Breadcrumb](#breadcrumb)
 1. [Enabling 301 redirects](#enabling-301-redirects)
 1. [Twig functions reference](#twig-functions-reference)
@@ -174,6 +174,9 @@ class Page
 Next, add the twig function `seo_schema_org()` at the bottom of your layout.
 
 The function will format and display the json schema of the current entity as you defined it.
+
+In case your schema needs more than the entity to build-up, you can pass a service id to `SchemaOrgBuilder`.
+This service must implement `Umanit\SeoBundle\SchemaOrg\SchemaBuilderInterface` and must be declared `public`.
 
 ```html
 <script type="application/ld+json">
