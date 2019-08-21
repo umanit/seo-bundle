@@ -266,10 +266,12 @@ class UrlHistoryWriter implements EventSubscriber
                 continue;
             }
             try {
-                $urlRef = $entity
-                    ->getUrlRef()
-                    ->setUrl($this->urlBuilder->url($entity))
-                ;
+                /** @var UrlRef $urlRef */
+                $urlRef = $entity->getUrlRef();
+                if (null === $urlRef) {
+                    continue;
+                }
+                $urlRef->setUrl($this->urlBuilder->url($entity));
                 $uow->recomputeSingleEntityChangeSet($em->getClassMetadata($this->getClass($urlRef)), $urlRef);
                 $uow->persist($urlRef);
 

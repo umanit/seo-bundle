@@ -15,6 +15,29 @@ This bundle adds SEO capabilities for Doctrine entities.
 
 `$ composer require umanit/seo-bundle`
 
+## Configuration
+
+The template needs to be declared in your Twig configuration, **before** other templates:
+```yaml
+twig:
+    # ...
+    form_themes:
+        - '@UmanitSeo/form/fields.html.twig'
+        - ...
+```
+
+You can configure your bundle further by creating a `umanit_seo.yaml` configuration file:
+```yaml
+umanit_seo:
+    metadata:
+        default_title: # The fallback value for the metatitle
+        default_description: # The fallback value for the metadescription
+        title_prefix: # You can define a prefix for you metatitle here
+        title_suffix: # You can define a suffix for you metatitle here
+    templates:
+        # Allows you to override default templates, like for example breadcrumb_microdata
+        breadcrumb_microdata: 'partials/_custom_template_name.microdata.html.twig'
+```
 
 ## Usage
 
