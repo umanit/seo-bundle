@@ -2,10 +2,10 @@
 
 namespace Umanit\SeoBundle\Breadcrumb;
 
-use Symfony\Bridge\Twig\TwigEngine;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Templating\EngineInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Umanit\SeoBundle\Doctrine\Annotation\Breadcrumb;
 use Umanit\SeoBundle\Doctrine\Annotation\BreadcrumbItem;
@@ -21,7 +21,7 @@ class BreadcrumbBuilder
 {
     use AnnotationReaderTrait;
 
-    /** @var TwigEngine */
+    /** @var EngineInterface */
     private $twig;
 
     /** @var PropertyAccessorInterface */
@@ -42,7 +42,7 @@ class BreadcrumbBuilder
     /**
      * BreadcrumbBuilder constructor.
      *
-     * @param TwigEngine                                                             $twig
+     * @param EngineInterface                                                        $twig
      * @param PropertyAccessorInterface                                              $propAccess
      * @param UrlGeneratorInterface                                                  $urlGenerator
      * @param Canonical                                                              $canonical
@@ -50,7 +50,7 @@ class BreadcrumbBuilder
      * @param array                                                                  $templates
      */
     public function __construct(
-        TwigEngine $twig,
+        EngineInterface $twig,
         PropertyAccessorInterface $propAccess,
         UrlGeneratorInterface $urlGenerator,
         Canonical $canonical,
