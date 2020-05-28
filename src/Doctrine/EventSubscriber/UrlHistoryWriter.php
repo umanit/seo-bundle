@@ -99,7 +99,7 @@ class UrlHistoryWriter implements EventSubscriber
         }
 
         foreach ($route->getRouteParameters() as $routeParameter) {
-            $pathItems = explode('.', $routeParameter->getProperty());
+            $pathItems = $this->getPropertyAsArray($routeParameter);
             if (count($pathItems) > 1) {
                 $this->walkRouteParameters($args->getClassMetadata()->rootEntityName, $args->getClassMetadata()->rootEntityName, $pathItems);
             }
@@ -189,23 +189,34 @@ class UrlHistoryWriter implements EventSubscriber
             // Build the new path
             $newPath = $this->urlBuilder->url($entity);
             // Get old values
-            array_walk(
-                $changeSet,
-                function (array &$changedFieldValue, string $changedFieldKey) use ($changeSet, $seoAnnotation) {
-                    foreach ($seoAnnotation->getRouteParameters() as $routeParameter) {
-                        /** @var RouteParameter $routeParameter */
-                        if ($routeParameter->getProperty() === $changedFieldKey) {
-                            $changedFieldValue = $changedFieldValue[0];
+            foreach ($changeSet as $changedFieldKey => $changedFieldValue) {
+                foreach ($seoAnnotation->getRouteParameters() as $routeParameter) {
+                    /** @var RouteParameter $routeParameter */
+                    $propertyAsArray = $this->getPropertyAsArray($routeParameter);
 
-                            return true;
+                    if (reset($propertyAsArray) === $changedFieldKey) {
+                        // The old value is the first element of the array
+                        $value = $changedFieldValue[0];
+
+                        if (is_object($value)) {
+                            $reflection = new \ReflectionClass($value);
+
+                            // If it's an objet, tries to access the value from the class
+                            try {
+                                $value = $this->getValueFromReflectionClass(
+                                    $reflection,
+                                    $propertyAsArray[1],
+                                    $value
+                                );
+                            } catch (\ReflectionException $e) {
+                                continue;
+                            }
                         }
+
+                        $changeSet[$changedFieldKey] = $value;
                     }
-
-                    unset($changeSet[$changedFieldKey]);
-
-                    return false;
                 }
-            );
+            }
             // Build the old path
             $oldPath = $this->urlBuilder->url($entity, $changeSet);
 
@@ -339,5 +350,50 @@ class UrlHistoryWriter implements EventSubscriber
     public function postFlush(PostFlushEventArgs $args): void
     {
         $this->urlPool->flush();
+    }
+
+    /**
+     * When the property of a route parameter is
+     * the path to a property of a child entity,
+     * explodes the property and returns an
+     * array
+     *
+     * @param RouteParameter $routeParameter
+     *
+     * @return false|string[]
+     */
+    private function getPropertyAsArray(RouteParameter $routeParameter)
+    {
+        return explode('.', $routeParameter->getProperty());
+    }
+
+    /**
+     * Tries to get a value from a reflection class, and calls
+     * itself recursively to test the parent reflection class
+     * in case of inheritance (on one or more levels)
+     *
+     * @param \ReflectionClass $reflection
+     * @param string           $property
+     * @param object           $object
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    private function getValueFromReflectionClass(\ReflectionClass $reflection, string $property, object $object)
+    {
+        try {
+            $prop = $reflection->getProperty($property);
+            $prop->setAccessible(true);
+
+            return $prop->getValue($object);
+        } catch (\ReflectionException $e) {
+            $parentReflectionClass = $reflection->getParentClass();
+
+            if (false !== $parentReflectionClass) {
+                return $this->getValueFromReflectionClass($parentReflectionClass, $property, $object);
+            }
+
+            throw new \ReflectionException('The property wasn\'t found');
+        }
     }
 }
