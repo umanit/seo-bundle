@@ -90,11 +90,37 @@ class Canonical
         $params = [];
         foreach ($seo->getRouteParameters() as $routeParam) {
             /** @var RouteParameter $routeParam */
-            $propName                            = $routeParam->getProperty();
-            $params[$routeParam->getParameter()] =
-                $overrides[$propName] ?? $this->propAccess->getValue($entity, $propName);
+            $params[$routeParam->getParameter()] = $this->getParamValue($entity, $routeParam, $overrides);
         }
 
         return $params;
+    }
+
+    /**
+     * In case an $overrides array is given, extracts the name
+     * of the property in the current entity and returns the
+     * value associated to it in the $overrides array
+     *
+     * By default, return the value as found by the property
+     * accessor
+     *
+     * @param                $entity
+     * @param RouteParameter $routeParam
+     * @param array          $overrides
+     *
+     * @return mixed
+     */
+    private function getParamValue($entity, RouteParameter $routeParam, array $overrides = [])
+    {
+        if (!empty($overrides)) {
+            $prop = explode('.', $routeParam->getProperty());
+            $prop = reset($prop);
+
+            if (array_key_exists($prop, $overrides)) {
+                return $overrides[$prop];
+            }
+        }
+
+        return $this->propAccess->getValue($entity, $routeParam->getProperty());
     }
 }
