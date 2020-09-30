@@ -55,8 +55,9 @@ In order to function properly, SeoBundle must be able to generate a URL for a gi
 
 **Add the `@Seo\Route` annotation to your entity**
 
-The `@Seo\Route` annotation needs to know how to generate a url from the entity.
-The first argument is the route name associated to your entity, the second is the parameters needed to generate the route.
+The `@Seo\Route` annotation needs to know how to generate an url from the entity.
+The first argument is the route name associated to your entity, the second is the parameters needed to generate the
+route.
 
 `routeParameters` takes as many `@RouteParameter` as needed.
 
@@ -104,7 +105,8 @@ You can now do like so:
 {{ path(my_page) }}
 ```
 
-___Note:__ You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve the entity associated to the current accessed route and generate the url from it._
+___Note:__ You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve
+the entity associated to the current accessed route and generate the url from it._
 
 Usually, you'll want to use the `canonical()` function directly within your main layout.
 
@@ -133,7 +135,7 @@ use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 class Page implements HasSeoMetadataInterface
 {
     use SeoMetadataTrait;
-    
+
     // ...
 }
 ```
@@ -150,7 +152,8 @@ This will add a subform with two fields, `title` and `description`.
 
 ### Schema.org implementation
 
-To generate valid [schema.org](https://schema.org/) json microdata, add the `@Seo\SchemaOrgBuilder` annotation to your entity.
+To generate valid [schema.org](https://schema.org/) json microdata, add the `@Seo\SchemaOrgBuilder` annotation to your
+entity.
 
 This annotation takes either a service id or a method of the entity.
 
@@ -175,7 +178,7 @@ use Spatie\SchemaOrg\Schema;
 class Page
 {
     // ...
-    
+
     /**
      * Builds the schema.org.
      *
@@ -218,9 +221,11 @@ This service must implement `Umanit\SeoBundle\SchemaOrg\SchemaBuilderInterface` 
 
 ### Breadcrumb
 
-You can easily generate your breadcrumb in 3 different formats; `Microdata`, `RDFa` or `JSON-LD` as described by [the specification](https://schema.org/BreadcrumbList).
+You can easily generate your breadcrumb in 3 different formats; `Microdata`, `RDFa` or `JSON-LD` as described by
+[the specification](https://schema.org/BreadcrumbList).
 
-Use the `@Seo\Breadcrumb` annotation on your entity. It takes two arguments, the first one is a collection of `@Seo\BreadcrumbItem`, the second one is the format you want, default is `'microdata'`.
+Use the `@Seo\Breadcrumb` annotation on your entity. It takes two arguments, the first one is a collection of
+`@Seo\BreadcrumbItem`, the second one is the format you want, default is `'microdata'`.
 
 ```php
 <?php
@@ -247,7 +252,7 @@ use Umanit\SeoBundle\Doctrine\Annotation as Seo;
  */
 class Page
 {
-    
+
 }
 ```
 
@@ -267,7 +272,8 @@ You can now use the twig function `seo_breadcrumb()` like the following examples
 
 ### Enabling 301 redirects
 
-In order to enable URL history and 301 redirects on an Entity, implement the interface `UrlHistorizedInterface` and use the trait `UrlHistorizedTrait`.
+In order to enable URL history and 301 redirects on an Entity, implement the interface `UrlHistorizedInterface` and use
+the trait `UrlHistorizedTrait`.
 
 ### Twig functions reference
 
@@ -298,8 +304,6 @@ use Spatie\SchemaOrg\BaseType;
 use Spatie\SchemaOrg\Schema;
 
 /**
- * Class Page
- *
  * @ORM\Entity()
  * @Seo\Route(
  *     routeName="app_page_show",
@@ -319,8 +323,6 @@ class Page implements HasSeoMetadataInterface, UrlHistorizedInterface
     use SeoMetadataTrait, UrlHistorizedTrait;
 
     /**
-     * The identifier of Page.
-     *
      * @var int
      *
      * @ORM\Column(name="id", type="integer")
@@ -330,46 +332,38 @@ class Page implements HasSeoMetadataInterface, UrlHistorizedInterface
     private $id;
 
     /**
-     * The name of the Page
-     *
      * @var string
+     *
      * @ORM\Column(nullable=true)
      */
     private $name;
 
     /**
-     * The introduction of the Page
-     *
      * @var string
+     *
      * @ORM\Column(type="text", nullable=true)
      */
     private $introduction;
 
     /**
-     * The slug of the Page
-     *
      * @var string
+     *
      * @ORM\Column(unique=true)
      */
     private $slug;
 
     /**
      * @var Category
+     *
      * @ORM\ManyToOne(targetEntity="App\Entity\Category", cascade={"all"})
      */
     private $category;
-    
+
     // Getters and setters...
-    
-    /**
-     * Builds the schema.org.
-     * 
-     * @return BaseType
-     */
+
     public function buildSchemaOrg() : BaseType
     {
-        return Schema::webPage()
-                       ->name($this->name);
+        return Schema::webPage()->name($this->name);
     }
 }
 ```
