@@ -23,6 +23,7 @@ services:
             - '@umanit_seo.routing.canonical'
             - '@cache.app'
             - '%kernel.default_locale%'
+            - '%umanit_seo.use_url_historization%'
         calls:
             - [setAnnotationReader, ['@annotations.cached_reader']]
         tags: ['doctrine.event_subscriber']
@@ -71,9 +72,11 @@ services:
             - { name: twig.extension }
     Umanit\SeoBundle\Runtime\Twig\SeoExtension: '@umanit_seo.runtime_twig.seo_extension'
 
-    twig.extension.routing:
+    umanit_seo.twig_extension.routing:
         class: Umanit\SeoBundle\Runtime\Twig\RoutingExtension
-        arguments: ['@router', '@umanit_seo.routing.canonical']
+        arguments:
+            - '@twig.extension.routing'
+            - '@umanit_seo.routing.canonical'
         tags:
             - { name: twig.extension }
 

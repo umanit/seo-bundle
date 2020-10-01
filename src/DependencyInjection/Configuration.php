@@ -20,6 +20,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('umanit_seo');
         $treeBuilder->getRootNode()
             ->children()
+                ->booleanNode('use_url_historization')->defaultTrue()->end()
                 ->scalarNode('redirect_code')->defaultValue(301)->end()
                 ->scalarNode('cache_service')->defaultValue('cache.app')->end()
                 ->arrayNode('templates')->info('Defines the default templates')

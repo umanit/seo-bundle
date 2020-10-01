@@ -45,12 +45,21 @@ class UrlHistoryWriter implements EventSubscriber
     /** @var string */
     private $defaultLocale;
 
-    public function __construct(UrlPool $urlPool, Canonical $urlBuilder, CacheInterface $cache, string $defaultLocale)
-    {
+    /** @var bool */
+    private $useUrlHitorization;
+
+    public function __construct(
+        UrlPool $urlPool,
+        Canonical $urlBuilder,
+        CacheInterface $cache,
+        string $defaultLocale,
+        bool $useUrlHitorization
+    ) {
         $this->urlPool = $urlPool;
         $this->urlBuilder = $urlBuilder;
         $this->cache = $cache;
         $this->defaultLocale = $defaultLocale;
+        $this->useUrlHitorization = $useUrlHitorization;
     }
 
     public function getSubscribedEvents(): array
@@ -73,7 +82,7 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
     {
-        if (null === $args->getClassMetadata()->getReflectionClass()) {
+        if (!$this->useUrlHitorization || null === $args->getClassMetadata()->getReflectionClass()) {
             return;
         }
 
@@ -99,81 +108,6 @@ class UrlHistoryWriter implements EventSubscriber
     }
 
     /**
-     * Walk through relations to set the cache.
-     *
-     * @param string $rootEntity
-     * @param string $subEntity
-     * @param array  $pathItems
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \ReflectionException
-     */
-    private function walkRouteParameters(string $rootEntity, string $subEntity, array &$pathItems): void
-    {
-        $refl = new \ReflectionClass($subEntity);
-
-        foreach ($pathItems as $key => $pathItem) {
-            $pathItem = preg_replace('/\[.+\]/', '', $pathItem);
-
-            try {
-                $prop = $refl->getProperty($pathItem);
-            } catch (\ReflectionException $e) {
-                continue;
-            }
-
-            $annotations = $this->annotationsReader->getPropertyAnnotations($prop);
-
-            foreach ($annotations as $annotation) {
-                if (property_exists($annotation, 'targetEntity')) {
-                    $targetEntity = $annotation->targetEntity;
-                    unset($pathItems[$key]);
-
-                    $this->addEntitiesToCache($targetEntity, $rootEntity);
-                    $this->walkRouteParameters($rootEntity, $targetEntity, $pathItems);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds and association to the cache.
-     *
-     * @param string $parent
-     * @param string $child
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \ReflectionException
-     */
-    private function addEntitiesToCache(string $parent, string $child): void
-    {
-        $route = $this->annotationsReader->getClassAnnotation(
-            new \ReflectionClass($child),
-            Route::class
-        );
-
-        if (!$route instanceof Route) {
-            return;
-        }
-
-        $this->cache->get(
-            self::ENTITY_DEPENDENCY_CACHE_KEY,
-            static function (ItemInterface $item) use ($parent, $child) {
-                $value = $item->get();
-
-                if (!isset($value[$parent])) {
-                    $value[$parent] = [];
-                }
-
-                if (!\in_array($child, $value[$parent], true)) {
-                    $value[$parent][] = $child;
-                }
-
-                return $value;
-            }
-        );
-    }
-
-    /**
      * Before updating an entity.
      *
      * @param PreUpdateEventArgs $args
@@ -182,6 +116,10 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function preUpdate(PreUpdateEventArgs $args): void
     {
+        if (!$this->useUrlHitorization) {
+            return;
+        }
+
         $entity = $args->getEntity();
         $changeSet = $args->getEntityChangeSet();
 
@@ -244,6 +182,10 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function prePersist(LifecycleEventArgs $args): void
     {
+        if (!$this->useUrlHitorization) {
+            return;
+        }
+
         $entity = $args->getEntity();
 
         if (!$entity instanceof UrlHistorizedInterface) {
@@ -280,6 +222,10 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
+        if (!$this->useUrlHitorization) {
+            return;
+        }
+
         $em = $args->getEntityManager();
         $uow = $em->getUnitOfWork();
 
@@ -367,7 +313,86 @@ class UrlHistoryWriter implements EventSubscriber
 
     public function postFlush(PostFlushEventArgs $args): void
     {
+        if (!$this->useUrlHitorization) {
+            return;
+        }
+
         $this->urlPool->flush();
+    }
+
+    /**
+     * Walk through relations to set the cache.
+     *
+     * @param string $rootEntity
+     * @param string $subEntity
+     * @param array  $pathItems
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \ReflectionException
+     */
+    private function walkRouteParameters(string $rootEntity, string $subEntity, array &$pathItems): void
+    {
+        $refl = new \ReflectionClass($subEntity);
+
+        foreach ($pathItems as $key => $pathItem) {
+            $pathItem = preg_replace('/\[.+\]/', '', $pathItem);
+
+            try {
+                $prop = $refl->getProperty($pathItem);
+            } catch (\ReflectionException $e) {
+                continue;
+            }
+
+            $annotations = $this->annotationsReader->getPropertyAnnotations($prop);
+
+            foreach ($annotations as $annotation) {
+                if (property_exists($annotation, 'targetEntity')) {
+                    $targetEntity = $annotation->targetEntity;
+                    unset($pathItems[$key]);
+
+                    $this->addEntitiesToCache($targetEntity, $rootEntity);
+                    $this->walkRouteParameters($rootEntity, $targetEntity, $pathItems);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds and association to the cache.
+     *
+     * @param string $parent
+     * @param string $child
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \ReflectionException
+     */
+    private function addEntitiesToCache(string $parent, string $child): void
+    {
+        $route = $this->annotationsReader->getClassAnnotation(
+            new \ReflectionClass($child),
+            Route::class
+        );
+
+        if (!$route instanceof Route) {
+            return;
+        }
+
+        $this->cache->get(
+            self::ENTITY_DEPENDENCY_CACHE_KEY,
+            static function (ItemInterface $item) use ($parent, $child) {
+                $value = $item->get();
+
+                if (!isset($value[$parent])) {
+                    $value[$parent] = [];
+                }
+
+                if (!\in_array($child, $value[$parent], true)) {
+                    $value[$parent][] = $child;
+                }
+
+                return $value;
+            }
+        );
     }
 
     /**

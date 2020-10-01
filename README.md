@@ -29,6 +29,7 @@ twig:
 You can configure your bundle further by creating a `umanit_seo.yaml` configuration file:
 ```yaml
 umanit_seo:
+    use_url_historization: true # Enable or not the historization of URLs in the database
     metadata:
         default_title: # The fallback value for the metatitle
         default_description: # The fallback value for the metadescription

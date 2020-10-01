@@ -4,56 +4,50 @@ namespace Umanit\SeoBundle\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
 
 /**
- * Class UrlRedirector
- *
  * Redirects old urls to new ones.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class UrlRedirector implements EventSubscriberInterface
 {
     /** @var UrlPool */
     private $pool;
 
+    /** @var bool */
+    private $useUrlHistorization;
+
     /** @var int */
     private $httpRedirectCode;
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [KernelEvents::EXCEPTION => ['onKernelException']];
     }
 
-    /**
-     * UrlRedirector constructor.
-     *
-     * @param UrlPool $pool
-     * @param int     $httpRedirectCode
-     */
-    public function __construct(UrlPool $pool, int $httpRedirectCode = 301)
+    public function __construct(UrlPool $pool, bool $useUrlHistorization, int $httpRedirectCode = 301)
     {
-        $this->pool             = $pool;
+        $this->pool = $pool;
+        $this->useUrlHistorization = $useUrlHistorization;
         $this->httpRedirectCode = $httpRedirectCode;
     }
 
     /**
      * Redirects an old url to a new one.
      *
-     * @param GetResponseForExceptionEvent $event
+     * @param ExceptionEvent $event
      */
-    public function onKernelException(GetResponseForExceptionEvent $event): void
+    public function onKernelException(ExceptionEvent $event): void
     {
-        if (!$event->getException() instanceof NotFoundHttpException) {
+        if (!$this->useUrlHistorization || !$event->getThrowable() instanceof NotFoundHttpException) {
             return;
         }
 
-        $path           = $event->getRequest()->getUri();
-        $locale         = $event->getRequest()->getLocale();
+        $path = $event->getRequest()->getUri();
+        $locale = $event->getRequest()->getLocale();
         $urlHistoryItem = $this->pool->get($path, $locale);
 
         // Check that url is in pool
@@ -61,5 +55,4 @@ class UrlRedirector implements EventSubscriberInterface
             $event->setResponse(new RedirectResponse($urlHistoryItem->getNewPath(), $this->httpRedirectCode));
         }
     }
-
 }
