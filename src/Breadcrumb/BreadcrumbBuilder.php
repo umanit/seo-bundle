@@ -5,8 +5,8 @@ namespace Umanit\SeoBundle\Breadcrumb;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Templating\EngineInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 use Umanit\SeoBundle\Doctrine\Annotation\Breadcrumb;
 use Umanit\SeoBundle\Doctrine\Annotation\BreadcrumbItem;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
@@ -21,7 +21,7 @@ class BreadcrumbBuilder
 {
     use AnnotationReaderTrait;
 
-    /** @var EngineInterface */
+    /** @var Environment */
     private $twig;
 
     /** @var PropertyAccessorInterface */
@@ -39,30 +39,20 @@ class BreadcrumbBuilder
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * BreadcrumbBuilder constructor.
-     *
-     * @param EngineInterface                                                        $twig
-     * @param PropertyAccessorInterface                                              $propAccess
-     * @param UrlGeneratorInterface                                                  $urlGenerator
-     * @param Canonical                                                              $canonical
-     * @param TranslatorInterface|\Symfony\Component\Translation\TranslatorInterface $translator
-     * @param array                                                                  $templates
-     */
     public function __construct(
-        EngineInterface $twig,
+        Environment $twig,
         PropertyAccessorInterface $propAccess,
         UrlGeneratorInterface $urlGenerator,
         Canonical $canonical,
-        $translator,
+        TranslatorInterface $translator,
         array $templates
     ) {
-        $this->twig         = $twig;
-        $this->propAccess   = $propAccess;
+        $this->twig = $twig;
+        $this->propAccess = $propAccess;
         $this->urlGenerator = $urlGenerator;
-        $this->canonical    = $canonical;
-        $this->templates    = $templates;
-        $this->translator   = $translator;
+        $this->canonical = $canonical;
+        $this->templates = $templates;
+        $this->translator = $translator;
     }
 
     /**
@@ -80,37 +70,42 @@ class BreadcrumbBuilder
      */
     public function buildBreadcrumb(?object $entity, $format = null)
     {
-        if (null !== $format && !in_array(strtolower($format), Breadcrumb::FORMATS, true)) {
+        if (null !== $format && !\in_array(strtolower($format), Breadcrumb::FORMATS, true)) {
             throw new \ErrorException(sprintf('Invalid format "%s". Valid formats are %s', $format, implode('", "', Breadcrumb::FORMATS)));
         }
+
         $breadcrumbAnnotation = $this->getBreadcrumbAnnotation($entity);
-        $items                = [];
-        $i                    = 0;
+        $items = [];
+        $i = 0;
 
         foreach ($breadcrumbAnnotation->getValue() as $breadcrumbItem) {
             /** @var BreadcrumbItem $breadcrumbItem */
             $value = $breadcrumbItem->getValue();
+
             if (null === $value) {
                 $items[$i]['url'] = $this->canonical->url($entity);
             } else {
                 // Try and generate the url from a property
                 try {
-                    $value            = $this->propAccess->getValue($entity, $value);
+                    $value = $this->propAccess->getValue($entity, $value);
                     $items[$i]['url'] = $this->canonical->url($value);
                 } catch (NoSuchPropertyException $e) {
                     // Try and generate a url from a route
                     $items[$i]['url'] = $this->urlGenerator->generate($value, [], UrlGeneratorInterface::ABSOLUTE_URL);
                 }
             }
+
             // Try and generate the name from a property
             try {
-                $nameValue         = $this->propAccess->getValue($entity, $breadcrumbItem->getName());
+                $nameValue = $this->propAccess->getValue($entity, $breadcrumbItem->getName());
                 $items[$i]['name'] = $nameValue;
             } catch (NoSuchPropertyException $e) {
                 $items[$i]['name'] = $this->translator->trans($breadcrumbItem->getName());
             }
+
             $i++;
         }
+
         $template = $this->templates['breadcrumb_'.str_replace('-', '_', $format ?? $breadcrumbAnnotation->getFormat())];
 
         return $this->twig->render($template, [

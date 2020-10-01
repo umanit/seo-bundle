@@ -18,7 +18,11 @@ services:
     # Url History Writer
     umanit_seo.event_subscriber.url_history_writer:
         class: Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter
-        arguments: ['@umanit_seo.url_history.url_pool', '@umanit_seo.routing.canonical', '@cache.app.simple','%kernel.default_locale%']
+        arguments:
+            - '@umanit_seo.url_history.url_pool'
+            - '@umanit_seo.routing.canonical'
+            - '@cache.app'
+            - '%kernel.default_locale%'
         calls:
             - [setAnnotationReader, ['@annotations.cached_reader']]
         tags: ['doctrine.event_subscriber']
@@ -33,14 +37,23 @@ services:
 
     umanit_seo.event_subscriber.url_redirector:
         class: Umanit\SeoBundle\EventSubscriber\UrlRedirector
-        arguments: ['@umanit_seo.url_history.url_pool', '%umanit_seo.redirect_code%']
+        arguments:
+            - '@umanit_seo.url_history.url_pool'
+            - '%umanit_seo.use_url_historization%'
+            - '%umanit_seo.redirect_code%'
         tags:
             - { name: kernel.event_subscriber }
     Umanit\SeoBundle\EventSubscriber\UrlRedirector: '@umanit_seo.event_subscriber.url_redirector'
 
     umanit_seo.breadcrumb.breadcrumb_builder:
         class: Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder
-        arguments: ['@templating', '@property_accessor', '@router.default', '@umanit_seo.routing.canonical', '@translator.default', '%umanit_seo.templates%']
+        arguments:
+            - '@twig'
+            - '@property_accessor'
+            - '@router.default'
+            - '@umanit_seo.routing.canonical'
+            - '@translator.default'
+            - '%umanit_seo.templates%'
         calls:
             - [setAnnotationReader, ['@annotations.cached_reader']]
     Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder: '@umanit_seo.breadcrumb.breadcrumb_builder'

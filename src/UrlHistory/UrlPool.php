@@ -2,19 +2,15 @@
 
 namespace Umanit\SeoBundle\UrlHistory;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\UrlHistory;
 use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 
 /**
- * Class UrlPool
- *
  * Pool of historized URLs.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class UrlPool
 {
@@ -29,34 +25,31 @@ class UrlPool
     /** @var array<UrlHistory> */
     private $items = [];
 
-    /**
-     * UrlPool constructor.
-     *
-     * @param EntityManagerInterface $em
-     * @param string                 $defaultLocale
-     */
-    public function __construct(
-        EntityManagerInterface $em,
-        string $defaultLocale
-    ) {
-        $this->em            = $em;
+    public function __construct(EntityManagerInterface $em, string $defaultLocale)
+    {
+        $this->em = $em;
         $this->defaultLocale = $defaultLocale;
     }
 
     /**
      * Add a set to the history.
      *
-     * @param string $oldPath
-     * @param string $newPath
-     * @param        $entity
+     * @param string                 $oldPath
+     * @param string                 $newPath
+     * @param UrlHistorizedInterface $entity
+     *
+     * @throws \ReflectionException
+     * @throws \Umanit\SeoBundle\Exception\NotSeoRouteEntityException
      */
     public function add(string $oldPath, string $newPath, UrlHistorizedInterface $entity): void
     {
-        $urlHistory = $this->getUrlHistoryRepository()->findOneBy([
-            'oldPath' => $oldPath,
-            'locale'  => method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale,
-            'seoUuid' => $entity->getUrlRef()->getSeoUuid(),
-        ])
+        $urlHistory = $this
+            ->getUrlHistoryRepository()
+            ->findOneBy([
+                'oldPath' => $oldPath,
+                'locale'  => method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale,
+                'seoUuid' => $entity->getUrlRef()->getSeoUuid(),
+            ])
         ;
 
         if (null === $urlHistory) {
@@ -69,8 +62,7 @@ class UrlPool
             ;
         }
 
-        $urlHistory
-            ->setNewPath($newPath);
+        $urlHistory->setNewPath($newPath);
 
         $this->items[] = $urlHistory;
     }
@@ -98,7 +90,9 @@ class UrlPool
             foreach ($this->items as $item) {
                 $this->em->persist($item);
             }
+
             $this->items = [];
+
             $this->em->flush();
         }
     }

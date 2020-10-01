@@ -2,31 +2,30 @@
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
+use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Psr\SimpleCache\CacheInterface;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Events;
 use Ramsey\Uuid\Uuid;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Umanit\SeoBundle\Doctrine\Annotation\Route;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\UrlRef;
-use Umanit\SeoBundle\Model\AnnotationReaderTrait;
-use Umanit\SeoBundle\UrlHistory\UrlPool;
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\ORM\Events;
-use Umanit\SeoBundle\Doctrine\Annotation\Route;
 use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
+use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Routing\Canonical;
+use Umanit\SeoBundle\UrlHistory\UrlPool;
 
 /**
  * Class UrlHistoryWriter
  *
  * Writes the url history log on update
  * of an entity annotated @Route().
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class UrlHistoryWriter implements EventSubscriber
 {
@@ -46,28 +45,15 @@ class UrlHistoryWriter implements EventSubscriber
     /** @var string */
     private $defaultLocale;
 
-    /**
-     * UrlHistoryWriter constructor.
-     *
-     * @param UrlPool        $urlPool
-     * @param Canonical      $urlBuilder
-     * @param CacheInterface $cache
-     * @param string         $defaultLocale
-     */
     public function __construct(UrlPool $urlPool, Canonical $urlBuilder, CacheInterface $cache, string $defaultLocale)
     {
-        $this->urlPool       = $urlPool;
-        $this->urlBuilder    = $urlBuilder;
-        $this->cache         = $cache;
+        $this->urlPool = $urlPool;
+        $this->urlBuilder = $urlBuilder;
+        $this->cache = $cache;
         $this->defaultLocale = $defaultLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array|string[]
-     */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             Events::preUpdate,
@@ -82,6 +68,8 @@ class UrlHistoryWriter implements EventSubscriber
      * Creates the cache used to match entities.
      *
      * @param LoadClassMetadataEventArgs $args
+     *
+     * @throws \ReflectionException
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
     {
@@ -100,8 +88,12 @@ class UrlHistoryWriter implements EventSubscriber
 
         foreach ($route->getRouteParameters() as $routeParameter) {
             $pathItems = $this->getPropertyAsArray($routeParameter);
-            if (count($pathItems) > 1) {
-                $this->walkRouteParameters($args->getClassMetadata()->rootEntityName, $args->getClassMetadata()->rootEntityName, $pathItems);
+            if (\count($pathItems) > 1) {
+                $this->walkRouteParameters(
+                    $args->getClassMetadata()->rootEntityName,
+                    $args->getClassMetadata()->rootEntityName,
+                    $pathItems
+                );
             }
         }
     }
@@ -113,6 +105,7 @@ class UrlHistoryWriter implements EventSubscriber
      * @param string $subEntity
      * @param array  $pathItems
      *
+     * @throws \Psr\Cache\InvalidArgumentException
      * @throws \ReflectionException
      */
     private function walkRouteParameters(string $rootEntity, string $subEntity, array &$pathItems): void
@@ -121,18 +114,21 @@ class UrlHistoryWriter implements EventSubscriber
 
         foreach ($pathItems as $key => $pathItem) {
             $pathItem = preg_replace('/\[.+\]/', '', $pathItem);
+
             try {
                 $prop = $refl->getProperty($pathItem);
             } catch (\ReflectionException $e) {
                 continue;
             }
+
             $annotations = $this->annotationsReader->getPropertyAnnotations($prop);
+
             foreach ($annotations as $annotation) {
                 if (property_exists($annotation, 'targetEntity')) {
                     $targetEntity = $annotation->targetEntity;
                     unset($pathItems[$key]);
-                    $this->addEntitiesToCache($targetEntity, $rootEntity);
 
+                    $this->addEntitiesToCache($targetEntity, $rootEntity);
                     $this->walkRouteParameters($rootEntity, $targetEntity, $pathItems);
                 }
             }
@@ -145,7 +141,7 @@ class UrlHistoryWriter implements EventSubscriber
      * @param string $parent
      * @param string $child
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Psr\Cache\InvalidArgumentException
      * @throws \ReflectionException
      */
     private function addEntitiesToCache(string $parent, string $child): void
@@ -159,25 +155,34 @@ class UrlHistoryWriter implements EventSubscriber
             return;
         }
 
-        $cache = $this->cache->get(self::ENTITY_DEPENDENCY_CACHE_KEY, []);
-        if (!isset($cache[$parent])) {
-            $cache[$parent] = [];
-        }
+        $this->cache->get(
+            self::ENTITY_DEPENDENCY_CACHE_KEY,
+            static function (ItemInterface $item) use ($parent, $child) {
+                $value = $item->get();
 
-        if (!in_array($child, $cache[$parent], true)) {
-            $cache[$parent][] = $child;
-        }
-        $this->cache->set(self::ENTITY_DEPENDENCY_CACHE_KEY, $cache);
+                if (!isset($value[$parent])) {
+                    $value[$parent] = [];
+                }
+
+                if (!\in_array($child, $value[$parent], true)) {
+                    $value[$parent][] = $child;
+                }
+
+                return $value;
+            }
+        );
     }
 
     /**
      * Before updating an entity.
      *
      * @param PreUpdateEventArgs $args
+     *
+     * @throws \ReflectionException
      */
     public function preUpdate(PreUpdateEventArgs $args): void
     {
-        $entity    = $args->getEntity();
+        $entity = $args->getEntity();
         $changeSet = $args->getEntityChangeSet();
 
         if (!$entity instanceof UrlHistorizedInterface) {
@@ -186,8 +191,10 @@ class UrlHistoryWriter implements EventSubscriber
 
         try {
             $seoAnnotation = $this->getSeoRouteAnnotation($entity);
+
             // Build the new path
             $newPath = $this->urlBuilder->url($entity);
+
             // Get old values
             foreach ($changeSet as $changedFieldKey => $changedFieldValue) {
                 foreach ($seoAnnotation->getRouteParameters() as $routeParameter) {
@@ -198,7 +205,7 @@ class UrlHistoryWriter implements EventSubscriber
                         // The old value is the first element of the array
                         $value = $changedFieldValue[0];
 
-                        if (is_object($value)) {
+                        if (\is_object($value)) {
                             $reflection = new \ReflectionClass($value);
 
                             // If it's an objet, tries to access the value from the class
@@ -217,6 +224,7 @@ class UrlHistoryWriter implements EventSubscriber
                     }
                 }
             }
+
             // Build the old path
             $oldPath = $this->urlBuilder->url($entity, $changeSet);
 
@@ -234,20 +242,23 @@ class UrlHistoryWriter implements EventSubscriber
      *
      * @throws \ReflectionException
      */
-    public function prePersist(LifecycleEventArgs $args)
+    public function prePersist(LifecycleEventArgs $args): void
     {
         $entity = $args->getEntity();
+
         if (!$entity instanceof UrlHistorizedInterface) {
             return;
         }
+
         try {
             if (null === $entity->getUrlRef()) {
-                $route  = $this->getSeoRouteAnnotation($entity);
+                $route = $this->getSeoRouteAnnotation($entity);
                 $urlRef = (new UrlRef())
                     ->setSeoUuid(Uuid::uuid4())
                     ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
                     ->setRoute($route->getRouteName())
                 ;
+
                 $entity->setUrlRef($urlRef);
             }
         } catch (NotSeoRouteEntityException $e) {
@@ -263,10 +274,13 @@ class UrlHistoryWriter implements EventSubscriber
      * @param OnFlushEventArgs $args
      *
      * @return void
+     * @throws NotSeoRouteEntityException
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \ReflectionException
      */
-    public function onFlush(OnFlushEventArgs $args)
+    public function onFlush(OnFlushEventArgs $args): void
     {
-        $em  = $args->getEntityManager();
+        $em = $args->getEntityManager();
         $uow = $em->getUnitOfWork();
 
         // process all objects being inserted, using scheduled insertions instead
@@ -276,20 +290,23 @@ class UrlHistoryWriter implements EventSubscriber
             if (!$entity instanceof UrlHistorizedInterface) {
                 continue;
             }
+
             try {
                 /** @var UrlRef $urlRef */
                 $urlRef = $entity->getUrlRef();
+
                 if (null === $urlRef) {
                     continue;
                 }
+
                 $urlRef->setUrl($this->urlBuilder->url($entity));
                 $uow->recomputeSingleEntityChangeSet($em->getClassMetadata($this->getClass($urlRef)), $urlRef);
                 $uow->persist($urlRef);
-
             } catch (NotSeoRouteEntityException $e) {
                 // Do nothing
             }
         }
+
         // we use onFlush and not preUpdate event to let other
         // event listeners be nested together
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
@@ -297,10 +314,13 @@ class UrlHistoryWriter implements EventSubscriber
                 try {
                     /** @var UrlRef $urlRef */
                     $urlRef = $entity->getUrlRef();
+
                     if (null === $urlRef) {
                         continue;
                     }
+
                     $newUrl = $this->urlBuilder->url($entity);
+
                     if ($urlRef->getUrl() !== $newUrl) {
                         $urlRef->setUrl($newUrl);
                         $uow->recomputeSingleEntityChangeSet($em->getClassMetadata($this->getClass($urlRef)), $urlRef);
@@ -313,7 +333,8 @@ class UrlHistoryWriter implements EventSubscriber
 
             // Look inside the cache if any dependent entity has to be historised
             $cache = $this->cache->get(self::ENTITY_DEPENDENCY_CACHE_KEY, []);
-            if (!array_key_exists($this->getClass($entity), $cache)) {
+
+            if (!\array_key_exists($this->getClass($entity), $cache)) {
                 continue;
             }
 
@@ -325,10 +346,10 @@ class UrlHistoryWriter implements EventSubscriber
                     ->from($dependantEntityClass, 'dependant')
                     ->innerJoin('dependant.urlRef', 'url_ref')
                 ;
+
                 // Regenerate route for all entities if different
                 foreach ($query->getQuery()->getResult() as $dependantEntity) {
                     $urlRef = $dependantEntity->getUrlRef();
-
                     $newUrl = $this->urlBuilder->url($dependantEntity);
                     $oldUrl = $urlRef->getUrl();
 
@@ -344,9 +365,6 @@ class UrlHistoryWriter implements EventSubscriber
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args): void
     {
         $this->urlPool->flush();
