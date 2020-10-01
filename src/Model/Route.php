@@ -9,10 +9,10 @@ class Route
     /** @var string */
     private $name;
 
-    /** @var array|null */
+    /** @var array */
     private $parameters;
 
-    public function __construct(string $name, array $parameters = null)
+    public function __construct(string $name, array $parameters = [])
     {
         $this->name = $name;
         $this->parameters = $parameters;
@@ -23,12 +23,12 @@ class Route
         return $this->name;
     }
 
-    public function getParameters(): ?array
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function setParameters(?array $parameters): void
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
