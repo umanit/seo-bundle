@@ -2,15 +2,12 @@
 
 namespace Umanit\SeoBundle\Utils;
 
-use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
+use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Utils\EntityParser\Excerpt;
 use Umanit\SeoBundle\Utils\EntityParser\Title;
 
 /**
- * Class SeoMetadataResolver
  * Resolves Seo metadata from an entity.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class SeoMetadataResolver
 {
@@ -32,8 +29,8 @@ class SeoMetadataResolver
      */
     public function __construct(Title $title, Excerpt $excerpt, array $metadataConfig)
     {
-        $this->title          = $title;
-        $this->description    = $excerpt;
+        $this->title = $title;
+        $this->description = $excerpt;
         $this->metadataConfig = $metadataConfig;
     }
 
@@ -42,8 +39,9 @@ class SeoMetadataResolver
      *
      * @param object|null $entity
      *
-     * @param bool $includePrefix
-     * @param bool $includeSuffix
+     * @param bool        $includePrefix
+     * @param bool        $includeSuffix
+     *
      * @return string
      */
     public function metaTitle(?object $entity, bool $includePrefix = true, bool $includeSuffix = true): string
@@ -74,12 +72,12 @@ class SeoMetadataResolver
     }
 
     /**
-     * @internal Returns a meta data field.
-     *
      * @param object|null $entity
      * @param string      $metatype
      *
      * @return string string
+     * @internal Returns a meta data field.
+     *
      */
     private function meta(?object $entity, string $metatype): string
     {

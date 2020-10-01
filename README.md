@@ -129,7 +129,7 @@ Make your entity implement the `HasSeoMetadataInterface` and use the `SeoMetadat
 
 namespace App\Entity;
 
-use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
+use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 
 class Page implements HasSeoMetadataInterface
@@ -295,7 +295,7 @@ the trait `UrlHistorizedTrait`.
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
+use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;

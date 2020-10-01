@@ -2,8 +2,9 @@
 
 namespace Umanit\SeoBundle\Doctrine\Model;
 
-use Umanit\SeoBundle\Entity\SeoMetadata;
 use Doctrine\ORM\Mapping as ORM;
+use Umanit\SeoBundle\Entity\SeoMetadata;
+use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 
 /**
  * Contains data usable for Seo metadata.

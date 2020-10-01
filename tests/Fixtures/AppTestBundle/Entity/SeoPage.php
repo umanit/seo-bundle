@@ -3,12 +3,12 @@
 namespace AppTestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface;
-use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
-use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Annotation as Seo;
+use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
+use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
+use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 
 /**
  * Class SeoPage

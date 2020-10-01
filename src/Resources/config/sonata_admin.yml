@@ -3,7 +3,7 @@ sonata_admin:
     extensions:
         umanit_seo.admin.extension.seo_admin_extension:
             implements:
-                - Umanit\SeoBundle\Doctrine\Model\HasSeoMetadataInterface
+                - Umanit\SeoBundle\Model\HasSeoMetadataInterface
 services:
     umanit_seo.admin.extension.seo_admin_extension:
         class: Umanit\SeoBundle\Sonata\AdminExtension\SeoAdminExtension
