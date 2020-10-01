@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Handler\Breadcrumbable;
 
-use Umanit\SeoBundle\Entity\BreadcrumbableEntityInterface;
+use Umanit\SeoBundle\Model\BreadcrumbableInterface;
 use Umanit\SeoBundle\Model\BreadcrumbItem;
 
 class Breadcrumbable
@@ -18,11 +18,11 @@ class Breadcrumbable
     }
 
     /**
-     * @param BreadcrumbableEntityInterface $entity
+     * @param BreadcrumbableInterface $entity
      *
      * @return BreadcrumbItem[]
      */
-    public function getItems(BreadcrumbableEntityInterface $entity): array
+    public function getItems(BreadcrumbableInterface $entity): array
     {
         foreach ($this->handlers as $handler) {
             if ($handler->supports($entity)) {
@@ -30,6 +30,6 @@ class Breadcrumbable
             }
         }
 
-        throw new \LogicException(sprintf('Can not determine the breadcrumb of the entity %s', $entity));
+        throw new \LogicException(sprintf('Can not determine the breadcrumb items of the entity %s', $entity));
     }
 }

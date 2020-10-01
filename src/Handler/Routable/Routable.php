@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Handler\Routable;
 
-use Umanit\SeoBundle\Entity\RoutableEntityInterface;
+use Umanit\SeoBundle\Model\RoutableInterface;
 use Umanit\SeoBundle\Model\Route;
 
 class Routable
 {
-    /** @var SeoCapableHandlerInterface[] */
+    /** @var RoutableHandlerInterface[] */
     private $handlers;
 
     public function __construct(iterable $handlers)
@@ -17,7 +17,7 @@ class Routable
         $this->handlers = $handlers;
     }
 
-    public function getRoute(RoutableEntityInterface $entity): Route
+    public function getRoute(RoutableInterface $entity): Route
     {
         foreach ($this->handlers as $handler) {
             if ($handler->supports($entity)) {
