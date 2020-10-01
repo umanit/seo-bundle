@@ -8,16 +8,12 @@ use Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder;
 use Umanit\SeoBundle\Exception\NotBreadcrumbEntityException;
 use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
 use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
+use Umanit\SeoBundle\Model\RoutableInterface;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
 use Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver;
 use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
-/**
- * Class SeoExtension
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 class SeoExtension extends AbstractExtension
 {
     /** @var Canonical */
@@ -35,15 +31,6 @@ class SeoExtension extends AbstractExtension
     /** @var BreadcrumbBuilder */
     private $breadcrumbBuilder;
 
-    /**
-     * SeoExtension constructor.
-     *
-     * @param Canonical           $canonical
-     * @param CurrentSeoEntity    $currentSeoEntity
-     * @param SeoMetadataResolver $metadataResolver
-     * @param SchemaOrgResolver   $schemaOrgResolver
-     * @param BreadcrumbBuilder   $breadcrumbBuilder
-     */
     public function __construct(
         Canonical $canonical,
         CurrentSeoEntity $currentSeoEntity,
@@ -52,14 +39,14 @@ class SeoExtension extends AbstractExtension
         BreadcrumbBuilder $breadcrumbBuilder
     ) {
 
-        $this->canonical         = $canonical;
-        $this->currentSeoEntity  = $currentSeoEntity;
-        $this->metadataResolver  = $metadataResolver;
+        $this->canonical = $canonical;
+        $this->currentSeoEntity = $currentSeoEntity;
+        $this->metadataResolver = $metadataResolver;
         $this->schemaOrgResolver = $schemaOrgResolver;
         $this->breadcrumbBuilder = $breadcrumbBuilder;
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('seo_title', [$this, 'title']),
@@ -92,16 +79,17 @@ class SeoExtension extends AbstractExtension
      */
     public function canonical(?object $entity = null, array $overrides = []): string
     {
-        try {
-            return sprintf('<link rel="canonical" href="%s"/>', $this->canonical->url(
-                $entity ?? $this->currentSeoEntity->get(),
-                $overrides
-            ));
-        } catch (NotSeoRouteEntityException $e) {
-            // Do nothing
+        if (null !== $entity && !$entity instanceof RoutableInterface) {
+            return '';
         }
 
-        return '';
+        return sprintf(
+            '<link rel="canonical" href="%s"/>',
+            $this->canonical->url(
+                $entity ?? $this->currentSeoEntity->get(),
+                $overrides
+            )
+        );
     }
 
     /**
@@ -135,13 +123,14 @@ HTML
     {
         try {
             return strtr(
-<<<HTML
+                <<<HTML
 <script type="application/ld+json">%json%</script>
 HTML
                 , [
-                    '%json%' => json_encode($this->schemaOrgResolver->getSchemaBuilder(
-                        $entity ?? $this->currentSeoEntity->get()
-                    )->toArray(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]);
+                '%json%' => json_encode($this->schemaOrgResolver->getSchemaBuilder(
+                    $entity ?? $this->currentSeoEntity->get()
+                )->toArray(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+            ]);
 
         } catch (NotSchemaOrgEntityException $e) {
             // Do nothing
@@ -154,11 +143,13 @@ HTML
      * Display the seo schema org from an entity or the current one.
      *
      * @param object|null $entity
-     * @param string      $format
+     * @param null        $format
      *
      * @return string
      * @throws NotSeoRouteEntityException
      * @throws \ErrorException
+     * @throws \ReflectionException
+     * @throws \Twig\Error\Error
      */
     public function breadcrumb(?object $entity = null, $format = null): string
     {
