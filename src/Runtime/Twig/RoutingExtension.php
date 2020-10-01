@@ -5,7 +5,7 @@ namespace Umanit\SeoBundle\Runtime\Twig;
 use Symfony\Bridge\Twig\Extension\RoutingExtension as BaseRoutingExtension;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
+use Umanit\SeoBundle\Model\RoutableInterface;
 use Umanit\SeoBundle\Routing\Canonical;
 
 class RoutingExtension extends AbstractExtension
@@ -32,19 +32,19 @@ class RoutingExtension extends AbstractExtension
 
     public function getPath($name, $parameters = [], $relative = false): ?string
     {
-        try {
+        if ($name instanceof RoutableInterface) {
             return $this->canonical->path($name, $parameters);
-        } catch (NotSeoRouteEntityException $e) {
-            return $this->decorated->getPath($name, $parameters, $relative);
         }
+
+        return $this->decorated->getPath($name, $parameters, $relative);
     }
 
     public function getUrl($name, $parameters = [], $schemeRelative = false): ?string
     {
-        try {
+        if ($name instanceof RoutableInterface) {
             return $this->canonical->url($name, $parameters);
-        } catch (NotSeoRouteEntityException $e) {
-            return $this->decorated->getPath($name, $parameters, $schemeRelative);
         }
+
+        return $this->decorated->getPath($name, $parameters, $schemeRelative);
     }
 }

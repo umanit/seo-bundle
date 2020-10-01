@@ -10,7 +10,9 @@ services:
     # Canonical url generator
     umanit_seo.routing.canonical:
         class: Umanit\SeoBundle\Routing\Canonical
-        arguments: ['@router']
+        arguments:
+            - '@router'
+            - '@umanit_seo.routable'
         calls:
             - [setAnnotationReader, ['@annotations.cached_reader']]
     Umanit\SeoBundle\Routing\Canonical: '@umanit_seo.routing.canonical'

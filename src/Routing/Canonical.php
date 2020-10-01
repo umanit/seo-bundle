@@ -2,20 +2,15 @@
 
 namespace Umanit\SeoBundle\Routing;
 
-use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
-use Umanit\SeoBundle\Doctrine\Annotation\Route;
-use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
+use Umanit\SeoBundle\Handler\Routable\RoutableInterface as HandlerRoutableInterface;
+use Umanit\SeoBundle\Model\AnnotationReaderTrait;
+use Umanit\SeoBundle\Model\RoutableInterface as ModelRoutableInterface;
+use Umanit\SeoBundle\Model\Route as ModelRoute;
 
 /**
- * Class Canonical
- *
- * Used to generate links from
- * an entity annotated by @Route().
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
+ * Used to generate links from an entity which implements Umanit\SeoBundle\Model\RoutableInterface.
  */
 class Canonical
 {
@@ -27,100 +22,43 @@ class Canonical
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /**
-     * Canonical constructor.
-     *
-     * @param UrlGeneratorInterface $urlGenerator
-     */
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    /** @var HandlerRoutableInterface */
+    private $routableHandler;
+
+    public function __construct(UrlGeneratorInterface $urlGenerator, HandlerRoutableInterface $routableHandler)
     {
-        $this->propAccess   = new PropertyAccessor();
         $this->urlGenerator = $urlGenerator;
+        $this->routableHandler = $routableHandler;
     }
 
-    /**
-     * Returns a canonical path.
-     *
-     * @param object $entity    An entity annotated by @Route()
-     * @param array  $overrides An associative array used to override field values if needed.
-     *
-     * @return string
-     * @throws NotSeoRouteEntityException
-     */
-    public function path($entity, array $overrides = []): string
+    public function path(ModelRoutableInterface $entity, array $overrides = []): string
     {
-        /** @var Route $route */
-        $route = $this->getSeoRouteAnnotation($entity);
+        $route = $this->routableHandler->handle($entity);
+        $parameters = $this->buildParams($route, $overrides);
 
-        $params = $this->buildParams($route, $entity, $overrides);
-
-        return $this->urlGenerator->generate($route->getRouteName(), $params);
+        return $this->urlGenerator->generate($route->getName(), $parameters);
     }
 
-    /**
-     * Returns a canonical url.
-     *
-     * @param object $entity    An entity annotated by @Seo()
-     * @param array  $overrides An associative array used to override field values if needed.
-     *
-     * @return string
-     * @throws NotSeoRouteEntityException
-     */
-    public function url($entity, array $overrides = []): string
+    public function url(ModelRoutableInterface $entity, array $overrides = []): string
     {
-        /** @var Route $route */
-        $route = $this->getSeoRouteAnnotation($entity);
+        $route = $this->routableHandler->handle($entity);
+        $parameters = $this->buildParams($route, $overrides);
 
-        $params = $this->buildParams($route, $entity, $overrides);
-
-        return $this->urlGenerator->generate($route->getRouteName(), $params, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate(
+            $route->getName(),
+            $parameters,
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
     }
 
-    /**
-     * Builds the route params.
-     *
-     * @param Route    $seo
-     * @param object $entity    An entity annotated by @Route()
-     * @param array  $overrides An associative array used to override field values if needed.
-     *
-     * @return array
-     */
-    private function buildParams(Route $seo, $entity, array $overrides = []): array
+    private function buildParams(ModelRoute $route, array $overrides = []): array
     {
         $params = [];
-        foreach ($seo->getRouteParameters() as $routeParam) {
-            /** @var RouteParameter $routeParam */
-            $params[$routeParam->getParameter()] = $this->getParamValue($entity, $routeParam, $overrides);
+
+        foreach ($route->getParameters() as $key => $value) {
+            $params[$key] = $overrides[$key] ?? $value;
         }
 
         return $params;
-    }
-
-    /**
-     * In case an $overrides array is given, extracts the name
-     * of the property in the current entity and returns the
-     * value associated to it in the $overrides array
-     *
-     * By default, return the value as found by the property
-     * accessor
-     *
-     * @param                $entity
-     * @param RouteParameter $routeParam
-     * @param array          $overrides
-     *
-     * @return mixed
-     */
-    private function getParamValue($entity, RouteParameter $routeParam, array $overrides = [])
-    {
-        if (!empty($overrides)) {
-            $prop = explode('.', $routeParam->getProperty());
-            $prop = reset($prop);
-
-            if (array_key_exists($prop, $overrides)) {
-                return $overrides[$prop];
-            }
-        }
-
-        return $this->propAccess->getValue($entity, $routeParam->getProperty());
     }
 }
