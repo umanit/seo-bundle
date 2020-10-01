@@ -117,3 +117,17 @@ services:
             - [setAnnotationReader, ['@annotations.cached_reader']]
             - [setContainer, ['@service_container']]
     Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver: '@umanit_seo.schema_org.schema_org_resolver'
+
+    # Routable
+    umanit_seo.routable:
+        class: Umanit\SeoBundle\Handler\Routable\Routable
+        arguments: [!tagged_iterator umanit_seo.routable.handler]
+
+    Umanit\SeoBundle\Handler\Routable\RoutableInterface: '@umanit_seo.routable'
+
+    # Breadcrumbable
+    umanit_seo.breadcrumbable:
+        class: Umanit\SeoBundle\Handler\Breadcrumbable\Breadcrumbable
+        arguments: [!tagged_iterator umanit_seo.breadcrumbable.handler]
+
+    Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableInterface: '@umanit_seo.breadcrumbable'
