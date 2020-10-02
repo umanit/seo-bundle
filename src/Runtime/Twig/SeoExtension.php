@@ -5,9 +5,8 @@ namespace Umanit\SeoBundle\Runtime\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder;
-use Umanit\SeoBundle\Exception\NotBreadcrumbEntityException;
 use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
-use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
+use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
@@ -104,13 +103,15 @@ class SeoExtension extends AbstractExtension
      */
     public function metadata(?object $entity = null): string
     {
+        $entity = $entity ?? $this->currentSeoEntity->get();
+
         return strtr(<<<HTML
 <meta name="title" content="%title%" />
 <meta name="description" content="%description%" />
 HTML
             , [
-                '%title%'       => $this->metadataResolver->metaTitle($entity ?? $this->currentSeoEntity->get()),
-                '%description%' => $this->metadataResolver->metaDescription($entity ?? $this->currentSeoEntity->get()),
+                '%title%'       => $this->metadataResolver->metaTitle($entity),
+                '%description%' => $this->metadataResolver->metaDescription($entity),
             ]);
     }
 
@@ -149,22 +150,20 @@ HTML
      * @param null        $format
      *
      * @return string
-     * @throws NotSeoRouteEntityException
      * @throws \ErrorException
-     * @throws \ReflectionException
-     * @throws \Twig\Error\Error
      */
     public function breadcrumb(?object $entity = null, $format = null): string
     {
-        try {
-            return $this->breadcrumbBuilder->buildBreadcrumb(
-                $entity ?? $this->currentSeoEntity->get(),
-                $format
-            );
-        } catch (NotBreadcrumbEntityException $e) {
-            // Do nothing
+        if (
+            (null !== $entity && !$entity instanceof BreadcrumbableModelInterface) ||
+            (null === $entity && null === $this->currentSeoEntity->get())
+        ) {
+            return '';
         }
 
-        return '';
+        return $this->breadcrumbBuilder->buildBreadcrumb(
+            $entity ?? $this->currentSeoEntity->get(),
+            $format
+        );
     }
 }

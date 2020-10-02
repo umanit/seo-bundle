@@ -52,13 +52,10 @@ services:
         class: Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder
         arguments:
             - '@twig'
-            - '@property_accessor'
-            - '@router.default'
             - '@umanit_seo.routing.canonical'
-            - '@translator.default'
+            - '@umanit_seo.breadcrumbable'
             - '%umanit_seo.templates%'
-        calls:
-            - [setAnnotationReader, ['@annotations.cached_reader']]
+
     Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder: '@umanit_seo.breadcrumb.breadcrumb_builder'
 
     # Twig Extension

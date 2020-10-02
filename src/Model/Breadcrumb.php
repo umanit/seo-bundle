@@ -35,16 +35,13 @@ class Breadcrumb
     public function setFormat(string $format): void
     {
         $this->format = $format;
+
+        $this->setTemplateFromFormat();
     }
 
     public function getTemplate(): string
     {
         return $this->template;
-    }
-
-    public function setTemplate(string $template): void
-    {
-        $this->template = $template;
     }
 
     public function getItems(): array
@@ -64,6 +61,6 @@ class Breadcrumb
 
     private function setTemplateFromFormat(): void
     {
-        $this->setTemplate('breadcrumb_'.str_replace('-', '_', $this->getFormat()));
+        $this->template = 'breadcrumb_'.str_replace('-', '_', $this->getFormat());
     }
 }
