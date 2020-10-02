@@ -79,7 +79,10 @@ class SeoExtension extends AbstractExtension
      */
     public function canonical(?object $entity = null, array $overrides = []): string
     {
-        if (null !== $entity && !$entity instanceof RoutableModelInterface) {
+        if (
+            (null !== $entity && !$entity instanceof RoutableModelInterface) ||
+            (null === $entity && null === $this->currentSeoEntity->get())
+        ) {
             return '';
         }
 
