@@ -13,8 +13,7 @@ services:
         arguments:
             - '@router'
             - '@umanit_seo.routable'
-        calls:
-            - [setAnnotationReader, ['@annotations.cached_reader']]
+
     Umanit\SeoBundle\Routing\Canonical: '@umanit_seo.routing.canonical'
 
     # Url History Writer

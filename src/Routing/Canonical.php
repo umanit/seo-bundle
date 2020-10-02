@@ -2,23 +2,13 @@
 
 namespace Umanit\SeoBundle\Routing;
 
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Umanit\SeoBundle\Handler\Routable\RoutableInterface;
-use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Model\Route;
 
-/**
- * Used to generate links from an entity which implements Umanit\SeoBundle\Model\RoutableInterface.
- */
 class Canonical
 {
-    use AnnotationReaderTrait;
-
-    /** @var PropertyAccessor */
-    private $propAccess;
-
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
