@@ -1,20 +1,18 @@
 {# This is the template for breadcrumb in Microdata format #}
-{%- if items is not empty -%}
-    {% apply spaceless %}
-        <ol itemscope itemtype="https://schema.org/BreadcrumbList">
-            {% for item in items %}
-                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                    {%- if item.url is defined and not loop.last %}
-                        <a itemprop="item" href="{{ item.url }}">
-                            <span itemprop="name">{{ item.name }}</span>
-                        </a>
-                    {% else %}
+{%- if items is not empty %}
+    <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+        {% for item in items -%}
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                {% if item.url is defined and not loop.last -%}
+                    <a itemprop="item" href="{{ item.url }}">
                         <span itemprop="name">{{ item.name }}</span>
-                    {% endif -%}
+                    </a>
+                {% else -%}
+                    <span itemprop="name">{{ item.name }}</span>
+                {% endif -%}
 
-                    <meta itemprop="position" content="{{ loop.index }}" />
-                </li>
-            {% endfor %}
-        </ol>
-    {% endapply %}
+                <meta itemprop="position" content="{{ loop.index }}" />
+            </li>
+        {% endfor -%}
+    </ol>
 {%- endif -%}

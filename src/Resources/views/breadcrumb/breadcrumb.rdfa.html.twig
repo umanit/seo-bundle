@@ -1,20 +1,18 @@
 {# This is the template for breadcrumb in RDFa format #}
-{%- if items is not empty -%}
-    {% apply spaceless %}
-        <ol vocab="https://schema.org/" typeof="BreadcrumbList">
-            {% for item in items %}
-                <li property="itemListElement" typeof="ListItem">
-                    {%- if item.url is defined and not loop.last %}
-                        <a property="item" typeof="WebPage" href="{{ item.url }}">
-                            <span property="name">{{ item.name }}</span>
-                        </a>
-                    {% else %}
+{%- if items is not empty %}
+    <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+        {% for item in items -%}
+            <li property="itemListElement" typeof="ListItem">
+                {% if item.url is defined and not loop.last -%}
+                    <a property="item" typeof="WebPage" href="{{ item.url }}">
                         <span property="name">{{ item.name }}</span>
-                    {% endif -%}
+                    </a>
+                {% else -%}
+                    <span property="name">{{ item.name }}</span>
+                {% endif -%}
 
-                    <meta property="position" content="{{ loop.index }}" />
-                </li>
-            {% endfor %}
-        </ol>
-    {% endapply %}
+                <meta property="position" content="{{ loop.index }}" />
+            </li>
+        {% endfor -%}
+    </ol>
 {%- endif -%}
