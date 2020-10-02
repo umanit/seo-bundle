@@ -10,6 +10,8 @@ class Breadcrumb
     public const FORMAT_JSON_LD = 'json-ld';
     public const FORMAT_RDFA = 'rdfa';
 
+    public const FORMATS = [self::FORMAT_JSON_LD, self::FORMAT_MICRODATA, self::FORMAT_RDFA];
+
     /** @var string */
     private $format;
 

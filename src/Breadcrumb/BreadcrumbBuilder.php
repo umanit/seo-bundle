@@ -3,8 +3,8 @@
 namespace Umanit\SeoBundle\Breadcrumb;
 
 use Twig\Environment;
-use Umanit\SeoBundle\Doctrine\Annotation\Breadcrumb;
 use Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableInterface;
+use Umanit\SeoBundle\Model\Breadcrumb;
 use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
