@@ -23,11 +23,13 @@ services:
         class: Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter
         arguments:
             - '@umanit_seo.url_history.url_pool'
+            - '@umanit_seo.routable'
             - '@umanit_seo.routing.canonical'
             - '@cache.app'
+            - '@annotations.reader'
             - '%kernel.default_locale%'
             - '%umanit_seo.use_url_historization%'
-#        tags: ['doctrine.event_subscriber']
+        tags: ['doctrine.event_subscriber']
 
     Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
 

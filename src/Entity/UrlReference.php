@@ -5,17 +5,13 @@ namespace Umanit\SeoBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class UrlRef@
- *
  * @ORM\Table(name="umanit_seo_url_reference", indexes={
  *     @ORM\Index(name="umanit_seo_url_ref_search_idx", columns={"seo_uuid"}),
  * })
  * @ORM\Entity(repositoryClass="Umanit\SeoBundle\Repository\UrlHistoryRepository")
  * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
-class UrlRef
+class UrlReference
 {
     /**
      * @var int
@@ -34,8 +30,9 @@ class UrlRef
     private $route;
 
     /**
-     * @ORM\Column(name="url", nullable=false, length=512)
      * @var string
+     *
+     * @ORM\Column(name="url", nullable=false, length=512)
      */
     private $url;
 
@@ -63,7 +60,7 @@ class UrlRef
         return $this->url;
     }
 
-    public function setUrl(?string $url): self
+    public function setUrl(?string $url): UrlReference
     {
         $this->url = $url;
 
@@ -75,7 +72,7 @@ class UrlRef
         return $this->locale;
     }
 
-    public function setLocale(?string $locale): self
+    public function setLocale(?string $locale): UrlReference
     {
         $this->locale = $locale;
 
@@ -87,7 +84,7 @@ class UrlRef
         return $this->seoUuid;
     }
 
-    public function setSeoUuid(?string $seoUuid): self
+    public function setSeoUuid(?string $seoUuid): UrlReference
     {
         $this->seoUuid = $seoUuid;
 
@@ -99,7 +96,7 @@ class UrlRef
         return $this->route;
     }
 
-    public function setRoute(?string $route): self
+    public function setRoute(?string $route): UrlReference
     {
         $this->route = $route;
 

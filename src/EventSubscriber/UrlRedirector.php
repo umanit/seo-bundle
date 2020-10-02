@@ -6,12 +6,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
 
-/**
- * Redirects old urls to new ones.
- */
 class UrlRedirector implements EventSubscriberInterface
 {
     /** @var UrlPool */
@@ -35,20 +33,15 @@ class UrlRedirector implements EventSubscriberInterface
         $this->httpRedirectCode = $httpRedirectCode;
     }
 
-    /**
-     * Redirects an old url to a new one.
-     *
-     * @param ExceptionEvent $event
-     */
     public function onKernelException(ExceptionEvent $event): void
     {
-        if (!$this->useUrlHistorization || !$event->getThrowable() instanceof NotFoundHttpException) {
+        $exception = 50000 > Kernel::VERSION_ID ? $event->getException() : $event->getThrowable();
+
+        if (!$this->useUrlHistorization || !$exception instanceof NotFoundHttpException) {
             return;
         }
 
-        $path = $event->getRequest()->getUri();
-        $locale = $event->getRequest()->getLocale();
-        $urlHistoryItem = $this->pool->get($path, $locale);
+        $urlHistoryItem = $this->pool->get($event->getRequest()->getUri(), $event->getRequest()->getLocale());
 
         // Check that url is in pool
         if (null !== $urlHistoryItem) {

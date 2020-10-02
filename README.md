@@ -299,7 +299,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
-use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
+use Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait;
 use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 use Spatie\SchemaOrg\BaseType;
 use Spatie\SchemaOrg\Schema;
@@ -321,7 +321,7 @@ use Spatie\SchemaOrg\Schema;
  */
 class Page implements HasSeoMetadataInterface, UrlHistorizedInterface
 {
-    use SeoMetadataTrait, UrlHistorizedTrait;
+    use SeoMetadataTrait, HistorizableUrlTrait;
 
     /**
      * @var int

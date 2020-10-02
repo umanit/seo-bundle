@@ -6,11 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Entity\SeoMetadata;
 use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 
-/**
- * Contains data usable for Seo metadata.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 trait SeoMetadataTrait
 {
     /**

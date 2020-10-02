@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
-use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
+use Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait;
 
 /**
  * Class ProductCategory. Used for testing multilevel url.
@@ -24,7 +24,7 @@ use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
  */
 class ProductCategory implements UrlHistorizedInterface
 {
-    use UrlHistorizedTrait;
+    use HistorizableUrlTrait;
 
     /**
      * The identifier of ProductCategory.

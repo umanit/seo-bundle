@@ -8,7 +8,7 @@ use Spatie\SchemaOrg\Schema;
 use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Annotation as Seo;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
-use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
+use Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait;
 
 /**
  * Class Category
@@ -24,7 +24,7 @@ use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedTrait;
  */
 class Category implements UrlHistorizedInterface
 {
-    use UrlHistorizedTrait;
+    use HistorizableUrlTrait;
 
     /**
      * The identifier of SeoPage.

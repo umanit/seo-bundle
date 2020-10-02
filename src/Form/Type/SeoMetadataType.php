@@ -12,9 +12,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\SeoMetadata;
 use Umanit\SeoBundle\Entity\UrlHistory;
+use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
 use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 class SeoMetadataType extends AbstractType
@@ -91,10 +91,10 @@ class SeoMetadataType extends AbstractType
 
         $entity = $form->getParent()->getData();
 
-        if ($entity instanceof UrlHistorizedInterface && $entity->getUrlRef()) {
+        if ($entity instanceof HistorizableUrlModelInterface && $entity->getUrlReference()) {
             $view->vars['url_history'] = $this->em
                 ->getRepository(UrlHistory::class)
-                ->findBy(['seoUuid' => $entity->getUrlRef()->getSeoUuid()], ['id' => 'ASC'])
+                ->findBy(['seoUuid' => $entity->getUrlReference()->getSeoUuid()], ['id' => 'ASC'])
             ;
         }
     }
