@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Handler\Breadcrumbable;
 
-use Umanit\SeoBundle\Model\BreadcrumbableInterface as ModelBreadcrumbableInterface;
+use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 
 class Breadcrumbable implements BreadcrumbableInterface
 {
@@ -16,7 +16,7 @@ class Breadcrumbable implements BreadcrumbableInterface
         $this->handlers = $handlers;
     }
 
-    public function handle(ModelBreadcrumbableInterface $entity): array
+    public function handle(BreadcrumbableModelInterface $entity): array
     {
         foreach ($this->handlers as $handler) {
             if ($handler->supports($entity)) {

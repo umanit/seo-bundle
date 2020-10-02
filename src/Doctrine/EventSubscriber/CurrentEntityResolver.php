@@ -6,7 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Umanit\SeoBundle\Model\RoutableInterface;
+use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
 
@@ -46,7 +46,7 @@ class CurrentEntityResolver implements EventSubscriber
 
         $entity = $args->getEntity();
 
-        if (!$entity instanceof RoutableInterface) {
+        if (!$entity instanceof RoutableModelInterface) {
             return;
         }
 

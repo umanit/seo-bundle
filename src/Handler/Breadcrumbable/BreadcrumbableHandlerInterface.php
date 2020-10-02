@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Handler\Breadcrumbable;
 
-use Umanit\SeoBundle\Model\BreadcrumbableInterface;
+use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 use Umanit\SeoBundle\Model\BreadcrumbItem;
 
 interface BreadcrumbableHandlerInterface
@@ -12,18 +12,18 @@ interface BreadcrumbableHandlerInterface
     /**
      * Does the handler supports this entity?
      *
-     * @param BreadcrumbableInterface $entity
+     * @param BreadcrumbableModelInterface $entity
      *
      * @return bool
      */
-    public function supports(BreadcrumbableInterface $entity): bool;
+    public function supports(BreadcrumbableModelInterface $entity): bool;
 
     /**
      * Should returns a list of BreadcrumbItem object for the entity.
      *
-     * @param BreadcrumbableInterface $entity
+     * @param BreadcrumbableModelInterface $entity
      *
      * @return BreadcrumbItem[]
      */
-    public function process(BreadcrumbableInterface $entity): array;
+    public function process(BreadcrumbableModelInterface $entity): array;
 }

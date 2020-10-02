@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Handler\Routable;
 
-use Umanit\SeoBundle\Model\RoutableInterface as ModelRoutableInterface;
+use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Model\Route;
 
 class Routable implements RoutableInterface
@@ -17,7 +17,7 @@ class Routable implements RoutableInterface
         $this->handlers = $handlers;
     }
 
-    public function handle(ModelRoutableInterface $entity): Route
+    public function handle(RoutableModelInterface $entity): Route
     {
         foreach ($this->handlers as $handler) {
             if ($handler->supports($entity)) {

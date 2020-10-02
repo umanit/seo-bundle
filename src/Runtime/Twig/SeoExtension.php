@@ -8,7 +8,7 @@ use Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder;
 use Umanit\SeoBundle\Exception\NotBreadcrumbEntityException;
 use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
 use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
-use Umanit\SeoBundle\Model\RoutableInterface;
+use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
 use Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver;
@@ -79,7 +79,7 @@ class SeoExtension extends AbstractExtension
      */
     public function canonical(?object $entity = null, array $overrides = []): string
     {
-        if (null !== $entity && !$entity instanceof RoutableInterface) {
+        if (null !== $entity && !$entity instanceof RoutableModelInterface) {
             return '';
         }
 
