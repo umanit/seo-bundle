@@ -25,6 +25,6 @@
             "@type": "BreadcrumbList",
             "itemListElement": json_items
         } %}
-        <script type="application/ld+json">{{ breadcrumb|json_encode(384)|raw }}</script>
+        <script type="application/ld+json">{{ breadcrumb|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
     {% endapply %}
 {%- endif -%}
