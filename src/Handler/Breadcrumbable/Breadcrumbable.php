@@ -25,9 +25,6 @@ class Breadcrumbable implements BreadcrumbableInterface
             }
         }
 
-        throw new \LogicException(sprintf(
-            'Can not determine the breadcrumb of the entity %s',
-            \get_class($entity)
-        ));
+        throw new \LogicException(sprintf('Can not determine the breadcrumb of the entity %s', \get_class($entity)));
     }
 }

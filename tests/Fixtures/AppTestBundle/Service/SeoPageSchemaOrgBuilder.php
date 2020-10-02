@@ -4,14 +4,14 @@ namespace AppTestBundle\Service;
 
 use Spatie\SchemaOrg\BaseType;
 use Spatie\SchemaOrg\Schema;
-use Umanit\SeoBundle\SchemaOrg\SchemaBuilderInterface;
+use Umanit\SeoBundle\SchemaOrg\SchemaOrgBuilderInterface;
 
 /**
  * Class SeoPageSchemaOrgBuilder
  *
  * @author Arthur Guigand <aguigand@umanit.fr>
  */
-class SeoPageSchemaOrgBuilder implements SchemaBuilderInterface
+class SeoPageSchemaOrgBuilder implements SchemaOrgBuilderInterface
 {
     public function buildSchema(object $entity): BaseType
     {

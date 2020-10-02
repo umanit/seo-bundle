@@ -5,6 +5,7 @@ services:
         arguments: ['@doctrine.orm.entity_manager','%kernel.default_locale%']
         calls:
             - [setAnnotationReader, ['@annotations.cached_reader']]
+
     Umanit\SeoBundle\UrlHistory\UrlPool: '@umanit_seo.url_history.url_pool'
 
     # Canonical url generator
@@ -28,6 +29,7 @@ services:
         calls:
             - [setAnnotationReader, ['@annotations.cached_reader']]
         tags: ['doctrine.event_subscriber']
+
     Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
 
     # Current Entity Resolver
@@ -45,6 +47,7 @@ services:
             - '%umanit_seo.redirect_code%'
         tags:
             - { name: kernel.event_subscriber }
+
     Umanit\SeoBundle\EventSubscriber\UrlRedirector: '@umanit_seo.event_subscriber.url_redirector'
 
     umanit_seo.breadcrumb.breadcrumb_builder:
@@ -64,10 +67,11 @@ services:
             - '@umanit_seo.routing.canonical'
             - '@umanit_seo.runtime.current_seo_entity'
             - '@umanit_seo.utils.seo_metadata_resolver'
-            - '@umanit_seo.schema_org.schema_org_resolver'
+            - '@umanit_seo.schema_org.schema_org_builder'
             - '@umanit_seo.breadcrumb.breadcrumb_builder'
         tags:
             - { name: twig.extension }
+
     Umanit\SeoBundle\Runtime\Twig\SeoExtension: '@umanit_seo.runtime_twig.seo_extension'
 
     umanit_seo.twig_extension.routing:
@@ -81,40 +85,57 @@ services:
     # CurrentSeo Entity
     umanit_seo.runtime.current_seo_entity:
         class: Umanit\SeoBundle\Runtime\CurrentSeoEntity
+
     Umanit\SeoBundle\Runtime\CurrentSeoEntity: '@umanit_seo.runtime.current_seo_entity'
 
     # Utils
     umanit_seo.utils_entity_parser.excerpt:
         class: Umanit\SeoBundle\Utils\EntityParser\Excerpt
         arguments: ['@property_accessor']
+
     Umanit\SeoBundle\Utils\EntityParser\Excerpt: '@umanit_seo.utils_entity_parser.excerpt'
 
     umanit_seo.utils_entity_parser.title:
         class: Umanit\SeoBundle\Utils\EntityParser\Title
         arguments: ['@property_accessor']
+
     Umanit\SeoBundle\Utils\EntityParser\Title: '@umanit_seo.utils_entity_parser.title'
 
     # Forms
     umanit_seo.form_type.seo_metadata_type:
         class: Umanit\SeoBundle\Form\Type\SeoMetadataType
-        arguments: ['@umanit_seo.utils.seo_metadata_resolver', '@translator', '@doctrine.orm.entity_manager','%umanit_seo.metadata%']
+        arguments:
+            - '@umanit_seo.utils.seo_metadata_resolver'
+            - '@translator'
+            - '@doctrine.orm.entity_manager'
+            - '%umanit_seo.metadata%'
         tags:
             - { name: form.type, alias: Umanit\SeoBundle\Form\Type\SeoMetadataType }
+
     Umanit\SeoBundle\Form\Type\SeoMetadataType: '@umanit_seo.form_type.seo_metadata_type'
 
     # Metadata Resolver
     umanit_seo.utils.seo_metadata_resolver:
         class: Umanit\SeoBundle\Utils\SeoMetadataResolver
-        arguments: ['@umanit_seo.utils_entity_parser.title', '@umanit_seo.utils_entity_parser.excerpt', '%umanit_seo.metadata%']
+        arguments:
+            - '@umanit_seo.utils_entity_parser.title'
+            - '@umanit_seo.utils_entity_parser.excerpt'
+            - '%umanit_seo.metadata%'
+
     Umanit\SeoBundle\Utils\SeoMetadataResolver: '@umanit_seo.utils.seo_metadata_resolver'
 
     # SchemaOrg Resolver
     umanit_seo.schema_org.schema_org_resolver:
         class: Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver
-        calls:
-            - [setAnnotationReader, ['@annotations.cached_reader']]
-            - [setContainer, ['@service_container']]
+
     Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver: '@umanit_seo.schema_org.schema_org_resolver'
+
+    umanit_seo.schema_org.schema_org_builder:
+        class: Umanit\SeoBundle\SchemaOrg\SchemaOrgBuilder
+        arguments:
+            - '@umanit_seo.schemable'
+
+    Umanit\SeoBundle\SchemaOrg\SchemaOrgBuilderInterface: '@umanit_seo.schema_org.schema_org_builder'
 
     # Routable
     umanit_seo.routable:
@@ -129,3 +150,10 @@ services:
         arguments: [!tagged_iterator umanit_seo.breadcrumbable.handler]
 
     Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableInterface: '@umanit_seo.breadcrumbable'
+
+    # Schemable
+    umanit_seo.schemable:
+        class: Umanit\SeoBundle\Handler\Schemable\Schemable
+        arguments: [!tagged_iterator umanit_seo.schemable.handler]
+
+    Umanit\SeoBundle\Handler\Schemable\SchemableInterface: '@umanit_seo.schemable'

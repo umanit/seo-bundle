@@ -5,12 +5,12 @@ namespace Umanit\SeoBundle\Runtime\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder;
-use Umanit\SeoBundle\Exception\NotSchemaOrgEntityException;
 use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
+use Umanit\SeoBundle\Model\SchemableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
-use Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver;
+use Umanit\SeoBundle\SchemaOrg\SchemaOrgBuilderInterface;
 use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 class SeoExtension extends AbstractExtension
@@ -24,8 +24,8 @@ class SeoExtension extends AbstractExtension
     /** @var SeoMetadataResolver */
     private $metadataResolver;
 
-    /** @var SchemaOrgResolver */
-    private $schemaOrgResolver;
+    /** @var SchemaOrgBuilderInterface */
+    private $schemaOrgBuilder;
 
     /** @var BreadcrumbBuilder */
     private $breadcrumbBuilder;
@@ -34,14 +34,14 @@ class SeoExtension extends AbstractExtension
         Canonical $canonical,
         CurrentSeoEntity $currentSeoEntity,
         SeoMetadataResolver $metadataResolver,
-        SchemaOrgResolver $schemaOrgResolver,
+        SchemaOrgBuilderInterface $schemaOrgBuilder,
         BreadcrumbBuilder $breadcrumbBuilder
     ) {
 
         $this->canonical = $canonical;
         $this->currentSeoEntity = $currentSeoEntity;
         $this->metadataResolver = $metadataResolver;
-        $this->schemaOrgResolver = $schemaOrgResolver;
+        $this->schemaOrgBuilder = $schemaOrgBuilder;
         $this->breadcrumbBuilder = $breadcrumbBuilder;
     }
 
@@ -121,26 +121,25 @@ HTML
      * @param object|null $entity
      *
      * @return string
-     * @throws \ReflectionException
      */
     public function schemaOrg(?object $entity = null): string
     {
-        try {
-            return strtr(
-                <<<HTML
-<script type="application/ld+json">%json%</script>
-HTML
-                , [
-                '%json%' => json_encode($this->schemaOrgResolver->getSchemaBuilder(
-                    $entity ?? $this->currentSeoEntity->get()
-                )->toArray(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
-            ]);
-
-        } catch (NotSchemaOrgEntityException $e) {
-            // Do nothing
+        if (
+            (null !== $entity && !$entity instanceof SchemableModelInterface) ||
+            (null === $entity && null === $this->currentSeoEntity->get())
+        ) {
+            return '';
         }
 
-        return '';
+        return strtr(
+            <<<HTML
+<script type="application/ld+json">%json%</script>
+HTML
+            , [
+            '%json%' => json_encode($this->schemaOrgBuilder->buildSchema(
+                $entity ?? $this->currentSeoEntity->get()
+            )->toArray(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+        ]);
     }
 
     /**

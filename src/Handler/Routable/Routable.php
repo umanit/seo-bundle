@@ -25,6 +25,6 @@ class Routable implements RoutableInterface
             }
         }
 
-        throw new \LogicException(sprintf('Can not determine the route of the entity %s', $entity));
+        throw new \LogicException(sprintf('Can not determine the route of the entity %s', \get_class($entity)));
     }
 }
