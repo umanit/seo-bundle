@@ -106,6 +106,7 @@ services:
         arguments:
             - '@umanit_seo.utils.seo_metadata_resolver'
             - '@doctrine.orm.entity_manager'
+            - '%umanit_seo.metadata.auto_inject_code_prettify%'
         tags:
             - { name: form.type, alias: Umanit\SeoBundle\Form\Type\SeoMetadataType }
 

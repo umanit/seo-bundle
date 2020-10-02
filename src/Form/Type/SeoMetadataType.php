@@ -25,10 +25,18 @@ class SeoMetadataType extends AbstractType
     /** @var SeoMetadataResolver */
     private $seoMetadataResolver;
 
-    public function __construct(SeoMetadataResolver $seoMetadataResolver, EntityManagerInterface $em)
+    /** @var bool */
+    private $injectCodePrettify;
+
+    public function __construct(
+        SeoMetadataResolver $seoMetadataResolver,
+        EntityManagerInterface $em,
+        bool $injectCodePrettify
+    )
     {
         $this->seoMetadataResolver = $seoMetadataResolver;
         $this->em = $em;
+        $this->injectCodePrettify = $injectCodePrettify;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -79,6 +87,8 @@ class SeoMetadataType extends AbstractType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
+        $view->vars['inject_code_prettify'] = $this->injectCodePrettify;
+
         $entity = $form->getParent()->getData();
 
         if ($entity instanceof UrlHistorizedInterface && $entity->getUrlRef()) {
