@@ -1,22 +1,30 @@
 {# This is the template for breadcrumb in RDFa format #}
-{% spaceless %}
-    {% if items is not empty %}
+{%- if items is not empty -%}
+    {% apply spaceless %}
         {% set json_items = [] %}
         {% for item in items %}
-            {% set json_items = json_items|merge([{
-                "@type": "ListItem",
-                "position": loop.index,
-                "item": {
-                    "@id": item.url,
+            {% if item.url is defined and not loop.last %}
+                {% set json_items = json_items|merge([{
+                    "@type": "ListItem",
+                    "position": loop.index,
+                    "item": {
+                        "@id": item.url,
+                        "name": item.name
+                    }
+                }]) %}
+            {% else %}
+                {% set json_items = json_items|merge([{
+                    "@type": "ListItem",
+                    "position": loop.index,
                     "name": item.name
-                }
-            }]) %}
+                }]) %}
+            {% endif %}
         {% endfor %}
         {% set breadcrumb = {
-            "@context": "http://schema.org",
+            "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": json_items
         } %}
         <script type="application/ld+json">{{ breadcrumb|json_encode(384)|raw }}</script>
-    {% endif %}
-{% endspaceless %}
+    {% endapply %}
+{%- endif -%}
