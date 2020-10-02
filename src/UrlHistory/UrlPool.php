@@ -3,31 +3,30 @@
 namespace Umanit\SeoBundle\UrlHistory;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\UrlHistory;
-use Umanit\SeoBundle\Model\AnnotationReaderTrait;
+use Umanit\SeoBundle\Handler\Routable\RoutableInterface;
+use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 
-/**
- * Pool of historized URLs.
- */
 class UrlPool
 {
-    use AnnotationReaderTrait;
-
     /** @var EntityManagerInterface */
     private $em;
+
+    /** @var RoutableInterface */
+    private $routableHandler;
 
     /** @var string */
     private $defaultLocale;
 
-    /** @var array<UrlHistory> */
+    /** @var UrlHistory[] */
     private $items = [];
 
-    public function __construct(EntityManagerInterface $em, string $defaultLocale)
+    public function __construct(EntityManagerInterface $em, RoutableInterface $routableHandler, string $defaultLocale)
     {
         $this->em = $em;
+        $this->routableHandler = $routableHandler;
         $this->defaultLocale = $defaultLocale;
     }
 
@@ -37,24 +36,22 @@ class UrlPool
      * @param string                 $oldPath
      * @param string                 $newPath
      * @param UrlHistorizedInterface $entity
-     *
-     * @throws \ReflectionException
-     * @throws \Umanit\SeoBundle\Exception\NotSeoRouteEntityException
      */
     public function add(string $oldPath, string $newPath, UrlHistorizedInterface $entity): void
     {
+        $locale = method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale;
         $urlHistory = $this
             ->getUrlHistoryRepository()
             ->findOneBy([
                 'oldPath' => $oldPath,
-                'locale'  => method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale,
+                'locale'  => $locale,
                 'seoUuid' => $entity->getUrlRef()->getSeoUuid(),
             ])
         ;
 
         if (null === $urlHistory) {
             $urlHistory = (new UrlHistory())
-                ->setLocale(method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale)
+                ->setLocale($locale)
                 ->setNewPath($newPath)
                 ->setOldPath($oldPath)
                 ->setRoute($this->resolveRouteFromEntity($entity))
@@ -97,23 +94,17 @@ class UrlPool
         }
     }
 
-    /**
-     * @return UrlHistoryRepository
-     */
-    private function getUrlHistoryRepository(): ObjectRepository
+    private function getUrlHistoryRepository(): UrlHistoryRepository
     {
         return $this->em->getRepository(UrlHistory::class);
     }
 
-    /**
-     * @param object $entity
-     *
-     * @return string|null
-     * @throws \ReflectionException
-     * @throws \Umanit\SeoBundle\Exception\NotSeoRouteEntityException
-     */
     private function resolveRouteFromEntity(object $entity): ?string
     {
-        return $this->getSeoRouteAnnotation($entity)->getRouteName();
+        if (!$entity instanceof RoutableModelInterface) {
+            return null;
+        }
+
+        return $this->routableHandler->handle($entity)->getName();
     }
 }

@@ -12,26 +12,14 @@ use Doctrine\ORM\Events;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
-use Umanit\SeoBundle\Doctrine\Annotation\Route;
-use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
 use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
 use Umanit\SeoBundle\Entity\UrlRef;
-use Umanit\SeoBundle\Exception\NotSeoRouteEntityException;
-use Umanit\SeoBundle\Model\AnnotationReaderTrait;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
 
-/**
- * Class UrlHistoryWriter
- *
- * Writes the url history log on update
- * of an entity annotated @Route().
- */
 class UrlHistoryWriter implements EventSubscriber
 {
     public const ENTITY_DEPENDENCY_CACHE_KEY = 'seo.entity_dependencies';
-
-    use AnnotationReaderTrait;
 
     /** @var UrlPool */
     private $urlPool;
@@ -78,6 +66,7 @@ class UrlHistoryWriter implements EventSubscriber
      *
      * @param LoadClassMetadataEventArgs $args
      *
+     * @throws \Psr\Cache\InvalidArgumentException
      * @throws \ReflectionException
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void

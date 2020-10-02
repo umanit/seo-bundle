@@ -2,9 +2,10 @@ services:
     # Url Pool
     umanit_seo.url_history.url_pool:
         class: Umanit\SeoBundle\UrlHistory\UrlPool
-        arguments: ['@doctrine.orm.entity_manager','%kernel.default_locale%']
-        calls:
-            - [setAnnotationReader, ['@annotations.cached_reader']]
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@umanit_seo.routable'
+            - '%kernel.default_locale%'
 
     Umanit\SeoBundle\UrlHistory\UrlPool: '@umanit_seo.url_history.url_pool'
 
@@ -26,9 +27,7 @@ services:
             - '@cache.app'
             - '%kernel.default_locale%'
             - '%umanit_seo.use_url_historization%'
-        calls:
-            - [setAnnotationReader, ['@annotations.cached_reader']]
-        tags: ['doctrine.event_subscriber']
+#        tags: ['doctrine.event_subscriber']
 
     Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
 
@@ -106,9 +105,7 @@ services:
         class: Umanit\SeoBundle\Form\Type\SeoMetadataType
         arguments:
             - '@umanit_seo.utils.seo_metadata_resolver'
-            - '@translator'
             - '@doctrine.orm.entity_manager'
-            - '%umanit_seo.metadata%'
         tags:
             - { name: form.type, alias: Umanit\SeoBundle\Form\Type\SeoMetadataType }
 
@@ -123,12 +120,6 @@ services:
             - '%umanit_seo.metadata%'
 
     Umanit\SeoBundle\Utils\SeoMetadataResolver: '@umanit_seo.utils.seo_metadata_resolver'
-
-    # SchemaOrg Resolver
-    umanit_seo.schema_org.schema_org_resolver:
-        class: Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver
-
-    Umanit\SeoBundle\SchemaOrg\SchemaOrgResolver: '@umanit_seo.schema_org.schema_org_resolver'
 
     umanit_seo.schema_org.schema_org_builder:
         class: Umanit\SeoBundle\SchemaOrg\SchemaOrgBuilder
