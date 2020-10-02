@@ -20,13 +20,6 @@ class SeoMetadataResolver
     /** @var array */
     private $metadataConfig;
 
-    /**
-     * SeoMetadataResolver constructor.
-     *
-     * @param Title   $title
-     * @param Excerpt $excerpt
-     * @param array   $metadataConfig
-     */
     public function __construct(Title $title, Excerpt $excerpt, array $metadataConfig)
     {
         $this->title = $title;
@@ -38,7 +31,6 @@ class SeoMetadataResolver
      * Returns the meta title of an entity.
      *
      * @param object|null $entity
-     *
      * @param bool        $includePrefix
      * @param bool        $includeSuffix
      *
@@ -48,11 +40,11 @@ class SeoMetadataResolver
     {
         $title = $this->meta($entity, 'title');
 
-        if (true === $includePrefix) {
+        if ($includePrefix) {
             $title = $this->metadataConfig['title_prefix'].$title;
         }
 
-        if (true === $includeSuffix) {
+        if ($includeSuffix) {
             $title .= $this->metadataConfig['title_suffix'];
         }
 
@@ -76,16 +68,18 @@ class SeoMetadataResolver
      * @param string      $metatype
      *
      * @return string string
-     * @internal Returns a meta data field.
-     *
      */
     private function meta(?object $entity, string $metatype): string
     {
-        if (null === $entity || false === is_object($entity)) {
+        if (null === $entity || !\is_object($entity)) {
             return $this->metadataConfig['default_'.$metatype];
         }
 
-        if (($entity instanceof HasSeoMetadataInterface) && null !== $entity->getSeoMetadata()->{'get'.ucfirst($metatype)}()) {
+        if (
+            $entity instanceof HasSeoMetadataInterface &&
+            null !== $entity->getSeoMetadata() &&
+            null !== $entity->getSeoMetadata()->{'get'.ucfirst($metatype)}()
+        ) {
             return $entity->getSeoMetadata()->{'get'.ucfirst($metatype)}();
         }
 

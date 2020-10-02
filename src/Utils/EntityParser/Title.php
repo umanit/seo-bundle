@@ -3,15 +3,10 @@
 namespace Umanit\SeoBundle\Utils\EntityParser;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Umanit\SeoBundle\Utils\Text\Html;
 use Umanit\SeoBundle\Utils\Text\Str;
 
-/**
- * Title util class.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 class Title
 {
     // The field names we do not want in a title.
@@ -50,17 +45,10 @@ class Title
         'identity',
     ];
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessorInterface */
     private $accessor;
 
-    /**
-     * Excerpt constructor.
-     *
-     * @param PropertyAccessor $accessor
-     */
-    public function __construct(PropertyAccessor $accessor)
+    public function __construct(PropertyAccessorInterface $accessor)
     {
         $this->accessor = $accessor;
     }
@@ -74,21 +62,20 @@ class Title
      * @return string|null
      * @throws \ReflectionException
      */
-    public function fromEntity($entity, $length = 100): ?string
+    public function fromEntity(object $entity, $length = 100): ?string
     {
         $refl = new \ReflectionClass($entity);
-
-        /** @var \ReflectionProperty[] $properties */
         $properties = $refl->getProperties();
 
         // Consider favourite keys first
-        uasort($properties, function(\ReflectionProperty $a, \ReflectionProperty $b) {
+        uasort($properties, function (\ReflectionProperty $a, \ReflectionProperty $b) {
             if (\in_array($a->getName(), $this::FAV_KEYS, true)) {
                 return -1;
             }
             if (\in_array($b->getName(), $this::FAV_KEYS, true)) {
                 return 1;
             }
+
             return 0;
         });
 
@@ -108,7 +95,7 @@ class Title
 
             // If the field is one of the favourite
             // keys, directly return its value.
-            if (false !== is_string($value) && Str::striposInArray($property->getName(), self::FAV_KEYS)) {
+            if (false !== \is_string($value) && Str::striposInArray($property->getName(), self::FAV_KEYS)) {
                 return Html::trimText($value, $length);
             }
         }

@@ -3,15 +3,13 @@
 namespace Umanit\SeoBundle\Utils\EntityParser;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Umanit\SeoBundle\Utils\Text\Html;
 use Umanit\SeoBundle\Utils\Text\Str;
 
 /**
  * Excerpt util class.
  * Inspired by Bolt CMS.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class Excerpt
 {
@@ -41,17 +39,10 @@ class Excerpt
         'introduction',
     ];
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessorInterface */
     private $accessor;
 
-    /**
-     * Excerpt constructor.
-     *
-     * @param PropertyAccessor $accessor
-     */
-    public function __construct(PropertyAccessor $accessor)
+    public function __construct(PropertyAccessorInterface $accessor)
     {
         $this->accessor = $accessor;
     }
@@ -65,12 +56,10 @@ class Excerpt
      * @return string|null ?string
      * @throws \ReflectionException
      */
-    public function fromEntity($entity, $length = 150): ?string
+    public function fromEntity(object $entity, $length = 150): ?string
     {
         $values = '';
-        $refl   = new \ReflectionClass($entity);
-
-        /** @var \ReflectionProperty[] $properties */
+        $refl = new \ReflectionClass($entity);
         $properties = $refl->getProperties();
 
         // Consider favourite keys first
@@ -100,11 +89,11 @@ class Excerpt
             }
 
             // Try to convert the value in a string
-            if (is_object($value) && method_exists($value, '__toString')) {
+            if (\is_object($value) && method_exists($value, '__toString')) {
                 $value = (string) $value;
             }
 
-            if (false === is_string($value)) {
+            if (false === \is_string($value)) {
                 continue;
             }
 
@@ -123,5 +112,4 @@ class Excerpt
 
         return '' === $trim ? null : $trim;
     }
-
 }
