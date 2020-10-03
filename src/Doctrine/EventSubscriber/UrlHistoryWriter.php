@@ -4,12 +4,14 @@ namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\Mapping\Annotation;
+use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -33,11 +35,11 @@ class UrlHistoryWriter implements EventSubscriber
     /** @var Canonical */
     private $urlBuilder;
 
-    /** @var CacheInterface */
-    private $cache;
-
     /** @var Reader */
     private $annotationsReader;
+
+    /** @var CacheInterface */
+    private $cache;
 
     /** @var string */
     private $defaultLocale;
@@ -49,16 +51,16 @@ class UrlHistoryWriter implements EventSubscriber
         UrlPool $urlPool,
         Routable $routableHandler,
         Canonical $urlBuilder,
-        CacheInterface $cache,
         Reader $annotationsReader,
+        CacheInterface $cache,
         string $defaultLocale,
         bool $useUrlHistorization
     ) {
         $this->urlPool = $urlPool;
         $this->routableHandler = $routableHandler;
         $this->urlBuilder = $urlBuilder;
-        $this->cache = $cache;
         $this->annotationsReader = $annotationsReader;
+        $this->cache = $cache;
         $this->defaultLocale = $defaultLocale;
         $this->useUrlHistorization = $useUrlHistorization;
     }
@@ -70,54 +72,59 @@ class UrlHistoryWriter implements EventSubscriber
             Events::onFlush,
             Events::prePersist,
             Events::postFlush,
-            Events::loadClassMetadata,
+            Events::postLoad,
         ];
     }
 
-    /**
-     * Creates the cache used to match entities.
-     *
-     * @param LoadClassMetadataEventArgs $args
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \ReflectionException
-     */
-    public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
+    public function postLoad(LifecycleEventArgs $args): void
     {
-        return;
-
-        if (!$this->useUrlHistorization || null === $args->getClassMetadata()->getReflectionClass()) {
+        if (!$this->useUrlHistorization) {
             return;
         }
 
-        $entity = $args->getClassMetadata()->getReflectionClass();
+        $entity = $args->getEntity();
 
         if (!$entity instanceof RoutableModelInterface) {
             return;
         }
 
         $route = $this->routableHandler->handle($entity);
+        $reflectionEntity = new \ReflectionClass($entity);
 
-        foreach ($route->getParameters() as $routeParameter) {
-            $pathItems = $this->getPropertyAsArray($routeParameter);
+        // Loops through each route parameters
+        foreach (array_keys($route->getParameters()) as $routeParameter) {
+            try {
+                $reflectionProperty = $reflectionEntity->getProperty($routeParameter);
+            } catch (\ReflectionException $e) {
+                continue;
+            }
 
-            if (\count($pathItems) > 1) {
-                $this->walkRouteParameters(
-                    $args->getClassMetadata()->rootEntityName,
-                    $args->getClassMetadata()->rootEntityName,
-                    $pathItems
+            $annotations = $this->annotationsReader->getPropertyAnnotations($reflectionProperty);
+
+            /** @var Annotation $annotation */
+            foreach ($annotations as $annotation) {
+                if (!property_exists($annotation, 'targetEntity')) {
+                    continue;
+                }
+
+                // Add the related entity to the cache if it's a mapping annotation
+                $entityClass = $reflectionEntity->getName();
+                $this->cache->get(
+                    $this->getCacheKey($annotation->targetEntity),
+                    static function (ItemInterface $item) use ($entityClass) {
+                        $cacheValue = $item->get() ?? [];
+
+                        return array_unique(array_merge(
+                            $cacheValue,
+                            [$entityClass]
+                        ));
+                    },
+                    INF // We use INF to forces immediate expiration.
                 );
             }
         }
     }
 
-    /**
-     * Before updating an entity.
-     *
-     * @param PreUpdateEventArgs $args
-     *
-     * @throws \ReflectionException
-     */
     public function preUpdate(PreUpdateEventArgs $args): void
     {
         if (!$this->useUrlHistorization) {
@@ -132,54 +139,23 @@ class UrlHistoryWriter implements EventSubscriber
 
         // Build the new path
         $newPath = $this->urlBuilder->url($entity);
-        $changeSet = $args->getEntityChangeSet();
+        $route = $this->routableHandler->handle($entity);
+        $changeSet = [];
 
         // Get old values
-        foreach ($changeSet as $changedFieldKey => $changedFieldValue) {
-            continue;
-
-            foreach ($seoAnnotation->getRouteParameters() as $routeParameter) {
-                /** @var RouteParameter $routeParameter */
-                $propertyAsArray = $this->getPropertyAsArray($routeParameter);
-
-                if (reset($propertyAsArray) === $changedFieldKey) {
-                    // The old value is the first element of the array
-                    $value = $changedFieldValue[0];
-
-                    if (\is_object($value)) {
-                        $reflection = new \ReflectionClass($value);
-
-                        // If it's an objet, tries to access the value from the class
-                        try {
-                            $value = $this->getValueFromReflectionClass(
-                                $reflection,
-                                $propertyAsArray[1],
-                                $value
-                            );
-                        } catch (\ReflectionException $e) {
-                            continue;
-                        }
-                    }
-
-                    $changeSet[$changedFieldKey] = $value;
-                }
+        foreach (array_keys($route->getParameters()) as $routeParameter) {
+            if ($args->hasChangedField($routeParameter)) {
+                $changeSet[$routeParameter] = $args->getOldValue($routeParameter);
             }
         }
 
         // Build the old path
-        $oldPath = $this->urlBuilder->url($entity, $changeSet);
+        $oldPath = $this->urlBuilder->url($this->getOldEntity($entity, $changeSet));
 
         // Add the redirection to the pool
         $this->urlPool->add($oldPath, $newPath, $entity);
     }
 
-    /**
-     * On prePersist, associate a fresh UrlReference to an entity.
-     *
-     * @param LifecycleEventArgs $args
-     *
-     * @throws \Exception
-     */
     public function prePersist(LifecycleEventArgs $args): void
     {
         if (!$this->useUrlHistorization) {
@@ -193,6 +169,7 @@ class UrlHistoryWriter implements EventSubscriber
         }
 
         if (null === $entity->getUrlReference()) {
+            // Associate a fresh UrlReference to an entity
             $urlReference = (new UrlReference())
                 ->setSeoUuid(Uuid::uuid4())
                 ->setLocale(
@@ -213,7 +190,7 @@ class UrlHistoryWriter implements EventSubscriber
      * @param OnFlushEventArgs $args
      *
      * @return void
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
@@ -244,6 +221,10 @@ class UrlHistoryWriter implements EventSubscriber
 
         // We use onFlush and not preUpdate event to let other event listeners be nested together
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
+            if (!$entity instanceof RoutableModelInterface) {
+                continue;
+            }
+
             if ($entity instanceof HistorizableUrlModelInterface) {
                 $urlReference = $entity->getUrlReference();
 
@@ -264,15 +245,11 @@ class UrlHistoryWriter implements EventSubscriber
             }
 
             // Look inside the cache if any dependent entity has to be historised
-            $cache = $this->cache->get(self::ENTITY_DEPENDENCY_CACHE_KEY, static function (ItemInterface $item) {
+            $dependencies = $this->cache->get($this->getCacheKey($entity), static function (ItemInterface $item) {
                 return [];
             });
 
-            if (!\array_key_exists($this->getClass($entity), $cache)) {
-                continue;
-            }
-
-            foreach ($cache[$this->getClass($entity)] as $dependantEntityClass) {
+            foreach ($dependencies as $dependantEntityClass) {
                 // Fetches the current url of the entities
                 $query = $args
                     ->getEntityManager()->createQueryBuilder()
@@ -311,109 +288,39 @@ class UrlHistoryWriter implements EventSubscriber
         $this->urlPool->flush();
     }
 
-    /**
-     * Walk through relations to set the cache.
-     *
-     * @param string $rootEntity
-     * @param string $subEntity
-     * @param array  $pathItems
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \ReflectionException
-     */
-    private function walkRouteParameters(string $rootEntity, string $subEntity, array &$pathItems): void
+    private function getClass(object $object): string
     {
-        $refl = new \ReflectionClass($subEntity);
+        return $object instanceof Proxy ? get_parent_class($object) : \get_class($object);
+    }
 
-        foreach ($pathItems as $key => $pathItem) {
-            $pathItem = preg_replace('/\[.+\]/', '', $pathItem);
+    /**
+     * @param object|string $entity
+     *
+     * @return string
+     */
+    private function getCacheKey($entity): string
+    {
+        $entityClass = \is_object($entity) ? $this->getClass($entity) : $entity;
 
+        return self::ENTITY_DEPENDENCY_CACHE_KEY.'.'.str_replace('\\', '-', $entityClass);
+    }
+
+    private function getOldEntity(RoutableModelInterface $entity, array $oldValues): RoutableModelInterface
+    {
+        $oldEntity = clone $entity;
+        $oldEntityReflection = new \ReflectionClass($oldEntity);
+
+        foreach ($oldValues as $key => $value) {
             try {
-                $prop = $refl->getProperty($pathItem);
+                $property = $oldEntityReflection->getProperty($key);
             } catch (\ReflectionException $e) {
                 continue;
             }
 
-            $annotations = $this->annotationsReader->getPropertyAnnotations($prop);
-
-            foreach ($annotations as $annotation) {
-                if (property_exists($annotation, 'targetEntity')) {
-                    $targetEntity = $annotation->targetEntity;
-                    unset($pathItems[$key]);
-
-                    $this->addEntitiesToCache($targetEntity, $rootEntity);
-                    $this->walkRouteParameters($rootEntity, $targetEntity, $pathItems);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds and association to the cache.
-     *
-     * @param string $parent
-     * @param string $child
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     * @throws \ReflectionException
-     */
-    private function addEntitiesToCache(string $parent, string $child): void
-    {
-        $childClass = new \ReflectionClass($child);
-
-        if (!$childClass instanceof RoutableModelInterface) {
-            return;
+            $property->setAccessible(true);
+            $property->setValue($oldEntity, $value);
         }
 
-        $this->cache->get(
-            self::ENTITY_DEPENDENCY_CACHE_KEY,
-            static function (ItemInterface $item) use ($parent, $child) {
-                $value = $item->get();
-
-                if (!isset($value[$parent])) {
-                    $value[$parent] = [];
-                }
-
-                if (!\in_array($child, $value[$parent], true)) {
-                    $value[$parent][] = $child;
-                }
-
-                return $value;
-            }
-        );
-    }
-
-    /**
-     * Tries to get a value from a reflection class, and calls itself recursively to test the parent reflection class
-     * in case of inheritance (on one or more levels)
-     *
-     * @param \ReflectionClass $reflection
-     * @param string           $property
-     * @param object           $object
-     *
-     * @return mixed
-     * @throws \ReflectionException
-     */
-    private function getValueFromReflectionClass(\ReflectionClass $reflection, string $property, object $object)
-    {
-        try {
-            $prop = $reflection->getProperty($property);
-            $prop->setAccessible(true);
-
-            return $prop->getValue($object);
-        } catch (\ReflectionException $e) {
-            $parentReflectionClass = $reflection->getParentClass();
-
-            if (false !== $parentReflectionClass) {
-                return $this->getValueFromReflectionClass($parentReflectionClass, $property, $object);
-            }
-
-            throw new \ReflectionException('The property wasn\'t found');
-        }
-    }
-
-    private function getClass(object $object): string
-    {
-        return \get_class($object);
+        return $oldEntity;
     }
 }
