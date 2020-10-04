@@ -1,6 +1,5 @@
-tests/phpunit.xml
-tests/Fixtures/App/cache
-tests/build
-/vendor
-/bin
-/build
+composer.lock
+symfony.lock
+/phpunit.xml
+vendor/
+build/
