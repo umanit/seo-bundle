@@ -62,8 +62,8 @@ services:
     Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder: '@umanit_seo.breadcrumb.breadcrumb_builder'
 
     # Twig Extension
-    umanit_seo.runtime_twig.seo_extension:
-        class: Umanit\SeoBundle\Runtime\Twig\SeoExtension
+    umanit_seo.runtime_twig.seo_runtime:
+        class: Umanit\SeoBundle\Runtime\Twig\SeoRuntime
         arguments:
             - '@umanit_seo.routing.canonical'
             - '@umanit_seo.runtime.current_seo_entity'
@@ -71,17 +71,29 @@ services:
             - '@umanit_seo.schema_org.schema_org_builder'
             - '@umanit_seo.breadcrumb.breadcrumb_builder'
         tags:
+            - { name: twig.runtime }
+
+    umanit_seo.runtime_twig.seo_extension:
+        class: Umanit\SeoBundle\Runtime\Twig\SeoExtension
+        tags:
             - { name: twig.extension }
 
     Umanit\SeoBundle\Runtime\Twig\SeoExtension: '@umanit_seo.runtime_twig.seo_extension'
 
-    umanit_seo.twig_extension.routing:
-        class: Umanit\SeoBundle\Runtime\Twig\RoutingExtension
+    umanit_seo.twig_extension.routing_runtime:
+        class: Umanit\SeoBundle\Runtime\Twig\RoutingRuntime
         arguments:
             - '@twig.extension.routing'
             - '@umanit_seo.routing.canonical'
         tags:
+            - { name: twig.runtime }
+
+    umanit_seo.twig_extension.routing_extension:
+        class: Umanit\SeoBundle\Runtime\Twig\RoutingExtension
+        tags:
             - { name: twig.extension }
+
+    Umanit\SeoBundle\Runtime\Twig\RoutingExtension: '@umanit_seo.twig_extension.routing_extension'
 
     # CurrentSeo Entity
     umanit_seo.runtime.current_seo_entity:
