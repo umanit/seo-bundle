@@ -115,6 +115,11 @@ services:
     Umanit\SeoBundle\Utils\EntityParser\Title: '@umanit_seo.utils_entity_parser.title'
 
     # Forms
+    umanit_seo.form_extension.form_type:
+        class: Umanit\SeoBundle\Form\Extension\FormTypeExtension
+        tags:
+            - { name: form.type_extension }
+
     umanit_seo.form_type.seo_metadata_type:
         class: Umanit\SeoBundle\Form\Type\SeoMetadataType
         arguments:
