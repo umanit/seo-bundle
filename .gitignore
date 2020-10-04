@@ -1,5 +1,7 @@
 composer.lock
 symfony.lock
-/phpunit.xml
+phpunit.xml
+.phpunit
+.phpunit.result.cache
 vendor/
 build/
