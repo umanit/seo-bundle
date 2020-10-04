@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableHandlerInterface;
+use Umanit\SeoBundle\Handler\Routable\RoutableHandlerInterface;
+use Umanit\SeoBundle\Handler\Schemable\SchemableHandlerInterface;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -27,6 +30,19 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
         $loader->load('services.yml');
 
         $this->processServices($container, $configs);
+
+        $container
+            ->registerForAutoconfiguration(RoutableHandlerInterface::class)
+            ->addTag('umanit_seo.routable.handler')
+        ;
+        $container
+            ->registerForAutoconfiguration(BreadcrumbableHandlerInterface::class)
+            ->addTag('umanit_seo.breadcrumbable.handler')
+        ;
+        $container
+            ->registerForAutoconfiguration(SchemableHandlerInterface::class)
+            ->addTag('umanit_seo.schemable.handler')
+        ;
     }
 
     public function prepend(ContainerBuilder $container): void
