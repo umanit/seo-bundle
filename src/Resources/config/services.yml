@@ -28,7 +28,6 @@ services:
             - '@annotations.reader'
             - ~ # Replaced by a compiler pass
             - '%kernel.default_locale%'
-            - '%umanit_seo.use_url_historization%'
         tags: ['doctrine.event_subscriber']
 
     Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
@@ -44,8 +43,8 @@ services:
         class: Umanit\SeoBundle\EventSubscriber\UrlRedirector
         arguments:
             - '@umanit_seo.url_history.url_pool'
-            - '%umanit_seo.use_url_historization%'
-            - '%umanit_seo.redirect_code%'
+            - ~ # Replaced by a compiler pass
+            - ~ # Replaced by a compiler pass
         tags:
             - { name: kernel.event_subscriber }
 
@@ -57,7 +56,7 @@ services:
             - '@twig'
             - '@umanit_seo.routing.canonical'
             - '@umanit_seo.breadcrumbable'
-            - '%umanit_seo.templates%'
+            - ~ # Replaced by a compiler pass
 
     Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder: '@umanit_seo.breadcrumb.breadcrumb_builder'
 
@@ -117,6 +116,8 @@ services:
     # Forms
     umanit_seo.form_extension.form_type:
         class: Umanit\SeoBundle\Form\Extension\FormTypeExtension
+        arguments:
+            - ~ # Replaced by a compiler pass
         tags:
             - { name: form.type_extension }
 
@@ -125,7 +126,7 @@ services:
         arguments:
             - '@umanit_seo.utils.seo_metadata_resolver'
             - '@doctrine.orm.entity_manager'
-            - '%umanit_seo.metadata.auto_inject_code_prettify%'
+            - ~ # Replaced by a compiler pass
         tags:
             - { name: form.type, alias: Umanit\SeoBundle\Form\Type\SeoMetadataType }
 
@@ -137,7 +138,7 @@ services:
         arguments:
             - '@umanit_seo.utils_entity_parser.title'
             - '@umanit_seo.utils_entity_parser.excerpt'
-            - '%umanit_seo.metadata%'
+            - ~ # Replaced by a compiler pass
 
     Umanit\SeoBundle\Utils\SeoMetadataResolver: '@umanit_seo.utils.seo_metadata_resolver'
 

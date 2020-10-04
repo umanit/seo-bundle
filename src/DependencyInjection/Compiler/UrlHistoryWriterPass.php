@@ -4,15 +4,26 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Umanit\SeoBundle\DependencyInjection\Configuration;
 
 class UrlHistoryWriterPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->hasDefinition('umanit_seo.event_subscriber.url_history_writer')) {
+            return;
+        }
+
         try {
-            $cacheService = $container->getDefinition($container->getParameter('umanit_seo.cache_service'));
+            $configs = $container->getExtensionConfig('umanit_seo');
+            $configuration = new Configuration();
+            $config = $this->processConfiguration($configuration, $configs);
+
+            $cacheService = $container->getDefinition($config['url_historization']['cache_service']);
             $urlHistoryWriter = $container->getDefinition('umanit_seo.event_subscriber.url_history_writer');
 
             $urlHistoryWriter->setArgument(4, $cacheService);
@@ -22,5 +33,12 @@ class UrlHistoryWriterPass implements CompilerPassInterface
                 $e->getMessage()
             ));
         }
+    }
+
+    private function processConfiguration(ConfigurationInterface $configuration, array $configs): array
+    {
+        $processor = new Processor();
+
+        return $processor->processConfiguration($configuration, $configs);
     }
 }

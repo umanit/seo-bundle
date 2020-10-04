@@ -44,17 +44,13 @@ class UrlHistoryWriter implements EventSubscriber
     /** @var string */
     private $defaultLocale;
 
-    /** @var bool */
-    private $useUrlHistorization;
-
     public function __construct(
         UrlPool $urlPool,
         Routable $routableHandler,
         Canonical $urlBuilder,
         Reader $annotationsReader,
         CacheInterface $cache,
-        string $defaultLocale,
-        bool $useUrlHistorization
+        string $defaultLocale
     ) {
         $this->urlPool = $urlPool;
         $this->routableHandler = $routableHandler;
@@ -62,7 +58,6 @@ class UrlHistoryWriter implements EventSubscriber
         $this->annotationsReader = $annotationsReader;
         $this->cache = $cache;
         $this->defaultLocale = $defaultLocale;
-        $this->useUrlHistorization = $useUrlHistorization;
     }
 
     public function getSubscribedEvents(): array
@@ -78,10 +73,6 @@ class UrlHistoryWriter implements EventSubscriber
 
     public function postLoad(LifecycleEventArgs $args): void
     {
-        if (!$this->useUrlHistorization) {
-            return;
-        }
-
         $entity = $args->getEntity();
 
         if (!$entity instanceof RoutableModelInterface) {
@@ -127,10 +118,6 @@ class UrlHistoryWriter implements EventSubscriber
 
     public function preUpdate(PreUpdateEventArgs $args): void
     {
-        if (!$this->useUrlHistorization) {
-            return;
-        }
-
         $entity = $args->getEntity();
 
         if (!$entity instanceof HistorizableUrlModelInterface) {
@@ -158,10 +145,6 @@ class UrlHistoryWriter implements EventSubscriber
 
     public function prePersist(LifecycleEventArgs $args): void
     {
-        if (!$this->useUrlHistorization) {
-            return;
-        }
-
         $entity = $args->getEntity();
 
         if (!$entity instanceof HistorizableUrlModelInterface) {
@@ -194,10 +177,6 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
-        if (!$this->useUrlHistorization) {
-            return;
-        }
-
         $em = $args->getEntityManager();
         $uow = $em->getUnitOfWork();
 
@@ -281,10 +260,6 @@ class UrlHistoryWriter implements EventSubscriber
 
     public function postFlush(PostFlushEventArgs $args): void
     {
-        if (!$this->useUrlHistorization) {
-            return;
-        }
-
         $this->urlPool->flush();
     }
 

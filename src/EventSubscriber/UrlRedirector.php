@@ -15,9 +15,6 @@ class UrlRedirector implements EventSubscriberInterface
     /** @var UrlPool */
     private $pool;
 
-    /** @var bool */
-    private $useUrlHistorization;
-
     /** @var int */
     private $httpRedirectCode;
 
@@ -26,10 +23,9 @@ class UrlRedirector implements EventSubscriberInterface
         return [KernelEvents::EXCEPTION => ['onKernelException']];
     }
 
-    public function __construct(UrlPool $pool, bool $useUrlHistorization, int $httpRedirectCode = 301)
+    public function __construct(UrlPool $pool, int $httpRedirectCode)
     {
         $this->pool = $pool;
-        $this->useUrlHistorization = $useUrlHistorization;
         $this->httpRedirectCode = $httpRedirectCode;
     }
 
@@ -37,7 +33,7 @@ class UrlRedirector implements EventSubscriberInterface
     {
         $exception = 50000 > Kernel::VERSION_ID ? $event->getException() : $event->getThrowable();
 
-        if (!$this->useUrlHistorization || !$exception instanceof NotFoundHttpException) {
+        if (!$exception instanceof NotFoundHttpException) {
             return;
         }
 
