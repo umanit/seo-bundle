@@ -27,7 +27,7 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
         $container->setParameter('umanit_seo.metadata', $metadata);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $loader->load('services.yaml');
 
         $this->processServices($container, $configs);
 
@@ -49,10 +49,10 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
     {
         $bundles = $container->getParameter('kernel.bundles');
 
-        // Conditionnaly load sonata_admin.yml
+        // Conditionnaly load sonata_admin.yaml
         if (isset($bundles['SonataAdminBundle'])) {
             $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load('sonata_admin.yml');
+            $loader->load('sonata_admin.yaml');
         }
     }
 
