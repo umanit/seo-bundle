@@ -36,7 +36,7 @@ umanit_seo:
     url_historization:
         enabled:              true
 
-        # Redirect code used by UrlRedirector
+        # Redirect code used by UrlRedirectorSubscriber
         redirect_code:        301
 
         # Cache service used to store entities dependencies. **MUST** implements \Symfony\Contracts\Cache\CacheInterface

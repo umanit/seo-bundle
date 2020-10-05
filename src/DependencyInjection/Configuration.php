@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeDisabled()
                     ->children()
                         ->scalarNode('redirect_code')
-                            ->info('Redirect code used by UrlRedirector')
+                            ->info('Redirect code used by UrlRedirectorSubscriber')
                             ->defaultValue(301)
                         ->end()
                         ->scalarNode('cache_service')

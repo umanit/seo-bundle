@@ -40,7 +40,7 @@ services:
             - { name: doctrine.event_subscriber }
 
     umanit_seo.event_subscriber.url_redirector:
-        class: Umanit\SeoBundle\EventSubscriber\UrlRedirector
+        class: Umanit\SeoBundle\EventSubscriber\UrlRedirectorSubscriber
         arguments:
             - '@umanit_seo.url_history.url_pool'
             - ~ # Replaced by a compiler pass
@@ -48,7 +48,7 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    Umanit\SeoBundle\EventSubscriber\UrlRedirector: '@umanit_seo.event_subscriber.url_redirector'
+    Umanit\SeoBundle\EventSubscriber\UrlRedirectorSubscriber: '@umanit_seo.event_subscriber.url_redirector'
 
     umanit_seo.breadcrumb.breadcrumb_builder:
         class: Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder

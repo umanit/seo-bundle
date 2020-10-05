@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Umanit\SeoBundle\UrlHistory\UrlPool;
 
-class UrlRedirector implements EventSubscriberInterface
+class UrlRedirectorSubscriber implements EventSubscriberInterface
 {
     /** @var UrlPool */
     private $pool;
