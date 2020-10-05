@@ -32,8 +32,7 @@ class SeoMetadataType extends AbstractType
         SeoMetadataResolver $seoMetadataResolver,
         EntityManagerInterface $em,
         bool $injectCodePrettify
-    )
-    {
+    ) {
         $this->seoMetadataResolver = $seoMetadataResolver;
         $this->em = $em;
         $this->injectCodePrettify = $injectCodePrettify;
@@ -89,7 +88,13 @@ class SeoMetadataType extends AbstractType
     {
         $view->vars['inject_code_prettify'] = $this->injectCodePrettify;
 
-        $entity = $form->getParent()->getData();
+        $parent = $form->getParent();
+
+        if (null === $parent) {
+            return;
+        }
+
+        $entity = $parent->getData();
 
         if ($entity instanceof HistorizableUrlModelInterface && $entity->getUrlReference()) {
             $view->vars['url_history'] = $this->em
