@@ -6,18 +6,18 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Umanit\SeoBundle\Handler\Routable\RoutableInterface;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Model\Route;
+use Umanit\SeoBundle\Service\RouterAwareInterface;
+use Umanit\SeoBundle\Service\RouterAwareTrait;
 
-class Canonical
+class Canonical implements RouterAwareInterface
 {
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
+    use RouterAwareTrait;
 
     /** @var RoutableInterface */
     private $routableHandler;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, RoutableInterface $routableHandler)
+    public function __construct(RoutableInterface $routableHandler)
     {
-        $this->urlGenerator = $urlGenerator;
         $this->routableHandler = $routableHandler;
     }
 
@@ -26,7 +26,7 @@ class Canonical
         $route = $this->routableHandler->handle($entity);
         $parameters = $this->buildParams($route, $overrides);
 
-        return $this->urlGenerator->generate($route->getName(), $parameters);
+        return $this->router->generate($route->getName(), $parameters);
     }
 
     public function url(RoutableModelInterface $entity, array $overrides = []): string
@@ -34,7 +34,7 @@ class Canonical
         $route = $this->routableHandler->handle($entity);
         $parameters = $this->buildParams($route, $overrides);
 
-        return $this->urlGenerator->generate(
+        return $this->router->generate(
             $route->getName(),
             $parameters,
             UrlGeneratorInterface::ABSOLUTE_URL

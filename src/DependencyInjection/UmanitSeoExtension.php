@@ -6,10 +6,12 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableHandlerInterface;
 use Umanit\SeoBundle\Handler\Routable\RoutableHandlerInterface;
 use Umanit\SeoBundle\Handler\Schemable\SchemableHandlerInterface;
+use Umanit\SeoBundle\Service\RouterAwareInterface;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -42,6 +44,10 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
         $container
             ->registerForAutoconfiguration(SchemableHandlerInterface::class)
             ->addTag('umanit_seo.schemable.handler')
+        ;
+        $container
+            ->registerForAutoconfiguration(RouterAwareInterface::class)
+            ->addMethodCall('setRouter', [new Reference('router')])
         ;
     }
 

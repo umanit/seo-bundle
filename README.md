@@ -72,7 +72,7 @@ umanit_seo:
 1. [Breadcrumb](#breadcrumb)
 1. [Enabling 301 redirects](#enabling-301-redirects)
 1. [Twig functions reference](#twig-functions-reference)
-1. [Full usage example](#full-usage-example)
+1. [Protips](#protips)
 
 ### Basic usage
 
@@ -371,12 +371,6 @@ In order to enable URL history and 301 redirects on an entity, ensure the config
 `Umanit\SeoBundle\Model\HistorizableUrlModelInterface` and use the trait
 `Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait`.
 
-**Protips:**
- * The `HistorizableUrlModelInterface` extends the `RoutableModelInterface`, so you don't need to implement both,
- * you can use a custom HTTP code when redirecting by overriding `umanit_seo.url_historization.redirect_code`,
- * you can use a custom cache service for `Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter` by overriding
- `umanit_seo.url_historization.cache_service`.
-
 ### Twig functions reference
 
 ```html
@@ -388,3 +382,12 @@ In order to enable URL history and 301 redirects on an entity, ensure the config
 {{ seo_schema_org(entity = null) }}                # Json schema of an entity (with markup)
 {{ seo_breadcrumb(entity = null, format = null) }} # Breadcrumb from an entity (default format to 'microdata')
 ```
+
+### Protips
+
+ * The `HistorizableUrlModelInterface` extends the `RoutableModelInterface`, so you don't need to implement both,
+ * you can use a custom HTTP code when redirecting by overriding `umanit_seo.url_historization.redirect_code`,
+ * you can use a custom cache service for `Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter` by overriding
+ `umanit_seo.url_historization.cache_service`,
+ * if one of your service needs the `@router`, you can implement `Umanit\SeoBundle\Service\RouterAwareInterface` and
+ use the trait `Umanit\SeoBundle\Service\RouterAwareTrait` (usefull for breadcrumb handlers!).
