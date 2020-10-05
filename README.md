@@ -1,6 +1,6 @@
 # Umanit Seo Bundle
 
-This bundle adds SEO capabilities for Doctrine entities.
+This bundle adds SEO capabilities for any model entities.
 
 ## Features
 
@@ -26,18 +26,42 @@ twig:
         - ...
 ```
 
-You can configure your bundle further by creating a `umanit_seo.yaml` configuration file:
+You can configure your bundle further by creating a `umanit_seo.yaml` configuration file. Here is the default
+configuration provided by the bundle:
 ```yaml
+# Default configuration for extension with alias: "umanit_seo"
 umanit_seo:
-    use_url_historization: true # Enable or not the historization of URLs in the database
-    metadata:
-        default_title: # The fallback value for the metatitle
-        default_description: # The fallback value for the metadescription
-        title_prefix: # You can define a prefix for you metatitle here
-        title_suffix: # You can define a suffix for you metatitle here
+
+    # Historize URLs of entities which implements HistorizableUrlModelInterface
+    url_historization:
+        enabled:              true
+
+        # Redirect code used by UrlRedirector
+        redirect_code:        301
+
+        # Cache service used to store entities dependencies. **MUST** implements \Symfony\Contracts\Cache\CacheInterface
+        cache_service:        cache.app
+
+    # Defines the default templates used to render breadcrumbs
     templates:
-        # Allows you to override default templates, like for example breadcrumb_microdata
-        breadcrumb_microdata: 'partials/_custom_template_name.microdata.html.twig'
+        breadcrumb_json_ld:   '@UmanitSeo/breadcrumb/breadcrumb.json-ld.html.twig'
+        breadcrumb_microdata: '@UmanitSeo/breadcrumb/breadcrumb.microdata.html.twig'
+        breadcrumb_rdfa:      '@UmanitSeo/breadcrumb/breadcrumb.rdfa.html.twig'
+    metadata:
+        form_type:
+
+            # Automaticaly add a SeoMetadataType on FormType which handled an entity which implements HasSeoMetadataInterface
+            add_seo_metadata_type: true
+
+            # FQCN of the FormType used to renders SEO Metadata fields
+            class_fqcn:           Umanit\SeoBundle\Form\Type\SeoMetadataType
+
+            # Injects Google Code Prettify when rendering breadcrumb and schema.org in FormType.
+            inject_code_prettify: true
+        default_title:        'Umanit Seo - Customize this default title to your needs.'
+        title_prefix:         ''
+        title_suffix:         ''
+        default_description:  'Umanit Seo - Customize this default description to your needs.'
 ```
 
 ## Usage
@@ -52,42 +76,61 @@ umanit_seo:
 
 ### Basic usage
 
-In order to function properly, SeoBundle must be able to generate a URL for a given entity.
+In order to function properly, SeoBundle must be able to generate a URL for a given entity. To do so, the
+`umanit_seo.routable` service uses handlers to process the entity.
 
-**Add the `@Seo\Route` annotation to your entity**
+A handler is a service which implements `Umanit\SeoBundle\Handler\Routable\RoutableHandlerInterface`. A `supports`
+method indicated if the service can handle the given entity and a `process` method do the job by returning a
+`Umanit\SeoBundle\Model\Route` object.
 
-The `@Seo\Route` annotation needs to know how to generate an url from the entity.
-The first argument is the route name associated to your entity, the second is the parameters needed to generate the
-route.
+The `Umanit\SeoBundle\Model\Route` object has a `name` attribute, which is the name of the route used to access the
+entity and a `parameters` attribute used to build the route.
 
-`routeParameters` takes as many `@RouteParameter` as needed.
-
-`@RouteParameter` takes two arguments:
-* `parameter`: The name of the route parameter
-* `property`: The property associated
+**You must implement the interface `Umanit\SeoBundle\Model\RoutableModelInterface` on your entity and create a handler
+to process it.**
 
 ```php
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
-use Umanit\SeoBundle\Doctrine\Annotation as Seo;
+use Umanit\SeoBundle\Model\RoutableModelInterface;
 
 /**
- * Class Page
- *
- * @Seo\Route(
- *     routeName="app_page_show",
- *     routeParameters={
- *         @RouteParameter(parameter="slug", property="slug")
- * })
  * @ORM\Entity()
  */
-class page
+class Page implements RoutableModelInterface
 {
     // ...
+}
+```
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Seo\Routable;
+
+use App\Entity\Page;
+use Umanit\SeoBundle\Handler\Routable\RoutableHandlerInterface;
+use Umanit\SeoBundle\Model\RoutableModelInterface;
+use Umanit\SeoBundle\Model\Route;
+
+class PageHandler implements RoutableHandlerInterface
+{
+    public function supports(RoutableModelInterface $entity): bool
+    {
+        return $entity instanceof Page;
+    }
+
+    public function process(RoutableModelInterface $entity): Route
+    {
+        return new Route('app_page_show', ['slug' => $entity->getSlug()]);
+    }
 }
 ```
 
@@ -96,7 +139,7 @@ If you ever change the slug of a page, the old URL will be redirected to the new
 
 If you wanted to generate the URL by yourself you would have done something like the following example:
 
-```html
+```twig
 {{ path('app_page_show', { 'slug': my_page.slug }) }}"
 ```
 
@@ -106,7 +149,7 @@ You can now do like so:
 {{ path(my_page) }}
 ```
 
-___Note:__ You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve
+_**Note:** You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve
 the entity associated to the current accessed route and generate the url from it._
 
 Usually, you'll want to use the `canonical()` function directly within your main layout.
@@ -128,12 +171,15 @@ Make your entity implement the `HasSeoMetadataInterface` and use the `SeoMetadat
 ```php
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
+use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
+use Umanit\SeoBundle\Model\RoutableModelInterface;
 
-class Page implements HasSeoMetadataInterface
+class Page implements RoutableModelInterface, HasSeoMetadataInterface
 {
     use SeoMetadataTrait;
 
@@ -141,58 +187,75 @@ class Page implements HasSeoMetadataInterface
 }
 ```
 
-Next in your admin form, use the `SeoMetadataType` form type.
-
-```php
-use Umanit\SeoBundle\Form\Type\SeoMetadataType;
-
-$builder->add('seoMetadata', SeoMetadataType::class);
-```
+If the configuration `umanit_seo.metadata.form_type.add_seo_metadata_type` is not disabled, all form which handles your
+entity as `data` will automatically have a new `SeoMetadataType` form type.
 
 This will add a subform with two fields, `title` and `description`.
 
+_**Note:** The form type class can be customized with `umanit_seo.metadata.form_type.class_fqcn`._
+
 ### Schema.org implementation
 
-To generate valid [schema.org](https://schema.org/) json microdata, add the `@Seo\SchemaOrgBuilder` annotation to your
-entity.
+To generate valid [schema.org](https://schema.org/) json microdata, SeoBundle must be able to process the given entity.
+To do so, the `umanit_seo.schemable` service uses handlers to process the entity.
 
-This annotation takes either a service id or a method of the entity.
+A handler is a service which implements `Umanit\SeoBundle\Handler\Schemable\SchemableHandlerInterface`. A `supports`
+method indicated if the service can handle the given entity and a `process` method do the job by returning a
+`Spatie\SchemaOrg\BaseType` object.
 
-Use the library [spatie/schema-org](https://github.com/spatie/schema-org) to generate your schema.
+The `Spatie\SchemaOrg\BaseType` object is provided by the library
+[spatie/schema-org](https://github.com/spatie/schema-org).
 
-__Example:__
+**You must implement the interface `Umanit\SeoBundle\Model\SchemableModelInterface` on your entity and create a handler
+to process it.**
 
 ```php
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Doctrine\Annotation as Seo;
-use Spatie\SchemaOrg\BaseType;
-use Spatie\SchemaOrg\Schema;
+use Umanit\SeoBundle\Model\SchemableModelInterface;
 
 /**
  * @ORM\Entity()
- * @Seo\SchemaOrgBuilder("buildSchemaOrg")
  */
-class Page
+class Page implements SchemableModelInterface
 {
     // ...
+}
+```
 
-    /**
-     * Builds the schema.org.
-     *
-     * @return BaseType
-     */
-    public function buildSchemaOrg() : BaseType
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Seo\Schemable;
+
+use App\Entity\Page;
+use Spatie\SchemaOrg\BaseType;
+use Spatie\SchemaOrg\Schema;
+use Umanit\SeoBundle\Handler\Schemable\SchemableHandlerInterface;
+use Umanit\SeoBundle\Model\SchemableModelInterface;
+
+class PageHandler implements SchemableHandlerInterface
+{
+    public function supports(SchemableModelInterface $entity): bool
     {
-        // Build the schema.org to you needs.
-        return
-            Schema::mensClothingStore()
-                  ->name($this->getName())
-                  ->email($this->getAuthor()->getEmail())
-                  ->contactPoint(Schema::contactPoint()->areaServed('Worldwide'))
+        return $entity instanceof Page;
+    }
+
+    public function process(SchemableModelInterface $entity): BaseType
+    {
+        /** @var $entity Page */
+
+        return Schema::mensClothingStore()
+                     ->name($entity->getName())
+                     ->url($entity->getSlug())
+                     ->contactPoint(Schema::contactPoint()->areaServed('Worldwide'))
             ;
     }
 }
@@ -214,19 +277,25 @@ The function will format and display the json schema of the current entity as yo
         "areaServed": "Worldwide"
     }
 }
-</script>\n
+</script>
 ```
-**Note:**
-In case your schema needs more than the entity to build-up, you can pass a service id to `SchemaOrgBuilder`.
-This service must implement `Umanit\SeoBundle\SchemaOrg\SchemaBuilderInterface` and must be declared `public`.
 
 ### Breadcrumb
 
 You can easily generate your breadcrumb in 3 different formats; `Microdata`, `RDFa` or `JSON-LD` as described by
-[the specification](https://schema.org/BreadcrumbList).
+[the specification](https://schema.org/BreadcrumbList). To do so, the `umanit_seo.breadcrumbable` service uses handlers
+to process the entity.
 
-Use the `@Seo\Breadcrumb` annotation on your entity. It takes two arguments, the first one is a collection of
-`@Seo\BreadcrumbItem`, the second one is the format you want, default is `'microdata'`.
+A handler is a service which implements `Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableHandlerInterface`. A
+`supports` method indicated if the service can handle the given entity and a `process` method do the job by returning a
+`Umanit\SeoBundle\Model\Breadcrumb` object.
+
+The `Umanit\SeoBundle\Model\Breadcrumb` obect has a `format` attribute, which is one of the previously mentionned and a
+`items` attributes which is an array of `Umanit\SeoBundle\Model\BreadcrumbItem`. Each `BreadcrumbItem` has a `label`
+attribute and an optionnal `url` attribute.
+
+**You must implement the interface `Umanit\SeoBundle\Model\BreadcrumbableModelInterface` on your entity and create a
+handler to process it.**
 
 ```php
 <?php
@@ -234,34 +303,58 @@ Use the `@Seo\Breadcrumb` annotation on your entity. It takes two arguments, the
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Doctrine\Annotation\RouteParameter;
-use Umanit\SeoBundle\Doctrine\Annotation as Seo;
+use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 
 /**
  * @ORM\Entity()
- * @Seo\Route(
- *     routeName="app_page_show",
- *     routeParameters={
- *         @RouteParameter(parameter="slug", property="slug"),
- *         @RouteParameter(parameter="category", property="category.slug")
- * })
- * @Seo\Breadcrumb({
- *     @Seo\BreadcrumbItem("app_home_page", name="Home"),
- *     @Seo\BreadcrumbItem("category", name="category.slug"),
- *     @Seo\BreadcrumbItem(name="name"),
- * })
  */
-class Page
+class Page implements BreadcrumbableModelInterface
 {
-
+    // ...
 }
 ```
 
-`@Seo\BreadcrumbItem` takes two optional arguments:
-1. `value` (the first arg) is either a route name, or the path to a child entity.
- /!\ The child entity must also be annotated with `Seo\Route`. It is used to generate the url of the breadcrumb item.
-  **Note:** leave it blank to generate a url from `$this` (`Page` in this example).
-1. `name` is either a path to a property of the current entity or a simple string.
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Seo\Breadcrumbable;
+
+use App\Entity\Page;
+use Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableHandlerInterface;
+use Umanit\SeoBundle\Model\Breadcrumb;
+use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
+use Umanit\SeoBundle\Model\BreadcrumbItem;
+
+class PageHandler implements BreadcrumbableHandlerInterface
+{
+    public function supports(BreadcrumbableModelInterface $entity): bool
+    {
+        return $entity instanceof Page;
+    }
+
+    public function process(BreadcrumbableModelInterface $entity): Breadcrumb
+    {
+        /** @var $entity Page */
+        $breadcrumb = new Breadcrumb();
+
+        $breadcrumb->setItems([
+            new BreadcrumbItem('Homepage', '/'),
+            new BreadcrumbItem(
+                $entity->getCategory()->getName(),
+                $this->router->generate('app_page_category_show', ['slug' => $entity->getCategory()->getSlug()])
+            ),
+            new BreadcrumbItem($entity->getName()),
+        ]);
+
+        return $breadcrumb;
+    }
+}
+```
+
+_**Note:** If the processed entity implements the `RoutableModelInterface`, you can omit the `url` attribute to let
+the service `umanit_seo.routable` generate it for you._
 
 You can now use the twig function `seo_breadcrumb()` like the following examples:
 
@@ -273,8 +366,16 @@ You can now use the twig function `seo_breadcrumb()` like the following examples
 
 ### Enabling 301 redirects
 
-In order to enable URL history and 301 redirects on an Entity, implement the interface `UrlHistorizedInterface` and use
-the trait `UrlHistorizedTrait`.
+In order to enable URL history and 301 redirects on an entity, ensure the configuration
+`umanit_seo.url_historization.enabled` is active then implement the interface
+`Umanit\SeoBundle\Model\HistorizableUrlModelInterface` and use the trait
+`Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait`.
+
+**Protips:**
+ * The `HistorizableUrlModelInterface` extends the `RoutableModelInterface`, so you don't need to implement both,
+ * you can use a custom HTTP code when redirecting by overriding `umanit_seo.url_historization.redirect_code`,
+ * you can use a custom cache service for `Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter` by overriding
+ `umanit_seo.url_historization.cache_service`.
 
 ### Twig functions reference
 
@@ -286,85 +387,4 @@ the trait `UrlHistorizedTrait`.
 {{ seo_metadata(entity = null) }}                  # Metadata of an entity (title and description, with markup)
 {{ seo_schema_org(entity = null) }}                # Json schema of an entity (with markup)
 {{ seo_breadcrumb(entity = null, format = null) }} # Breadcrumb from an entity (default format to 'microdata')
-```
-
-### Full usage example
-
-```php
-<?php
-
-namespace App\Entity;
-
-use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
-use Umanit\SeoBundle\Doctrine\Model\SeoMetadataTrait;
-use Umanit\SeoBundle\Doctrine\Model\UrlHistorizedInterface;
-use Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait;
-use Umanit\SeoBundle\Doctrine\Annotation as Seo;
-use Spatie\SchemaOrg\BaseType;
-use Spatie\SchemaOrg\Schema;
-
-/**
- * @ORM\Entity()
- * @Seo\Route(
- *     routeName="app_page_show",
- *     routeParameters={
- *         @Seo\RouteParameter(parameter="slug", property="slug"),
- *         @Seo\RouteParameter(parameter="category", property="category.slug")
- * })
- * @Seo\SchemaOrgBuilder("buildSchemaOrg")
- * @Seo\Breadcrumb({
- *     @Seo\BreadcrumbItem("app_home_page", name="Home"),
- *     @Seo\BreadcrumbItem("category", name="category.slug"),
- *     @Seo\BreadcrumbItem(name="name"),
- * })
- */
-class Page implements HasSeoMetadataInterface, UrlHistorizedInterface
-{
-    use SeoMetadataTrait, HistorizableUrlTrait;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(nullable=true)
-     */
-    private $name;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $introduction;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(unique=true)
-     */
-    private $slug;
-
-    /**
-     * @var Category
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Category", cascade={"all"})
-     */
-    private $category;
-
-    // Getters and setters...
-
-    public function buildSchemaOrg() : BaseType
-    {
-        return Schema::webPage()->name($this->name);
-    }
-}
 ```
