@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Umanit\SeoBundle\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

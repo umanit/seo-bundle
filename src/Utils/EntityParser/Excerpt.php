@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Umanit\SeoBundle\Utils\EntityParser;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;

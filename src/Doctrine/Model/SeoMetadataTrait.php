@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Umanit\SeoBundle\Doctrine\Model;
 
 use Doctrine\ORM\Mapping as ORM;

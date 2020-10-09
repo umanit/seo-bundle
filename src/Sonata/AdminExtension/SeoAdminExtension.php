@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Umanit\SeoBundle\Sonata\AdminExtension;
 
 use Sonata\AdminBundle\Admin\AbstractAdminExtension;
@@ -20,6 +22,7 @@ class SeoAdminExtension extends AbstractAdminExtension
     {
         if ($listMapper->has('_action')) {
             $actions = $listMapper->get('_action')->getOption('actions');
+
             if ($actions && isset($actions['show'])) {
                 // Overrides show action to use SeoBundle system
                 $actions['show'] = ['template' => '@UmanitSeo/admin/CRUD/list__action_show.html.twig'];
@@ -31,12 +34,14 @@ class SeoAdminExtension extends AbstractAdminExtension
     public function getPersistentParameters(AdminInterface $admin)
     {
         $admin->setTemplate('button_show', '@UmanitSeo/admin/Button/show_button.html.twig');
+
         return parent::getPersistentParameters($admin);
     }
 
     public function configureShowFields(ShowMapper $showMapper)
     {
         $showMapper->add('seoMetadata');
+
         parent::configureShowFields($showMapper);
     }
 }

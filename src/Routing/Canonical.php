@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Umanit\SeoBundle\Routing;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
