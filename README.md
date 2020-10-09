@@ -300,6 +300,8 @@ handler to process it.**
 ```php
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -367,9 +369,31 @@ You can now use the twig function `seo_breadcrumb()` like the following examples
 ### Enabling 301 redirects
 
 In order to enable URL history and 301 redirects on an entity, ensure the configuration
-`umanit_seo.url_historization.enabled` is active then implement the interface
+`umanit_seo.url_historization.enabled` is active (yes by default) then implement the interface
 `Umanit\SeoBundle\Model\HistorizableUrlModelInterface` and use the trait
 `Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait`.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait;
+use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
+
+/**
+ * @ORM\Entity()
+ */
+class Page implements HistorizableUrlModelInterface
+{
+    use HistorizableUrlTrait;
+
+    // ...
+}
+```
 
 ### Twig functions reference
 
