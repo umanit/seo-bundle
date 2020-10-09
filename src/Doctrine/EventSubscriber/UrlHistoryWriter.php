@@ -156,7 +156,7 @@ class UrlHistoryWriter implements EventSubscriber
         if (null === $entity->getUrlReference()) {
             // Associate a fresh UrlReference to an entity
             $urlReference = (new UrlReference())
-                ->setSeoUuid(Uuid::uuid4())
+                ->setSeoUuid(Uuid::uuid4()->toString())
                 ->setLocale(
                     method_exists($entity, 'getLocale') ?
                         $entity->getLocale() :
