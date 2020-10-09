@@ -13,6 +13,7 @@ services:
     umanit_seo.routing.canonical:
         class: Umanit\SeoBundle\Routing\Canonical
         arguments:
+            - '@router'
             - '@umanit_seo.routable'
 
     Umanit\SeoBundle\Routing\Canonical: '@umanit_seo.routing.canonical'

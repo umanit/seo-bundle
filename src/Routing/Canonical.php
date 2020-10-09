@@ -3,21 +3,22 @@
 namespace Umanit\SeoBundle\Routing;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Umanit\SeoBundle\Handler\Routable\RoutableInterface;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Model\Route;
-use Umanit\SeoBundle\Service\RouterAwareInterface;
-use Umanit\SeoBundle\Service\RouterAwareTrait;
 
-class Canonical implements RouterAwareInterface
+class Canonical
 {
-    use RouterAwareTrait;
+    /** @var RouterInterface */
+    private $router;
 
     /** @var RoutableInterface */
     private $routableHandler;
 
-    public function __construct(RoutableInterface $routableHandler)
+    public function __construct(RouterInterface $router, RoutableInterface $routableHandler)
     {
+        $this->router = $router;
         $this->routableHandler = $routableHandler;
     }
 
