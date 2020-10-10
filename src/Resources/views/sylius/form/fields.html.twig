@@ -23,8 +23,10 @@
         </div>
         <div class="ui bottom attached tab segment active" data-tab="seo-metadata-{{ entity_id }}">
             {{ form_row(form.title) }}
-            <div class="help-block text-muted small">
-                {{ 'seo.metatitle.help'|trans(domain='UmanitSeoBundle') }}"{{ seo_title(form.parent.vars.value) }}"
+            <div class="ui mini message">
+                {{ 'seo.metatitle.help'|trans({
+                    '%meta_title%': '<strong>' ~ seo_title(form.parent.vars.value) ~ '</strong>'
+                }, 'UmanitSeoBundle')|raw }}
             </div>
             {{ form_row(form.description) }}
         </div>

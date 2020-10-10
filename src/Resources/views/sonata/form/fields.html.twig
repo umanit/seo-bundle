@@ -41,7 +41,9 @@
                 <div class="tab-pane active" id="seo-metadata">
                     {{ form_row(form.title) }}
                     <div class="help-block text-muted small">
-                        {{ 'seo.metatitle.help'|trans(domain='UmanitSeoBundle') }}"{{ seo_title(form.parent.vars.value) }}"
+                        {{ 'seo.metatitle.help'|trans({
+                            '%meta_title%': '<strong>' ~ seo_title(form.parent.vars.value) ~ '</strong>'
+                        }, 'UmanitSeoBundle')|raw }}
                     </div>
                     {{ form_row(form.description) }}
                 </div>
