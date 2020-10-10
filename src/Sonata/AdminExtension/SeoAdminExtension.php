@@ -25,7 +25,7 @@ class SeoAdminExtension extends AbstractAdminExtension
 
             if ($actions && isset($actions['show'])) {
                 // Overrides show action to use SeoBundle system
-                $actions['show'] = ['template' => '@UmanitSeo/admin/CRUD/list__action_show.html.twig'];
+                $actions['show'] = ['template' => '@UmanitSeo/sonata/admin/CRUD/list__action_show.html.twig'];
                 $listMapper->get('_action')->setOption('actions', $actions);
             }
         }
@@ -33,7 +33,7 @@ class SeoAdminExtension extends AbstractAdminExtension
 
     public function getPersistentParameters(AdminInterface $admin)
     {
-        $admin->setTemplate('button_show', '@UmanitSeo/admin/Button/show_button.html.twig');
+        $admin->setTemplate('button_show', '@UmanitSeo/sonata/admin/Button/show_button.html.twig');
 
         return parent::getPersistentParameters($admin);
     }

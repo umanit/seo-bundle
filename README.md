@@ -17,12 +17,15 @@ This bundle adds SEO capabilities for any model entities.
 
 ## Configuration
 
-The template needs to be declared in your Twig configuration, **before** other templates:
+The template needs to be declared in your Twig configuration, **before** other templates. You must choose one between:
+
 ```yaml
 twig:
     # ...
     form_themes:
-        - '@UmanitSeo/form/fields.html.twig'
+        - '@UmanitSeo/sylius/form/fields.html.twig'
+        # OR
+        - '@UmanitSeo/sonata/form/fields.html.twig'
         - ...
 ```
 

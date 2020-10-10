@@ -1,0 +1,88 @@
+{% block seo_metadata_widget %}
+    {% set entity_id = form.parent.vars.value.id|default(null) %}
+    {% if entity_id is not null %}
+        {% set breadcrumb = seo_breadcrumb(form.parent.vars.value) %}
+        {% set schema = seo_schema_org(form.parent.vars.value) %}
+        {% set current_entity_url = url(form.parent.vars.value) %}
+
+        {% if inject_code_prettify %}
+            <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+        {% endif %}
+
+        <div class="ui top attached tabular menu">
+            <a class="item active" data-tab="seo-metadata-{{ entity_id }}">{{ 'seo.metadata'|trans(domain='UmanitSeoBundle') }}</a>
+            {% if current_entity_url is not null %}
+                <a class="item" data-tab="seo-urls-{{ entity_id }}">{{ 'seo.urls'|trans(domain='UmanitSeoBundle') }}</a>
+            {% endif %}
+            {% if breadcrumb is not empty %}
+                <a class="item" data-tab="seo-breadcrumb-{{ entity_id }}">{{ 'seo.breadcrumb'|trans(domain='UmanitSeoBundle') }}</a>
+            {% endif %}
+            {% if schema is not empty %}
+                <a class="item" data-tab="seo-schema-{{ entity_id }}">{{ 'seo.microdata'|trans(domain='UmanitSeoBundle') }}</a>
+            {% endif %}
+        </div>
+        <div class="ui bottom attached tab segment active" data-tab="seo-metadata-{{ entity_id }}">
+            {{ form_row(form.title) }}
+            <div class="help-block text-muted small">
+                {{ 'seo.metatitle.help'|trans(domain='UmanitSeoBundle') }}"{{ seo_title(form.parent.vars.value) }}"
+            </div>
+            {{ form_row(form.description) }}
+        </div>
+        {% if current_entity_url is not null %}
+            <div class="ui bottom attached tab segment" data-tab="seo-urls-{{ entity_id }}">
+                <div class="form-group">
+                    <label class="control-label">
+                        <strong>{{ 'seo.main_url'|trans(domain='UmanitSeoBundle') }}</strong>
+                    </label>
+                    <div>
+                        <a class="text-bold" target="_blank" href="{{ url(form.parent.vars.value) }}">
+                            {{ url(form.parent.vars.value) }}
+                        </a>
+                    </div>
+                </div>
+
+                <table class="ui striped compact table">
+                    <thead>
+                        <tr>
+                            <th class="one wild">#</th>
+                            <th>{{ 'seo.source_url'|trans(domain='UmanitSeoBundle') }}</th>
+                            <th class="one wild"></th>
+                            <th>{{ 'seo.destination_url'|trans(domain='UmanitSeoBundle') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for url_item in url_history|default([]) %}
+                            {# @var url_item \Umanit\SeoBundle\Entity\UrlHistory #}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="float-right">
+                                    <a target="_blank" href="{{ url_item.oldPath }}">{{ url_item.oldPath }}</a>
+                                </td>
+                                <td>
+                                    <span class="text-center text-green text-uppercase font-weight-bold h3">&rarr;</span>
+                                </td>
+                                <td>
+                                    <a target="_blank" href="{{ url_item.newPath }}">{{ url_item.newPath }}</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4">{{ 'seo.no_redirects'|trans(domain='UmanitSeoBundle') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+        {% if breadcrumb is not empty %}
+            <div class="ui bottom attached tab segment" data-tab="seo-breadcrumb-{{ entity_id }}">
+                <pre class="prettyprint">{{- breadcrumb -}}</pre>
+            </div>
+        {% endif %}
+        {% if schema is not empty %}
+            <div class="ui bottom attached tab segment" data-tab="seo-schema-{{ entity_id }}">
+                <pre class="prettyprint">{{- schema -}}</pre>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock seo_metadata_widget %}

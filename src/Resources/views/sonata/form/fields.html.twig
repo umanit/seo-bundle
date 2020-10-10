@@ -1,5 +1,4 @@
 {% block seo_metadata_widget %}
-
     {% if form.parent.vars.value|default(null) is not null %}
         {% set breadcrumb = seo_breadcrumb(form.parent.vars.value) %}
         {% set schema = seo_schema_org(form.parent.vars.value) %}
