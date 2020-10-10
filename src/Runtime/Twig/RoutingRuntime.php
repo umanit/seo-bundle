@@ -32,6 +32,10 @@ class RoutingRuntime implements RuntimeExtensionInterface
             return $this->canonical->path($name, $parameters);
         }
 
+        if (!\is_string($name)) {
+            return null;
+        }
+
         return $this->decorated->getPath($name, $parameters, $relative);
     }
 
@@ -39,6 +43,10 @@ class RoutingRuntime implements RuntimeExtensionInterface
     {
         if ($name instanceof RoutableModelInterface) {
             return $this->canonical->url($name, $parameters);
+        }
+
+        if (!\is_string($name)) {
+            return null;
         }
 
         return $this->decorated->getPath($name, $parameters, $schemeRelative);
