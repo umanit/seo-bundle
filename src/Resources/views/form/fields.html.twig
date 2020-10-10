@@ -1,7 +1,9 @@
 {% block seo_metadata_widget %}
-    {% if form.parent.vars.value.id is not null %}
+
+    {% if form.parent.vars.value|default(null) is not null %}
         {% set breadcrumb = seo_breadcrumb(form.parent.vars.value) %}
         {% set schema = seo_schema_org(form.parent.vars.value) %}
+        {% set current_entity_url = url(form.parent.vars.value) %}
 
         {% if inject_code_prettify %}
             <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
@@ -14,11 +16,13 @@
                         {{ 'seo.metadata'|trans(domain='UmanitSeoBundle') }}
                     </a>
                 </li>
-                <li>
-                    <a href="#seo-urls" data-toggle="tab" aria-expanded="false">
-                        {{ 'seo.urls'|trans(domain='UmanitSeoBundle') }}
-                    </a>
-                </li>
+                {% if current_entity_url is not null %}
+                    <li>
+                        <a href="#seo-urls" data-toggle="tab" aria-expanded="false">
+                            {{ 'seo.urls'|trans(domain='UmanitSeoBundle') }}
+                        </a>
+                    </li>
+                {% endif %}
                 {% if breadcrumb is not empty %}
                     <li>
                         <a href="#seo-breadcrumb" data-toggle="tab" aria-expanded="false">
@@ -42,46 +46,48 @@
                     </div>
                     {{ form_row(form.description) }}
                 </div>
-                <div class="tab-pane" id="seo-urls">
-                    <div class="form-group">
-                        <label class="control-label">{{ 'seo.main_url'|trans(domain='UmanitSeoBundle') }}</label>
-                        <div>
-                            <a class="text-bold" target="_blank" href="{{ url(form.parent.vars.value) }}">
-                                {{ url(form.parent.vars.value) }}
-                            </a>
+                {% if current_entity_url is not null %}
+                    <div class="tab-pane" id="seo-urls">
+                        <div class="form-group">
+                            <label class="control-label">{{ 'seo.main_url'|trans(domain='UmanitSeoBundle') }}</label>
+                            <div>
+                                <a class="text-bold" target="_blank" href="{{ url(form.parent.vars.value) }}">
+                                    {{ url(form.parent.vars.value) }}
+                                </a>
+                            </div>
                         </div>
-                    </div>
 
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th style="width: 20px">#</th>
-                                <th>{{ 'seo.source_url'|trans(domain='UmanitSeoBundle') }}</th>
-                                <th></th>
-                                <th>{{ 'seo.destination_url'|trans(domain='UmanitSeoBundle') }}</th>
-                            </tr>
-                            {% for url_item in url_history|default([]) %}
-                                {# @var url_item \Umanit\SeoBundle\Entity\UrlHistory #}
+                        <table class="table">
+                            <tbody>
                                 <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td class="float-right">
-                                        <a target="_blank" href="{{ url_item.oldPath }}">{{ url_item.oldPath }}</a>
-                                    </td>
-                                    <td>
-                                        <span class="text-center text-green text-uppercase font-weight-bold h3">&rarr;</span>
-                                    </td>
-                                    <td>
-                                        <a target="_blank" href="{{ url_item.newPath }}">{{ url_item.newPath }}</a>
-                                    </td>
+                                    <th style="width: 20px">#</th>
+                                    <th>{{ 'seo.source_url'|trans(domain='UmanitSeoBundle') }}</th>
+                                    <th></th>
+                                    <th>{{ 'seo.destination_url'|trans(domain='UmanitSeoBundle') }}</th>
                                 </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="4">{{ 'seo.no_redirects'|trans(domain='UmanitSeoBundle') }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                                {% for url_item in url_history|default([]) %}
+                                    {# @var url_item \Umanit\SeoBundle\Entity\UrlHistory #}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="float-right">
+                                            <a target="_blank" href="{{ url_item.oldPath }}">{{ url_item.oldPath }}</a>
+                                        </td>
+                                        <td>
+                                            <span class="text-center text-green text-uppercase font-weight-bold h3">&rarr;</span>
+                                        </td>
+                                        <td>
+                                            <a target="_blank" href="{{ url_item.newPath }}">{{ url_item.newPath }}</a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4">{{ 'seo.no_redirects'|trans(domain='UmanitSeoBundle') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
                 {% if breadcrumb is not empty %}
                     <div class="tab-pane" id="seo-breadcrumb">
                         <pre class="prettyprint">{{- breadcrumb -}}</pre>
