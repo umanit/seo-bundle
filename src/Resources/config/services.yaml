@@ -9,6 +9,15 @@ services:
 
     Umanit\SeoBundle\UrlHistory\UrlPool: '@umanit_seo.url_history.url_pool'
 
+    umanit_seo.url_history.url_pooler:
+        class: Umanit\SeoBundle\UrlHistory\UrlPooler
+        arguments:
+            - '@umanit_seo.routing.canonical'
+            - '@umanit_seo.url_history.url_pool'
+            - '%kernel.default_locale%'
+
+    Umanit\SeoBundle\UrlHistory\UrlPoolerInterface: '@umanit_seo.url_history.url_pooler'
+
     # Canonical url generator
     umanit_seo.routing.canonical:
         class: Umanit\SeoBundle\Routing\Canonical
@@ -22,7 +31,7 @@ services:
     umanit_seo.event_subscriber.url_history_writer:
         class: Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter
         arguments:
-            - '@umanit_seo.url_history.url_pool'
+            - '@umanit_seo.url_history.url_pooler'
             - '@umanit_seo.routable'
             - '@umanit_seo.routing.canonical'
             - ~ # Replaced by a compiler pass

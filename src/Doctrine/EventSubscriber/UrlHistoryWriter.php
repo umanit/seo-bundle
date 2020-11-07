@@ -21,20 +21,20 @@ use Umanit\SeoBundle\Handler\Routable\Routable;
 use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
-use Umanit\SeoBundle\UrlHistory\UrlPool;
+use Umanit\SeoBundle\UrlHistory\UrlPoolerInterface;
 
 class UrlHistoryWriter implements EventSubscriber
 {
     public const ENTITY_DEPENDENCY_CACHE_KEY = 'seo.entity_dependencies';
 
-    /** @var UrlPool */
-    private $urlPool;
+    /** @var UrlPoolerInterface */
+    private $urlPooler;
 
     /** @var Routable */
     private $routableHandler;
 
     /** @var Canonical */
-    private $urlBuilder;
+    private $canonical;
 
     /** @var CacheInterface */
     private $cache;
@@ -43,16 +43,16 @@ class UrlHistoryWriter implements EventSubscriber
     private $defaultLocale;
 
     public function __construct(
-        UrlPool $urlPool,
+        UrlPoolerInterface $urlPooler,
         Routable $routableHandler,
-        Canonical $urlBuilder,
+        Canonical $canonical,
         CacheInterface $cache,
         string $defaultLocale
     ) {
-        $this->urlPool = $urlPool;
         $this->routableHandler = $routableHandler;
-        $this->urlBuilder = $urlBuilder;
+        $this->canonical = $canonical;
         $this->cache = $cache;
+        $this->urlPooler = $urlPooler;
         $this->defaultLocale = $defaultLocale;
     }
 
@@ -116,23 +116,18 @@ class UrlHistoryWriter implements EventSubscriber
             return;
         }
 
-        // Build the new path
-        $newPath = $this->urlBuilder->url($entity);
+        // Get old values
         $route = $this->routableHandler->handle($entity);
         $changeSet = [];
 
-        // Get old values
         foreach (array_keys($route->getParameters()) as $routeParameter) {
             if ($args->hasChangedField($routeParameter)) {
                 $changeSet[$routeParameter] = $args->getOldValue($routeParameter);
             }
         }
 
-        // Build the old path
-        $oldPath = $this->urlBuilder->url($this->getOldEntity($entity, $changeSet));
-
-        // Add the redirection to the pool
-        $this->urlPool->add($oldPath, $newPath, $entity);
+        // Process the entity update
+        $this->urlPooler->processEntityUpdate($entity, $this->getOldEntity($entity, $changeSet));
     }
 
     public function prePersist(LifecycleEventArgs $args): void
@@ -185,7 +180,7 @@ class UrlHistoryWriter implements EventSubscriber
                 continue;
             }
 
-            $urlReference->setUrl($this->urlBuilder->url($entity));
+            $urlReference->setUrl($this->canonical->url($entity));
             $uow->recomputeSingleEntityChangeSet($em->getClassMetadata($this->getClass($urlReference)), $urlReference);
             $uow->persist($urlReference);
         }
@@ -203,7 +198,7 @@ class UrlHistoryWriter implements EventSubscriber
                     continue;
                 }
 
-                $newUrl = $this->urlBuilder->url($entity);
+                $newUrl = $this->canonical->url($entity);
 
                 if ($urlReference->getUrl() !== $newUrl) {
                     $urlReference->setUrl($newUrl);
@@ -231,14 +226,8 @@ class UrlHistoryWriter implements EventSubscriber
 
                 // Regenerate route for all entities if different
                 foreach ($query->getQuery()->getResult() as $dependantEntity) {
-                    $urlReference = $dependantEntity->getUrlReference();
-                    $newUrl = $this->urlBuilder->url($dependantEntity);
-                    $oldUrl = $urlReference->getUrl();
-
-                    if ($newUrl !== $oldUrl) {
-                        // Add the redirection to the pool
-                        $this->urlPool->add($oldUrl, $newUrl, $dependantEntity);
-                        $urlReference->setUrl($newUrl);
+                    if ($this->urlPooler->processEntityDependency($entity, $dependantEntity)) {
+                        $urlReference = $dependantEntity->getUrlReference();
                         $uow->recomputeSingleEntityChangeSet(
                             $em->getClassMetadata($this->getClass($urlReference)),
                             $urlReference
@@ -252,7 +241,7 @@ class UrlHistoryWriter implements EventSubscriber
 
     public function postFlush(PostFlushEventArgs $args): void
     {
-        $this->urlPool->flush();
+        $this->urlPooler->flush();
     }
 
     private function getClass(object $object): string
@@ -272,7 +261,7 @@ class UrlHistoryWriter implements EventSubscriber
         return self::ENTITY_DEPENDENCY_CACHE_KEY.'.'.str_replace('\\', '-', $entityClass);
     }
 
-    private function getOldEntity(RoutableModelInterface $entity, array $oldValues): RoutableModelInterface
+    private function getOldEntity(HistorizableUrlModelInterface $entity, array $oldValues): HistorizableUrlModelInterface
     {
         $oldEntity = clone $entity;
         $oldEntityReflection = new \ReflectionClass($oldEntity);
