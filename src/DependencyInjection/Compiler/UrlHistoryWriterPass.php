@@ -26,7 +26,7 @@ class UrlHistoryWriterPass implements CompilerPassInterface
             $cacheService = $container->getDefinition($config['url_historization']['cache_service']);
             $urlHistoryWriter = $container->getDefinition('umanit_seo.event_subscriber.url_history_writer');
 
-            $urlHistoryWriter->setArgument(4, $cacheService);
+            $urlHistoryWriter->setArgument(3, $cacheService);
         } catch (\Throwable $e) {
             throw new \RuntimeException(sprintf(
                 'Can not build UmanIT SEO - UrlHistoryWriter: %s',

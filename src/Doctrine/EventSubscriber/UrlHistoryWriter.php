@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Doctrine\ORM\Mapping\Annotation;
 use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -37,9 +36,6 @@ class UrlHistoryWriter implements EventSubscriber
     /** @var Canonical */
     private $urlBuilder;
 
-    /** @var Reader */
-    private $annotationsReader;
-
     /** @var CacheInterface */
     private $cache;
 
@@ -50,14 +46,12 @@ class UrlHistoryWriter implements EventSubscriber
         UrlPool $urlPool,
         Routable $routableHandler,
         Canonical $urlBuilder,
-        Reader $annotationsReader,
         CacheInterface $cache,
         string $defaultLocale
     ) {
         $this->urlPool = $urlPool;
         $this->routableHandler = $routableHandler;
         $this->urlBuilder = $urlBuilder;
-        $this->annotationsReader = $annotationsReader;
         $this->cache = $cache;
         $this->defaultLocale = $defaultLocale;
     }
@@ -65,56 +59,43 @@ class UrlHistoryWriter implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
+            Events::loadClassMetadata,
             Events::preUpdate,
             Events::onFlush,
             Events::prePersist,
             Events::postFlush,
-            Events::postLoad,
         ];
     }
 
-    public function postLoad(LifecycleEventArgs $args): void
+    public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
     {
-        $entity = $args->getEntity();
+        $reflectionEntity = $args->getClassMetadata()->getReflectionClass();
 
-        if (!$entity instanceof RoutableModelInterface) {
+        if (!$reflectionEntity->implementsInterface(RoutableModelInterface::class)) {
             return;
         }
 
-        $route = $this->routableHandler->handle($entity);
-        $reflectionEntity = new \ReflectionClass($entity);
-
-        // Loops through each route parameters
-        foreach (array_keys($route->getParameters()) as $routeParameter) {
-            try {
-                $reflectionProperty = $reflectionEntity->getProperty($routeParameter);
-            } catch (\ReflectionException $e) {
+        // Loops through each entity associations
+        foreach ($args->getClassMetadata()->getAssociationMappings() as $fieldName => $mappingData) {
+            if (!\array_key_exists('targetEntity', $mappingData)) {
                 continue;
             }
 
-            $annotations = $this->annotationsReader->getPropertyAnnotations($reflectionProperty);
+            // Add the related entity to the cache if it's a mapping annotation
+            $entityClass = $mappingData['targetEntity'];
 
-            /** @var Annotation $annotation */
-            foreach ($annotations as $annotation) {
-                if (!property_exists($annotation, 'targetEntity')) {
-                    continue;
-                }
+            $this->cache->get(
+                $this->getCacheKey($mappingData['sourceEntity']),
+                static function (ItemInterface $item) use ($entityClass) {
+                    $cacheValue = $item->get() ?? [];
 
-                // Add the related entity to the cache if it's a mapping annotation
-                $entityClass = $reflectionEntity->getName();
-                $this->cache->get(
-                    $this->getCacheKey($annotation->targetEntity),
-                    static function (ItemInterface $item) use ($entityClass) {
-                        $cacheValue = $item->get() ?? [];
-
-                        return array_unique(array_merge(
-                            $cacheValue,
-                            [$entityClass]
-                        ));
-                    },
-                    INF // We use INF to forces immediate expiration.
-                );
-            }
+                    return array_unique(array_merge(
+                        $cacheValue,
+                        [$entityClass]
+                    ));
+                },
+                INF // We use INF to forces immediate expiration.
+            );
         }
     }
 

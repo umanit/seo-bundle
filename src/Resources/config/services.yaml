@@ -25,7 +25,6 @@ services:
             - '@umanit_seo.url_history.url_pool'
             - '@umanit_seo.routable'
             - '@umanit_seo.routing.canonical'
-            - '@annotations.reader'
             - ~ # Replaced by a compiler pass
             - '%kernel.default_locale%'
         tags: ['doctrine.event_subscriber']
