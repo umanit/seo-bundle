@@ -81,17 +81,26 @@ class UrlHistoryWriter implements EventSubscriber
                 continue;
             }
 
-            // Add the related entity to the cache if it's a mapping annotation
-            $entityClass = $mappingData['targetEntity'];
+            // Add the related entity to the cache if it's implements HistorizableUrlModelInterface
+            try {
+                $targetEntityClass = $mappingData['targetEntity'];
+                $targetReflectionEntity = new \ReflectionClass($targetEntityClass);
+            } catch (\Throwable $e) {
+                continue;
+            }
+
+            if (!$targetReflectionEntity->implementsInterface(HistorizableUrlModelInterface::class)) {
+                continue;
+            }
 
             $this->cache->get(
                 $this->getCacheKey($mappingData['sourceEntity']),
-                static function (ItemInterface $item) use ($entityClass) {
+                static function (ItemInterface $item) use ($targetEntityClass) {
                     $cacheValue = $item->get() ?? [];
 
                     return array_unique(array_merge(
                         $cacheValue,
-                        [$entityClass]
+                        [$targetEntityClass]
                     ));
                 },
                 INF // We use INF to forces immediate expiration.
