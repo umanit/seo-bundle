@@ -71,7 +71,10 @@ class UrlHistoryWriter implements EventSubscriber
     {
         $reflectionEntity = $args->getClassMetadata()->getReflectionClass();
 
-        if (!$reflectionEntity->implementsInterface(RoutableModelInterface::class)) {
+        if (
+            $reflectionEntity->isAbstract() ||
+            !$reflectionEntity->implementsInterface(RoutableModelInterface::class)
+        ) {
             return;
         }
 
@@ -94,7 +97,7 @@ class UrlHistoryWriter implements EventSubscriber
             }
 
             $this->cache->get(
-                $this->getCacheKey($mappingData['sourceEntity']),
+                $this->getCacheKey($reflectionEntity->name),
                 static function (ItemInterface $item) use ($targetEntityClass) {
                     $cacheValue = $item->get() ?? [];
 
