@@ -83,6 +83,8 @@ class UrlPool
      */
     public function flush(): void
     {
+        $this->em->clear();
+
         if (!empty($this->items)) {
             foreach ($this->items as $item) {
                 $this->em->persist($item);
