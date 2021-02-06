@@ -13,7 +13,7 @@ use Umanit\SeoBundle\Utils\Text\Str;
  * Excerpt util class.
  * Inspired by Bolt CMS.
  */
-class Excerpt
+class Excerpt implements EntityParserInterface
 {
     // The field names we do not want in an excerpt
     public const STRIP_KEYS = [
@@ -55,8 +55,7 @@ class Excerpt
      * @param object $entity The object from which the excerpt is generated.
      * @param int    $length The max length of the excerpt.
      *
-     * @return string|null ?string
-     * @throws \ReflectionException
+     * @return ?string
      */
     public function fromEntity(object $entity, $length = 150): ?string
     {

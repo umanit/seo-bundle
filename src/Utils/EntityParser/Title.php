@@ -9,7 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Umanit\SeoBundle\Utils\Text\Html;
 use Umanit\SeoBundle\Utils\Text\Str;
 
-class Title
+class Title implements EntityParserInterface
 {
     // The field names we do not want in a title.
     public const STRIP_KEYS = [
@@ -61,8 +61,7 @@ class Title
      * @param object $entity The object from which the title is generated.
      * @param int    $length The max length of the excerpt.
      *
-     * @return string|null
-     * @throws \ReflectionException
+     * @return ?string
      */
     public function fromEntity(object $entity, $length = 100): ?string
     {

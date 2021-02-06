@@ -5,24 +5,23 @@ declare(strict_types=1);
 namespace Umanit\SeoBundle\Utils;
 
 use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
-use Umanit\SeoBundle\Utils\EntityParser\Excerpt;
-use Umanit\SeoBundle\Utils\EntityParser\Title;
+use Umanit\SeoBundle\Utils\EntityParser\EntityParserInterface;
 
 /**
  * Resolves Seo metadata from an entity.
  */
 class SeoMetadataResolver
 {
-    /** @var Title */
+    /** @var EntityParserInterface */
     private $title;
 
-    /** @var Excerpt */
+    /** @var EntityParserInterface */
     private $description;
 
     /** @var array */
     private $metadataConfig;
 
-    public function __construct(Title $title, Excerpt $excerpt, array $metadataConfig)
+    public function __construct(EntityParserInterface $title, EntityParserInterface $excerpt, array $metadataConfig)
     {
         $this->title = $title;
         $this->description = $excerpt;
