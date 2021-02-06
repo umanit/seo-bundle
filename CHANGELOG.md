@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2021-02-06
+### Fixed
+- Fix composer version for symfony/twig-bundle
+
 ## [2.0.1] - 2021-01-08
 ### Fixed
 - Clear the entity manager before creating redirection in the URL Pool to avoid side effects with other entities.
