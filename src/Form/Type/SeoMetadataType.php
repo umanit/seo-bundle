@@ -121,8 +121,7 @@ class SeoMetadataType extends AbstractType
         $optionValue
     ): void {
         $options = $parentForm->get($childName)->getConfig()->getOptions();
-
-        $options[$optionName] = $optionValue;
+        $options[$optionName] = array_merge($options[$optionName], $optionValue);
 
         $parentForm->add(
             $childName,
