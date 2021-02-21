@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Fix crash when `seo_schema_org` when both given entity and current entity are null
+- Fix crash when `$reflectionEntity` is `null` in `UrlHistoryWriter::loadClassMetadata`
 
 ## [2.0.3] - 2021-02-06
 ### Fixed

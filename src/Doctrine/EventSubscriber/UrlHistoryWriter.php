@@ -72,6 +72,7 @@ class UrlHistoryWriter implements EventSubscriber
         $reflectionEntity = $args->getClassMetadata()->getReflectionClass();
 
         if (
+            null === $reflectionEntity ||
             $reflectionEntity->isAbstract() ||
             !$reflectionEntity->implementsInterface(RoutableModelInterface::class)
         ) {
