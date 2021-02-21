@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Runtime\Twig;
 
+use ErrorException;
 use Twig\Extension\RuntimeExtensionInterface;
 use Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder;
 use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
@@ -68,20 +69,13 @@ class SeoRuntime implements RuntimeExtensionInterface
      */
     public function canonical(?object $entity = null, array $overrides = []): string
     {
-        if (
-            (null !== $entity && !$entity instanceof RoutableModelInterface) ||
-            (null === $entity && null === $this->currentSeoEntity->get())
-        ) {
+        $entity = $entity ?? $this->currentSeoEntity->get();
+
+        if (!$entity instanceof RoutableModelInterface) {
             return '';
         }
 
-        return sprintf(
-            '<link rel="canonical" href="%s"/>',
-            $this->canonical->url(
-                $entity ?? $this->currentSeoEntity->get(),
-                $overrides
-            )
-        );
+        return sprintf('<link rel="canonical" href="%s" />', $this->canonical->url($entity, $overrides));
     }
 
     /**
@@ -114,10 +108,9 @@ HTML
      */
     public function schemaOrg(?object $entity = null): string
     {
-        if (
-            (null !== $entity && !$entity instanceof SchemableModelInterface) ||
-            (null === $entity && null === $this->currentSeoEntity->get())
-        ) {
+        $entity = $entity ?? $this->currentSeoEntity->get();
+
+        if (!$entity instanceof SchemableModelInterface) {
             return '';
         }
 
@@ -126,9 +119,10 @@ HTML
 <script type="application/ld+json">%json%</script>
 HTML
             , [
-            '%json%' => json_encode($this->schemaOrgBuilder->buildSchema(
-                $entity ?? $this->currentSeoEntity->get()
-            )->toArray(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+            '%json%' => json_encode(
+                $this->schemaOrgBuilder->buildSchema($entity)->toArray(),
+                JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+            ),
         ]);
     }
 
@@ -139,20 +133,16 @@ HTML
      * @param null        $format
      *
      * @return string
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function breadcrumb(?object $entity = null, $format = null): string
     {
-        if (
-            (null !== $entity && !$entity instanceof BreadcrumbableModelInterface) ||
-            (null === $entity && null === $this->currentSeoEntity->get())
-        ) {
+        $entity = $entity ?? $this->currentSeoEntity->get();
+
+        if (!$entity instanceof BreadcrumbableModelInterface) {
             return '';
         }
 
-        return $this->breadcrumbBuilder->buildBreadcrumb(
-            $entity ?? $this->currentSeoEntity->get(),
-            $format
-        );
+        return $this->breadcrumbBuilder->buildBreadcrumb($entity, $format);
     }
 }
