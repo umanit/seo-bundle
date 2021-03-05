@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.5] - 2021-03-05
+### Added
+- Handle parameters which are not in the `entity` route when using `path`, `url` and `seo_canonical` Twig functions
+
 ## [2.0.4] - 2021-02-21
 ### Fixed
 - Fix crash when `seo_schema_org` when both given entity and current entity are null
@@ -35,7 +39,8 @@ Initial release for the v2.
 ## [1.2.6] - 2020-05-28
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.0.4...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.0.5...HEAD
+[2.0.5]: https://github.com/umanit/block-collection-bundle/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/umanit/block-collection-bundle/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/umanit/block-collection-bundle/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/umanit/block-collection-bundle/compare/2.0.1...2.0.2
