@@ -24,18 +24,18 @@ class Canonical
         $this->routableHandler = $routableHandler;
     }
 
-    public function path(RoutableModelInterface $entity, array $overrides = []): string
+    public function path(RoutableModelInterface $entity, array $parameters = []): string
     {
         $route = $this->routableHandler->handle($entity);
-        $parameters = $this->buildParams($route, $overrides);
+        $parameters = $this->buildParams($route, $parameters);
 
         return $this->router->generate($route->getName(), $parameters);
     }
 
-    public function url(RoutableModelInterface $entity, array $overrides = []): string
+    public function url(RoutableModelInterface $entity, array $parameters = []): string
     {
         $route = $this->routableHandler->handle($entity);
-        $parameters = $this->buildParams($route, $overrides);
+        $parameters = $this->buildParams($route, $parameters);
 
         return $this->router->generate(
             $route->getName(),
@@ -44,14 +44,12 @@ class Canonical
         );
     }
 
-    private function buildParams(Route $route, array $overrides = []): array
+    private function buildParams(Route $route, array $parameters = []): array
     {
-        $params = [];
-
         foreach ($route->getParameters() as $key => $value) {
-            $params[$key] = $overrides[$key] ?? $value;
+            $parameters[$key] = $parameters[$key] ?? $value;
         }
 
-        return $params;
+        return $parameters;
     }
 }

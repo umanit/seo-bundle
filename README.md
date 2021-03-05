@@ -31,25 +31,26 @@ twig:
 
 You can configure your bundle further by creating a `umanit_seo.yaml` configuration file. Here is the default
 configuration provided by the bundle:
+
 ```yaml
 # Default configuration for extension with alias: "umanit_seo"
 umanit_seo:
 
     # Historize URLs of entities which implements HistorizableUrlModelInterface
     url_historization:
-        enabled:              true
+        enabled: true
 
         # Redirect code used by UrlRedirectorSubscriber
-        redirect_code:        301
+        redirect_code: 301
 
         # Cache service used to store entities dependencies. **MUST** implements \Symfony\Contracts\Cache\CacheInterface
-        cache_service:        cache.app
+        cache_service: cache.app
 
     # Defines the default templates used to render breadcrumbs
     templates:
-        breadcrumb_json_ld:   '@UmanitSeo/breadcrumb/breadcrumb.json-ld.html.twig'
+        breadcrumb_json_ld: '@UmanitSeo/breadcrumb/breadcrumb.json-ld.html.twig'
         breadcrumb_microdata: '@UmanitSeo/breadcrumb/breadcrumb.microdata.html.twig'
-        breadcrumb_rdfa:      '@UmanitSeo/breadcrumb/breadcrumb.rdfa.html.twig'
+        breadcrumb_rdfa: '@UmanitSeo/breadcrumb/breadcrumb.rdfa.html.twig'
     metadata:
         form_type:
 
@@ -57,14 +58,14 @@ umanit_seo:
             add_seo_metadata_type: true
 
             # FQCN of the FormType used to renders SEO Metadata fields
-            class_fqcn:           Umanit\SeoBundle\Form\Type\SeoMetadataType
+            class_fqcn: Umanit\SeoBundle\Form\Type\SeoMetadataType
 
             # Injects Google Code Prettify when rendering breadcrumb and schema.org in FormType.
             inject_code_prettify: true
-        default_title:        'Umanit Seo - Customize this default title to your needs.'
-        title_prefix:         ''
-        title_suffix:         ''
-        default_description:  'Umanit Seo - Customize this default description to your needs.'
+        default_title: 'Umanit Seo - Customize this default title to your needs.'
+        title_prefix: ''
+        title_suffix: ''
+        default_description: 'Umanit Seo - Customize this default description to your needs.'
 ```
 
 ## Usage
@@ -137,8 +138,8 @@ class PageHandler implements RoutableHandlerInterface
 }
 ```
 
-SeoBundle will now be able to generate a URL from the entity.
-If you ever change the slug of a page, the old URL will be redirected to the new one.
+SeoBundle will now be able to generate a URL from the entity. If you ever change the slug of a page, the old URL will be
+redirected to the new one.
 
 If you wanted to generate the URL by yourself you would have done something like the following example:
 
@@ -152,8 +153,8 @@ You can now do like so:
 {{ path(my_page) }}
 ```
 
-_**Note:** You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve
-the entity associated to the current accessed route and generate the url from it._
+_**Note:** You can use the `canonical()` function without passing it an entity, SeoBundle will automatically resolve the
+entity associated to the current accessed route and generate the url from it._
 
 Usually, you'll want to use the `canonical()` function directly within your main layout.
 
@@ -269,6 +270,7 @@ Next, add the twig function `seo_schema_org()` at the bottom of your layout.
 The function will format and display the json schema of the current entity as you defined it.
 
 ```html
+
 <script type="application/ld+json">
 {
     "@context": "https:\/\/schema.org",
@@ -280,6 +282,7 @@ The function will format and display the json schema of the current entity as yo
         "areaServed": "Worldwide"
     }
 }
+
 </script>
 ```
 
@@ -358,8 +361,8 @@ class PageHandler implements BreadcrumbableHandlerInterface
 }
 ```
 
-_**Note:** If the processed entity implements the `RoutableModelInterface`, you can omit the `url` attribute to let
-the service `umanit_seo.routable` generate it for you._
+_**Note:** If the processed entity implements the `RoutableModelInterface`, you can omit the `url` attribute to let the
+service `umanit_seo.routable` generate it for you._
 
 You can now use the twig function `seo_breadcrumb()` like the following examples:
 
@@ -401,20 +404,20 @@ class Page implements HistorizableUrlModelInterface
 ### Twig functions reference
 
 ```html
-{{ path(entity) }}                                 # Path to an Seo entity
-{{ url(entity) }}                                  # Url to an Seo entity
-{{ seo_canonical(entity = null, overrides = []) }} # Canonical link of an Seo entity
-{{ seo_title(entity = null) }}                     # Title (without markup) of an Seo entity
-{{ seo_metadata(entity = null) }}                  # Metadata of an entity (title and description, with markup)
-{{ seo_schema_org(entity = null) }}                # Json schema of an entity (with markup)
-{{ seo_breadcrumb(entity = null, format = null) }} # Breadcrumb from an entity (default format to 'microdata')
+{{ path(entity, parameters = []) }}                 # Path to an Seo entity
+{{ url(entity, parameters = []) }}                  # Url to an Seo entity
+{{ seo_canonical(entity = null, parameters = []) }} # Canonical link of an Seo entity
+{{ seo_title(entity = null) }}                      # Title (without markup) of an Seo entity
+{{ seo_metadata(entity = null) }}                   # Metadata of an entity (title and description, with markup)
+{{ seo_schema_org(entity = null) }}                 # Json schema of an entity (with markup)
+{{ seo_breadcrumb(entity = null, format = null) }}  # Breadcrumb from an entity (default format to 'microdata')
 ```
 
 ### Protips
 
- * The `HistorizableUrlModelInterface` extends the `RoutableModelInterface`, so you don't need to implement both,
- * you can use a custom HTTP code when redirecting by overriding `umanit_seo.url_historization.redirect_code`,
- * you can use a custom cache service for `Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter` by overriding
- `umanit_seo.url_historization.cache_service`,
- * if one of your service needs the `@router`, you can implement `Umanit\SeoBundle\Service\RouterAwareInterface` and
- use the trait `Umanit\SeoBundle\Service\RouterAwareTrait` (usefull for breadcrumb handlers!).
+* The `HistorizableUrlModelInterface` extends the `RoutableModelInterface`, so you don't need to implement both,
+* you can use a custom HTTP code when redirecting by overriding `umanit_seo.url_historization.redirect_code`,
+* you can use a custom cache service for `Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter` by overriding
+  `umanit_seo.url_historization.cache_service`,
+* if one of your service needs the `@router`, you can implement `Umanit\SeoBundle\Service\RouterAwareInterface` and use
+  the trait `Umanit\SeoBundle\Service\RouterAwareTrait` (usefull for breadcrumb handlers!).

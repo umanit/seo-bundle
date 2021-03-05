@@ -63,11 +63,11 @@ class SeoRuntime implements RuntimeExtensionInterface
      * Generates and returns the canonical url.
      *
      * @param object|null $entity
-     * @param array|null  $overrides
+     * @param array       $parameters
      *
      * @return string
      */
-    public function canonical(?object $entity = null, array $overrides = []): string
+    public function canonical(?object $entity = null, array $parameters = []): string
     {
         $entity = $entity ?? $this->currentSeoEntity->get();
 
@@ -75,7 +75,7 @@ class SeoRuntime implements RuntimeExtensionInterface
             return '';
         }
 
-        return sprintf('<link rel="canonical" href="%s" />', $this->canonical->url($entity, $overrides));
+        return sprintf('<link rel="canonical" href="%s" />', $this->canonical->url($entity, $parameters));
     }
 
     /**
