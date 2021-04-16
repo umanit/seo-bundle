@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.6] - 2021-04-16
+### Fixed
+- The argument `$entity` for `UrlPoolerInterface::processEntityDependency` is a non sens and was removed
+    * ⚠️ Potential BC Break if you have overide the service `@umanit_seo.url_history.url_pooler` ⚠️
+
 ## [2.0.5] - 2021-03-05
 ### Added
 - Handle parameters which are not in the `entity` route when using `path`, `url` and `seo_canonical` Twig functions
@@ -39,7 +44,8 @@ Initial release for the v2.
 ## [1.2.6] - 2020-05-28
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.0.5...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.0.6...HEAD
+[2.0.6]: https://github.com/umanit/block-collection-bundle/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/umanit/block-collection-bundle/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/umanit/block-collection-bundle/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/umanit/block-collection-bundle/compare/2.0.2...2.0.3
