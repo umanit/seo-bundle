@@ -33,10 +33,7 @@ class UrlPooler implements UrlPoolerInterface
         }
     }
 
-    public function processEntityDependency(
-        HistorizableUrlModelInterface $entity,
-        HistorizableUrlModelInterface $dependency
-    ): bool {
+    public function processEntityDependency(HistorizableUrlModelInterface $dependency): bool {
         $urlReference = $dependency->getUrlReference();
         $newUrl = $this->canonical->url($dependency);
         $oldUrl = null !== $urlReference ? $urlReference->getUrl() : null;

@@ -230,7 +230,7 @@ class UrlHistoryWriter implements EventSubscriber
 
                 // Regenerate route for all entities if different
                 foreach ($query->getQuery()->getResult() as $dependantEntity) {
-                    if ($this->urlPooler->processEntityDependency($entity, $dependantEntity)) {
+                    if ($this->urlPooler->processEntityDependency($dependantEntity)) {
                         $urlReference = $dependantEntity->getUrlReference();
                         $uow->recomputeSingleEntityChangeSet(
                             $em->getClassMetadata($this->getClass($urlReference)),

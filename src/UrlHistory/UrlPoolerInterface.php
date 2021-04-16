@@ -22,15 +22,11 @@ interface UrlPoolerInterface
     /**
      * Process the dependency of an updated entity to historize URLs changes.
      *
-     * @param HistorizableUrlModelInterface $entity
      * @param HistorizableUrlModelInterface $dependency
      *
      * @return bool
      */
-    public function processEntityDependency(
-        HistorizableUrlModelInterface $entity,
-        HistorizableUrlModelInterface $dependency
-    ): bool;
+    public function processEntityDependency(HistorizableUrlModelInterface $dependency): bool;
 
     /**
      * Flush the pool.
