@@ -83,16 +83,16 @@ class UrlPool
      */
     public function flush(): void
     {
-        $this->em->clear();
-
         if (!empty($this->items)) {
+            $this->em->clear();
+
             foreach ($this->items as $item) {
                 $this->em->persist($item);
+                // @todo Needs to be reworked because flushing only a specific entity is deprecated and will not work anymore with Doctrine 3
+                $this->em->flush($item);
             }
 
             $this->items = [];
-
-            $this->em->flush();
         }
     }
 

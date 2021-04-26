@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.7] - 2021-04-26
+### Fixed
+- Remove the code from [2.0.1] which is a bad solution with more problems than solutions. Instead, each entity are
+  flushed one by one which is not a good solution either because it will not work anymore with Doctrine 3. However, it's
+  a good temporary solution for now.
+
 ## [2.0.6] - 2021-04-16
 ### Fixed
 - The argument `$entity` for `UrlPoolerInterface::processEntityDependency` is a non sens and was removed
@@ -44,7 +50,8 @@ Initial release for the v2.
 ## [1.2.6] - 2020-05-28
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.0.6...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.0.7...HEAD
+[2.0.7]: https://github.com/umanit/block-collection-bundle/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/umanit/block-collection-bundle/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/umanit/block-collection-bundle/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/umanit/block-collection-bundle/compare/2.0.3...2.0.4
