@@ -21,16 +21,16 @@
         "spatie/schema-org": "^2.1",
         "ramsey/uuid": "^3.9|^4.1",
         "symfony/flex": "^1.9",
-        "symfony/twig-bundle": "^4.4|^5.1",
+        "symfony/twig-bundle": "^4.4|^5.1|^5.2",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
         "doctrine/doctrine-bundle": "^1.12|^2.0",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.7",
-        "symfony/form": "^4.4|^5.1"
+        "symfony/form": "^4.4|^5.1|^5.2"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^5.1",
+        "symfony/phpunit-bridge": "^5.1|^5.2",
         "phpunit/phpunit": "^7.5"
     },
     "minimum-stability": "stable",
