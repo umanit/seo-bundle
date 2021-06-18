@@ -62,6 +62,24 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
             $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
             $loader->load('sonata_admin.yaml');
         }
+
+        $container->prependExtensionConfig('doctrine', [
+            'orm' => [
+                'entity_managers' => [
+                    'umanit_seo' => [
+                        'connection' => 'default',
+                        'mappings'   => [
+                            'UmanitSeo' => [
+                                'is_bundle' => false,
+                                'type'      => 'annotation',
+                                'dir'       => \dirname(__DIR__).'/Entity',
+                                'prefix'    => 'Umanit\SeoBundle\Entity',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     private function processServices(ContainerBuilder $container, array $config): void

@@ -21,9 +21,6 @@ class UrlPool
     /** @var string */
     private $defaultLocale;
 
-    /** @var UrlHistory[] */
-    private $items = [];
-
     public function __construct(EntityManagerInterface $em, RoutableInterface $routableHandler, string $defaultLocale)
     {
         $this->em = $em;
@@ -62,7 +59,8 @@ class UrlPool
 
         $urlHistory->setNewPath($newPath);
 
-        $this->items[] = $urlHistory;
+        $this->em->persist($urlHistory);
+        $this->em->flush();
     }
 
     /**
@@ -76,24 +74,6 @@ class UrlPool
     public function get(string $path, string $locale = null): ?UrlHistory
     {
         return $this->getUrlHistoryRepository()->findOneBy(['oldPath' => $path, 'locale' => $locale]);
-    }
-
-    /**
-     * Flushes the cached items.
-     */
-    public function flush(): void
-    {
-        if (!empty($this->items)) {
-            $this->em->clear();
-
-            foreach ($this->items as $item) {
-                $this->em->persist($item);
-                // @todo Needs to be reworked because flushing only a specific entity is deprecated and will not work anymore with Doctrine 3
-                $this->em->flush($item);
-            }
-
-            $this->items = [];
-        }
     }
 
     private function getUrlHistoryRepository(): UrlHistoryRepository

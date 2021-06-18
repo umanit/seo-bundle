@@ -27,9 +27,4 @@ interface UrlPoolerInterface
      * @return bool
      */
     public function processEntityDependency(HistorizableUrlModelInterface $dependency): bool;
-
-    /**
-     * Flush the pool.
-     */
-    public function flush(): void;
 }

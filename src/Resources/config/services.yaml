@@ -3,7 +3,7 @@ services:
     umanit_seo.url_history.url_pool:
         class: Umanit\SeoBundle\UrlHistory\UrlPool
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine.orm.umanit_seo_entity_manager'
             - '@umanit_seo.routable'
             - '%kernel.default_locale%'
 
@@ -133,7 +133,7 @@ services:
         class: Umanit\SeoBundle\Form\Type\SeoMetadataType
         arguments:
             - '@umanit_seo.utils.seo_metadata_resolver'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine.orm.umanit_seo_entity_manager'
             - ~ # Replaced by a compiler pass
         tags:
             - { name: form.type, alias: Umanit\SeoBundle\Form\Type\SeoMetadataType }

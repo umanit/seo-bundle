@@ -51,9 +51,4 @@ class UrlPooler implements UrlPoolerInterface
 
         return false;
     }
-
-    public function flush(): void
-    {
-        $this->urlPool->flush();
-    }
 }

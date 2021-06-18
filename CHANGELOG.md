@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2021-06-18
+### Changed
+- Use a custom Entity Manager to manipulate UrlPooler and URL historization. These modifications should definitely fix
+  problems with other entities side effects.
+
+### Removed
+- Remove the `flush` method on `UrlPoolerInterface`.
+    * ⚠️ Potential BC Break if you have overide the service `@umanit_seo.url_history.url_pooler` ⚠️
+
+## [2.0.8] - 2021-05-25
+### Added
+- Add compatibility with Symfony 5.3.
+
 ## [2.0.7] - 2021-04-26
 ### Fixed
 - Remove the code from [2.0.1] which is a bad solution with more problems than solutions. Instead, each entity are
@@ -50,7 +63,9 @@ Initial release for the v2.
 ## [1.2.6] - 2020-05-28
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.0.7...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/umanit/block-collection-bundle/compare/2.0.8...2.1.0
+[2.0.8]: https://github.com/umanit/block-collection-bundle/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/umanit/block-collection-bundle/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/umanit/block-collection-bundle/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/umanit/block-collection-bundle/compare/2.0.4...2.0.5

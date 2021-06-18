@@ -9,7 +9,6 @@ use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Psr\Cache\InvalidArgumentException;
@@ -63,7 +62,6 @@ class UrlHistoryWriter implements EventSubscriber
             Events::preUpdate,
             Events::onFlush,
             Events::prePersist,
-            Events::postFlush,
         ];
     }
 
@@ -241,11 +239,6 @@ class UrlHistoryWriter implements EventSubscriber
                 }
             }
         }
-    }
-
-    public function postFlush(PostFlushEventArgs $args): void
-    {
-        $this->urlPooler->flush();
     }
 
     private function getClass(object $object): string
