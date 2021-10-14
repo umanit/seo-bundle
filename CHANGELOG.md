@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - 2021-10-14
+### Fixed
+- Fix a wrong call to decorated method
+
 ## [2.1.1] - 2021-08-02
 ###Added
 - Add PHP 8.0 compatiblity.
@@ -67,7 +71,8 @@ Initial release for the v2.
 ## [1.2.6] - 2020-05-28
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.1...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.2...HEAD
+[2.1.2]: https://github.com/umanit/block-collection-bundle/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/umanit/block-collection-bundle/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/umanit/block-collection-bundle/compare/2.0.8...2.1.0
 [2.0.8]: https://github.com/umanit/block-collection-bundle/compare/2.0.7...2.0.8
