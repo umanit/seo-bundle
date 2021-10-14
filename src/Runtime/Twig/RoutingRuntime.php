@@ -46,6 +46,6 @@ class RoutingRuntime implements RuntimeExtensionInterface
             return null;
         }
 
-        return $this->decorated->getPath($name, $parameters, $schemeRelative);
+        return $this->decorated->getUrl($name, $parameters, $schemeRelative);
     }
 }
