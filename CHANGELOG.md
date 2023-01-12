@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixes the call of Sonata `AbstractAdmin` method from `canAccessObject` to `hasAccess`, in accordance with its new name
+
 ## [2.1.4] - 2023-01-12
 
 ### Changed
