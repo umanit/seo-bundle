@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.4] - 2023-01-12
+
 ### Changed
 
 - Updates `SeoAdminExtension` method declarations to be compatible with Sonata Admin 4
@@ -109,7 +111,9 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.3...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.4...HEAD
+
+[2.1.4]: https://github.com/umanit/block-collection-bundle/compare/2.1.3...2.1.4
 
 [2.1.3]: https://github.com/umanit/block-collection-bundle/compare/2.1.2...2.1.3
 
