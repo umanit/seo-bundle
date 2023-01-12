@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updates `SeoAdminExtension` method declarations to be compatible with Sonata Admin 4
+
 ## [2.1.3] - 2023-01-12
 
 ### Removed
