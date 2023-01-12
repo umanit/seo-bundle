@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Removes the `symfony/flex` requirement
+
 ## [2.1.2] - 2021-10-14
 ### Fixed
 - Fix a wrong call to decorated method
