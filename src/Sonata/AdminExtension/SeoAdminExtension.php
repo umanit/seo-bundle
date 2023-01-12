@@ -11,37 +11,32 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\AdminBundle\Templating\MutableTemplateRegistryInterface;
 
-/**
- * Class SeoAdminExtension
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 class SeoAdminExtension extends AbstractAdminExtension
 {
-    public function configureListFields(ListMapper $listMapper)
+    public function configureListFields(ListMapper $list): void
     {
-        if ($listMapper->has('_action')) {
-            $actions = $listMapper->get('_action')->getOption('actions');
+        if ($list->has('_action')) {
+            $actions = $list->get('_action')->getOption('actions');
 
             if ($actions && isset($actions['show'])) {
                 // Overrides show action to use SeoBundle system
                 $actions['show'] = ['template' => '@UmanitSeo/sonata/admin/CRUD/list__action_show.html.twig'];
-                $listMapper->get('_action')->setOption('actions', $actions);
+                $list->get('_action')->setOption('actions', $actions);
             }
         }
     }
 
-    public function getPersistentParameters(AdminInterface $admin)
+    public function configurePersistentParameters(AdminInterface $admin, array $parameters): array
     {
         $admin->setTemplate('button_show', '@UmanitSeo/sonata/admin/Button/show_button.html.twig');
 
-        return parent::getPersistentParameters($admin);
+        return parent::configurePersistentParameters($admin, $parameters);
     }
 
-    public function configureShowFields(ShowMapper $showMapper)
+    public function configureShowFields(ShowMapper $show): void
     {
-        $showMapper->add('seoMetadata');
+        $show->add('seoMetadata');
 
-        parent::configureShowFields($showMapper);
+        parent::configureShowFields($show);
     }
 }
