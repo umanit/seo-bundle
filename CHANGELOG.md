@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.5] - 2023-01-12
+
 ### Fixed
 
 - Fixes the call of Sonata `AbstractAdmin` method from `canAccessObject` to `hasAccess`, in accordance with its new name
@@ -115,7 +117,9 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.4...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.5...HEAD
+
+[2.1.5]: https://github.com/umanit/block-collection-bundle/compare/2.1.4...2.1.5
 
 [2.1.4]: https://github.com/umanit/block-collection-bundle/compare/2.1.3...2.1.4
 
