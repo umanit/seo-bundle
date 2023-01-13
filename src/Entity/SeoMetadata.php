@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Embeddable
  */
+#[ORM\Embeddable]
 class SeoMetadata
 {
     /**
@@ -16,6 +17,7 @@ class SeoMetadata
      *
      * @ORM\Column(nullable=true)
      */
+    #[ORM\Column(nullable: true)]
     protected $title;
 
     /**
@@ -23,6 +25,7 @@ class SeoMetadata
      *
      * @ORM\Column(type="text", nullable=true)
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     protected $description;
 
     public function getTitle(): ?string

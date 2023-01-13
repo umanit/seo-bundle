@@ -15,6 +15,7 @@ trait SeoMetadataTrait
      *
      * @ORM\Embedded(class="Umanit\SeoBundle\Entity\SeoMetadata", columnPrefix="seo_meta_")
      */
+    #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: 'seo_meta_')]
     protected $seoMetadata;
 
     /**
