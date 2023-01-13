@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2023-01-13
+
 ### Added
 
 - Adds Doctrine attributes to all classes and properties to make them usable whether the ORM mapping is configured to
@@ -122,7 +124,9 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.1.5...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.2.0...HEAD
+
+[2.2.0]: https://github.com/umanit/block-collection-bundle/compare/2.1.5...2.2.0
 
 [2.1.5]: https://github.com/umanit/block-collection-bundle/compare/2.1.4...2.1.5
 
