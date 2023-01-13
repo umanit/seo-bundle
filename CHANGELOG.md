@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Adds Doctrine attributes to all classes and properties to make them usable whether the ORM mapping is configured to
+  read attributes (`doctrine/orm` >= 2.9) or annotations
+
 ## [2.1.5] - 2023-01-12
 
 ### Fixed

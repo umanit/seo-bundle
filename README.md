@@ -106,6 +106,7 @@ use Umanit\SeoBundle\Model\RoutableModelInterface;
 /**
  * @ORM\Entity()
  */
+ #[ORM\Entity]
 class Page implements RoutableModelInterface
 {
     // ...
@@ -226,6 +227,7 @@ use Umanit\SeoBundle\Model\SchemableModelInterface;
 /**
  * @ORM\Entity()
  */
+ #[ORM\Entity]
 class Page implements SchemableModelInterface
 {
     // ...
@@ -316,6 +318,7 @@ use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 /**
  * @ORM\Entity()
  */
+ #[ORM\Entity]
 class Page implements BreadcrumbableModelInterface
 {
     // ...
@@ -393,6 +396,7 @@ use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
 /**
  * @ORM\Entity()
  */
+ #[ORM\Entity]
 class Page implements HistorizableUrlModelInterface
 {
     use HistorizableUrlTrait;
