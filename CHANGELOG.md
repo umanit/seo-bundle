@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2023-05-25
+
 ### Added
 
 - Symfony 6 support
@@ -128,7 +130,9 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.2.0...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/2.2.1...HEAD
+
+[2.2.1]: https://github.com/umanit/block-collection-bundle/compare/2.2.0...2.2.1
 
 [2.2.0]: https://github.com/umanit/block-collection-bundle/compare/2.1.5...2.2.0
 
