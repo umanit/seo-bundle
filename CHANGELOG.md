@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] - 2024-02-10
+
 ### Changed
 
 - Fix deprecated
 
-## [3.0.0]
+## [3.0.0] - 2024-02-10
 
 ### Added
 
@@ -150,7 +152,9 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/3.0.1...HEAD
+
+[3.0.1]: https://github.com/umanit/block-collection-bundle/compare/3.0.0...3.0.1
 
 [3.0.0]: https://github.com/umanit/block-collection-bundle/compare/2.2.1...3.0.0
 
