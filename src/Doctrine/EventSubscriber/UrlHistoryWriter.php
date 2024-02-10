@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\Common\Proxy\Proxy;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Psr\Cache\InvalidArgumentException;
@@ -22,7 +22,11 @@ use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
 use Umanit\SeoBundle\UrlHistory\UrlPoolerInterface;
 
-class UrlHistoryWriter implements EventSubscriber
+#[AsDoctrineListener(Events::loadClassMetadata)]
+#[AsDoctrineListener(Events::preUpdate)]
+#[AsDoctrineListener(Events::onFlush)]
+#[AsDoctrineListener(Events::prePersist)]
+class UrlHistoryWriter
 {
     public const ENTITY_DEPENDENCY_CACHE_KEY = 'seo.entity_dependencies';
 
@@ -33,16 +37,6 @@ class UrlHistoryWriter implements EventSubscriber
         private readonly CacheInterface $cache,
         private readonly string $defaultLocale,
     ) {
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            Events::loadClassMetadata,
-            Events::preUpdate,
-            Events::onFlush,
-            Events::prePersist,
-        ];
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
@@ -94,7 +88,7 @@ class UrlHistoryWriter implements EventSubscriber
 
     public function preUpdate(PreUpdateEventArgs $args): void
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
 
         if (!$entity instanceof HistorizableUrlModelInterface) {
             return;
@@ -114,9 +108,9 @@ class UrlHistoryWriter implements EventSubscriber
         $this->urlPooler->processEntityUpdate($entity, $this->getOldEntity($entity, $changeSet));
     }
 
-    public function prePersist(LifecycleEventArgs $args): void
+    public function prePersist(PrePersistEventArgs $args): void
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
 
         if (!$entity instanceof HistorizableUrlModelInterface) {
             return;
@@ -145,7 +139,7 @@ class UrlHistoryWriter implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
-        $em = $args->getEntityManager();
+        $em = $args->getObjectManager();
         $uow = $em->getUnitOfWork();
 
         // Process all objects being inserted, using scheduled insertions instead of prePersist in case if record will
@@ -197,7 +191,7 @@ class UrlHistoryWriter implements EventSubscriber
             foreach ($dependencies as $dependantEntityClass) {
                 // Fetches the current url of the entities
                 $query = $args
-                    ->getEntityManager()->createQueryBuilder()
+                    ->getObjectManager()->createQueryBuilder()
                     ->select('dependant', 'url_ref')
                     ->from($dependantEntityClass, 'dependant')
                     ->innerJoin('dependant.urlReference', 'url_ref')

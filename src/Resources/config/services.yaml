@@ -36,16 +36,23 @@ services:
             - '@umanit_seo.routing.canonical'
             - ~ # Replaced by a compiler pass
             - '%kernel.default_locale%'
-        tags: ['doctrine.event_subscriber']
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }
+            - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: prePersist }
 
     Umanit\SeoBundle\Doctrine\EventSubscriber\UrlHistoryWriter: '@umanit_seo.event_subscriber.url_history_writer'
 
     # Current Entity Resolver
     umanit_seo.doctrine_event_subscriber.current_entity_resolver:
         class: Umanit\SeoBundle\Doctrine\EventSubscriber\CurrentEntityResolver
-        arguments: ['@umanit_seo.runtime.current_seo_entity', '@umanit_seo.routing.canonical', '@request_stack']
+        arguments:
+            - '@umanit_seo.runtime.current_seo_entity'
+            - '@umanit_seo.routing.canonical'
+            - '@request_stack'
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: postLoad }
 
     umanit_seo.event_subscriber.url_redirector:
         class: Umanit\SeoBundle\EventSubscriber\UrlRedirectorSubscriber

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Events;
+use Doctrine\ORM\Event\PostLoadEventArgs;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 use Umanit\SeoBundle\Routing\Canonical;
@@ -15,7 +13,7 @@ use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
 /**
  * Matches each entity loaded against the current request to resolve the requested Seo entity.
  */
-class CurrentEntityResolver implements EventSubscriber
+class CurrentEntityResolver
 {
     public function __construct(
         private readonly CurrentSeoEntity $currentSeoEntity,
@@ -24,12 +22,7 @@ class CurrentEntityResolver implements EventSubscriber
     ) {
     }
 
-    public function getSubscribedEvents(): array
-    {
-        return [Events::postLoad];
-    }
-
-    public function postLoad(LifecycleEventArgs $args): void
+    public function postLoad(PostLoadEventArgs $args): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -37,7 +30,7 @@ class CurrentEntityResolver implements EventSubscriber
             return;
         }
 
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
 
         if (!$entity instanceof RoutableModelInterface) {
             return;
