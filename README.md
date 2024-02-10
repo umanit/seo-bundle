@@ -103,9 +103,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Model\RoutableModelInterface;
 
-/**
- * @ORM\Entity()
- */
  #[ORM\Entity]
 class Page implements RoutableModelInterface
 {
@@ -224,9 +221,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Model\SchemableModelInterface;
 
-/**
- * @ORM\Entity()
- */
  #[ORM\Entity]
 class Page implements SchemableModelInterface
 {
@@ -254,10 +248,11 @@ class PageHandler implements SchemableHandlerInterface
         return $entity instanceof Page;
     }
 
+    /**
+     * @param Page $entity
+    */
     public function process(SchemableModelInterface $entity): BaseType
     {
-        /** @var $entity Page */
-
         return Schema::mensClothingStore()
                      ->name($entity->getName())
                      ->url($entity->getSlug())
@@ -274,16 +269,16 @@ The function will format and display the json schema of the current entity as yo
 ```html
 
 <script type="application/ld+json">
-{
-    "@context": "https:\/\/schema.org",
-    "@type": "MensClothingStore",
-    "name": "Test",
-    "email": "test@umanit.fr",
-    "contactPoint": {
-        "@type": "ContactPoint",
-        "areaServed": "Worldwide"
+    {
+        "@context": "https:\/\/schema.org",
+        "@type": "MensClothingStore",
+        "name": "Test",
+        "email": "test@umanit.fr",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "areaServed": "Worldwide"
+        }
     }
-}
 
 </script>
 ```
@@ -315,9 +310,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 
-/**
- * @ORM\Entity()
- */
  #[ORM\Entity]
 class Page implements BreadcrumbableModelInterface
 {
@@ -345,9 +337,11 @@ class PageHandler implements BreadcrumbableHandlerInterface
         return $entity instanceof Page;
     }
 
+    /**
+     * @param Page $entity
+     */
     public function process(BreadcrumbableModelInterface $entity): Breadcrumb
     {
-        /** @var $entity Page */
         $breadcrumb = new Breadcrumb();
 
         $breadcrumb->setItems([
@@ -393,9 +387,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Doctrine\Model\HistorizableUrlTrait;
 use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
 
-/**
- * @ORM\Entity()
- */
  #[ORM\Entity]
 class Page implements HistorizableUrlModelInterface
 {
