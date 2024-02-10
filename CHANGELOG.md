@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Automatically support attribute on entities
+
 ## [2.2.1] - 2023-05-25
 
 ### Added

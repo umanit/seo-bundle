@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\DependencyInjection;
 
+use Doctrine\Common\Annotations\Annotation;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -30,7 +31,7 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
 
         $container->setParameter('umanit_seo.metadata', $metadata);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
 
         $this->processServices($container, $configs);
@@ -59,9 +60,11 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
 
         // Conditionnaly load sonata_admin.yaml
         if (isset($bundles['SonataAdminBundle'])) {
-            $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+            $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
             $loader->load('sonata_admin.yaml');
         }
+
+        $mappingType = class_exists(Annotation::class) ? 'annotation' : 'attribute';
 
         $container->prependExtensionConfig('doctrine', [
             'orm' => [
@@ -71,8 +74,8 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
                         'mappings'   => [
                             'UmanitSeo' => [
                                 'is_bundle' => false,
-                                'type'      => 'annotation',
-                                'dir'       => \dirname(__DIR__).'/Entity',
+                                'type'      => $mappingType,
+                                'dir'       => \dirname(__DIR__) . '/Entity',
                                 'prefix'    => 'Umanit\SeoBundle\Entity',
                             ],
                         ],
