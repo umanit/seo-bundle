@@ -9,12 +9,10 @@ use Umanit\SeoBundle\Model\Route;
 
 class Routable implements RoutableInterface
 {
-    /** @var RoutableHandlerInterface[] */
-    private $handlers;
-
-    public function __construct(iterable $handlers)
-    {
-        $this->handlers = $handlers;
+    public function __construct(
+        /** @var RoutableHandlerInterface[] */
+        private readonly iterable $handlers
+    ) {
     }
 
     public function handle(RoutableModelInterface $entity): Route
@@ -25,6 +23,6 @@ class Routable implements RoutableInterface
             }
         }
 
-        throw new \LogicException(sprintf('Can not determine the route of the entity %s', \get_class($entity)));
+        throw new \LogicException(sprintf('Can not determine the route of the entity %s', $entity::class));
     }
 }

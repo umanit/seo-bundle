@@ -6,16 +6,10 @@ namespace Umanit\SeoBundle\Model;
 
 class Route
 {
-    /** @var string */
-    private $name;
-
-    /** @var array */
-    private $parameters;
-
-    public function __construct(string $name, array $parameters = [])
-    {
-        $this->name = $name;
-        $this->parameters = $parameters;
+    public function __construct(
+        private readonly string $name,
+        private array $parameters = [],
+    ) {
     }
 
     public function getName(): string

@@ -17,12 +17,10 @@ use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 #[ORM\Entity(repositoryClass: UrlHistoryRepository::class)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ORM\Table(name: 'umanit_seo_url_reference')]
-#[ORM\Index(name: 'umanit_seo_url_ref_search_idx', columns: ['seo_uuid'])]
+#[ORM\Index(columns: ['seo_uuid'], name: 'umanit_seo_url_ref_search_idx')]
 class UrlReference
 {
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -30,39 +28,31 @@ class UrlReference
     #[ORM\Column(name: 'id', type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="route", type="string", length=255, nullable=false)
      */
     #[ORM\Column(name: 'route', type: 'string', length: 255, nullable: false)]
-    private $route;
+    private ?string $route = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="url", nullable=false, length=512)
      */
-    #[ORM\Column(name: 'url', type: 'string', length: 512, nullable: false)]
-    private $url;
+    #[ORM\Column(name: 'url', length: 512, nullable: false)]
+    private ?string $url = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="locale", type="string", length=10, nullable=true)
      */
     #[ORM\Column(name: 'locale', type: 'string', length: 10, nullable: true)]
-    private $locale;
+    private ?string $locale = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="seo_uuid", type="guid", unique=true)
      */
-    #[ORM\Column(name: 'seo_uuid', type: 'guid', unique: false)]
-    private $seoUuid;
+    #[ORM\Column(name: 'seo_uuid', type: 'guid', unique: true)]
+    private ?string $seoUuid = null;
 
     public function getId(): ?int
     {

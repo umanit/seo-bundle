@@ -16,7 +16,7 @@ use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 class SeoMetadataTypeTest extends TypeTestCase
 {
-    public function testAddTwoFieldsAndAListener()
+    public function testAddTwoFieldsAndAListener(): void
     {
         $form = $this->factory->create(SeoMetadataType::class);
 
@@ -24,7 +24,7 @@ class SeoMetadataTypeTest extends TypeTestCase
         self::assertTrue($form->has('description'));
     }
 
-    public function testVariableInFormView()
+    public function testVariableInFormView(): void
     {
         // Form without parent
         $form = $this->factory->create(SeoMetadataType::class);
@@ -36,8 +36,10 @@ class SeoMetadataTypeTest extends TypeTestCase
         // Form with parent
         $entity = new WithHasSeoMetadata();
         $entity->setUrlReference(new UrlReference());
+
         $form = $this->factory->create(FormType::class, $entity);
         $form->add('seoMetadata', SeoMetadataType::class);
+
         $view = $form->get('seoMetadata')->createView();
 
         self::assertArrayHasKey('inject_code_prettify', $view->vars);

@@ -8,8 +8,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 trait RouterAwareTrait
 {
-    /** @var RouterInterface */
-    private $router;
+    private RouterInterface $router;
 
     public function setRouter(RouterInterface $router): void
     {

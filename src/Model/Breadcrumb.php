@@ -9,23 +9,17 @@ class Breadcrumb
     public const FORMAT_MICRODATA = 'microdata';
     public const FORMAT_JSON_LD = 'json-ld';
     public const FORMAT_RDFA = 'rdfa';
-
     public const FORMATS = [self::FORMAT_JSON_LD, self::FORMAT_MICRODATA, self::FORMAT_RDFA];
 
     /** @var string */
-    private $format;
+    private string $template;
 
-    /** @var string */
-    private $template;
+    /** @var array<int, BreadcrumbItem> */
+    private array $items = [];
 
-    /** @var BreadcrumbItem[] */
-    private $items;
-
-    public function __construct(string $format = self::FORMAT_MICRODATA)
-    {
-        $this->format = $format;
-        $this->items = [];
-
+    public function __construct(
+        private string $format = self::FORMAT_MICRODATA,
+    ) {
         $this->setTemplateFromFormat();
     }
 
@@ -63,6 +57,6 @@ class Breadcrumb
 
     private function setTemplateFromFormat(): void
     {
-        $this->template = 'breadcrumb_'.str_replace('-', '_', $this->getFormat());
+        $this->template = 'breadcrumb_' . str_replace('-', '_', $this->getFormat());
     }
 }

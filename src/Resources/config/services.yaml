@@ -121,6 +121,13 @@ services:
 
     Umanit\SeoBundle\Utils\EntityParser\Title: '@umanit_seo.utils_entity_parser.title'
 
+    # Repositories
+    umanit_seo.repository.url_history_repository:
+        class: Umanit\SeoBundle\Repository\UrlHistoryRepository
+        arguments:
+            - '@doctrine'
+            - 'Umanit\SeoBundle\Entity\UrlHistory'
+
     # Forms
     umanit_seo.form_extension.form_type:
         class: Umanit\SeoBundle\Form\Extension\FormTypeExtension
@@ -133,7 +140,7 @@ services:
         class: Umanit\SeoBundle\Form\Type\SeoMetadataType
         arguments:
             - '@umanit_seo.utils.seo_metadata_resolver'
-            - '@doctrine.orm.umanit_seo_entity_manager'
+            - '@umanit_seo.repository.url_history_repository'
             - ~ # Replaced by a compiler pass
         tags:
             - { name: form.type, alias: Umanit\SeoBundle\Form\Type\SeoMetadataType }

@@ -12,16 +12,10 @@ use Umanit\SeoBundle\Model\Route;
 
 class Canonical
 {
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var RoutableInterface */
-    private $routableHandler;
-
-    public function __construct(RouterInterface $router, RoutableInterface $routableHandler)
-    {
-        $this->router = $router;
-        $this->routableHandler = $routableHandler;
+    public function __construct(
+        private readonly RouterInterface $router,
+        private readonly RoutableInterface $routableHandler,
+    ) {
     }
 
     public function path(RoutableModelInterface $entity, array $parameters = []): string
@@ -47,7 +41,7 @@ class Canonical
     private function buildParams(Route $route, array $parameters = []): array
     {
         foreach ($route->getParameters() as $key => $value) {
-            $parameters[$key] = $parameters[$key] ?? $value;
+            $parameters[$key] ??= $value;
         }
 
         return $parameters;

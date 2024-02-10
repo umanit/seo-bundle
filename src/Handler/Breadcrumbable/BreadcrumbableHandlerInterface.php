@@ -11,19 +11,11 @@ interface BreadcrumbableHandlerInterface
 {
     /**
      * Does the handler supports this entity?
-     *
-     * @param BreadcrumbableModelInterface $entity
-     *
-     * @return bool
      */
     public function supports(BreadcrumbableModelInterface $entity): bool;
 
     /**
-     * Should returns a Breadcrumb object for the entity.
-     *
-     * @param BreadcrumbableModelInterface $entity
-     *
-     * @return Breadcrumb
+     * Should return a Breadcrumb object for the entity.
      */
     public function process(BreadcrumbableModelInterface $entity): Breadcrumb;
 }

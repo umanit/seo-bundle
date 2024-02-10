@@ -10,7 +10,7 @@ use Umanit\SeoBundle\Handler\Schemable\Schemable;
 
 class SchemableTest extends TestCase
 {
-    public function testThrowLogicExceptionIfEntityNotSupported()
+    public function testThrowLogicExceptionIfEntityNotSupported(): void
     {
         $schemable = new Schemable([]);
 

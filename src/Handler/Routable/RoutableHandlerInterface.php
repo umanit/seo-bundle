@@ -11,19 +11,11 @@ interface RoutableHandlerInterface
 {
     /**
      * Does the handler supports this entity?
-     *
-     * @param RoutableModelInterface $entity
-     *
-     * @return bool
      */
     public function supports(RoutableModelInterface $entity): bool;
 
     /**
-     * Should returns a Route object for the entity.
-     *
-     * @param RoutableModelInterface $entity
-     *
-     * @return Route
+     * Should return a Route object for the entity.
      */
     public function process(RoutableModelInterface $entity): Route;
 }

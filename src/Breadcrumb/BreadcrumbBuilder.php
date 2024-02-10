@@ -13,38 +13,24 @@ use Umanit\SeoBundle\Routing\Canonical;
 
 class BreadcrumbBuilder
 {
-    /** @var Environment */
-    private $twig;
-
-    /** @var Canonical */
-    private $canonical;
-
-    /** @var BreadcrumbableInterface */
-    private $breadcrumbableHandler;
-
-    /** @var array */
-    private $templates;
-
     public function __construct(
-        Environment $twig,
-        Canonical $canonical,
-        BreadcrumbableInterface $breadcrumbableHandler,
-        array $templates
+        private readonly Environment $twig,
+        private readonly Canonical $canonical,
+        private readonly BreadcrumbableInterface $breadcrumbableHandler,
+        private readonly array $templates,
     ) {
-        $this->twig = $twig;
-        $this->canonical = $canonical;
-        $this->breadcrumbableHandler = $breadcrumbableHandler;
-        $this->templates = $templates;
     }
 
     public function buildBreadcrumb(BreadcrumbableModelInterface $entity, string $format = null): string
     {
         if (null !== $format && !\in_array(strtolower($format), Breadcrumb::FORMATS, true)) {
-            throw new \ErrorException(sprintf(
-                'Invalid format "%s". Valid formats are %s',
-                $format,
-                implode(', ', Breadcrumb::FORMATS)
-            ));
+            throw new \ErrorException(
+                sprintf(
+                    'Invalid format "%s". Valid formats are %s',
+                    $format,
+                    implode(', ', Breadcrumb::FORMATS)
+                )
+            );
         }
 
         $breadcrumb = $this->breadcrumbableHandler->handle($entity);

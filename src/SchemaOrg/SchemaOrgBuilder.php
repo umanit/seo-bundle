@@ -10,12 +10,9 @@ use Umanit\SeoBundle\Model\SchemableModelInterface;
 
 class SchemaOrgBuilder implements SchemaOrgBuilderInterface
 {
-    /** @var Schemable */
-    private $schemableHandler;
-
-    public function __construct(Schemable $schemableHandler)
-    {
-        $this->schemableHandler = $schemableHandler;
+    public function __construct(
+        private readonly Schemable $schemableHandler,
+    ) {
     }
 
     public function buildSchema(SchemableModelInterface $entity): BaseType

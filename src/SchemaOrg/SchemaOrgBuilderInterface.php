@@ -11,10 +11,6 @@ interface SchemaOrgBuilderInterface
 {
     /**
      * Builds the schema.org
-     *
-     * @param SchemableModelInterface $entity
-     *
-     * @return BaseType
      */
     public function buildSchema(SchemableModelInterface $entity): BaseType;
 }

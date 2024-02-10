@@ -16,7 +16,7 @@ use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 class FormTypeExtensionTest extends TypeTestCase
 {
-    public function testAddSeoMetadataOnEntityWithHasSeoMetadataInterface()
+    public function testAddSeoMetadataOnEntityWithHasSeoMetadataInterface(): void
     {
         $entity = new WithHasSeoMetadata();
         $form = $this->factory->create(FormType::class, $entity);
@@ -24,7 +24,7 @@ class FormTypeExtensionTest extends TypeTestCase
         self::assertTrue($form->has('seoMetadata'));
     }
 
-    public function testNotAddSeoMetadataOnEntityWithoutHasSeoMetadataInterface()
+    public function testNotAddSeoMetadataOnEntityWithoutHasSeoMetadataInterface(): void
     {
         $entity = new WithoutHasSeoMetadata();
         $form = $this->factory->create(FormType::class, $entity);

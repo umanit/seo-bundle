@@ -6,16 +6,10 @@ namespace Umanit\SeoBundle\Model;
 
 class BreadcrumbItem
 {
-    /** @var string */
-    private $label;
-
-    /** @var string|null */
-    private $url;
-
-    public function __construct(string $label, string $url = null)
-    {
-        $this->label = $label;
-        $this->url = $url;
+    public function __construct(
+        private readonly string $label,
+        private ?string $url = null,
+    ) {
     }
 
     public function getLabel(): string

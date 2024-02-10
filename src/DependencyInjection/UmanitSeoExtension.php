@@ -8,7 +8,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Umanit\SeoBundle\Handler\Breadcrumbable\BreadcrumbableHandlerInterface;
@@ -23,7 +23,7 @@ use Umanit\SeoBundle\Service\RouterAwareInterface;
  */
 class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensionInterface
 {
-    public function loadInternal(array $configs, ContainerBuilder $container): void
+    protected function loadInternal(array $configs, ContainerBuilder $container): void
     {
         // Set metadata configuration into params
         $metadata = $configs['metadata'];
@@ -31,7 +31,7 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
 
         $container->setParameter('umanit_seo.metadata', $metadata);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
 
         $this->processServices($container, $configs);
@@ -60,7 +60,7 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
 
         // Conditionnaly load sonata_admin.yaml
         if (isset($bundles['SonataAdminBundle'])) {
-            $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+            $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
             $loader->load('sonata_admin.yaml');
         }
 

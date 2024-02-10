@@ -18,33 +18,37 @@ class RoutingExtension extends AbstractExtension
             new TwigFunction(
                 'url',
                 [RoutingRuntime::class, 'getUrl'],
-                ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]
+                ['is_safe_callback' => $this->isUrlGenerationSafe(...)]
             ),
             new TwigFunction(
                 'path',
                 [RoutingRuntime::class, 'getPath'],
-                ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]
+                ['is_safe_callback' => $this->isUrlGenerationSafe(...)]
             ),
         ];
     }
 
     /**
-     * @param Node $argsNode
-     *
-     * @return array
-     *
      * @see \Symfony\Bridge\Twig\Extension\RoutingExtension::isUrlGenerationSafe
      */
     public function isUrlGenerationSafe(Node $argsNode): array
     {
         // support named arguments
-        $paramsNode = $argsNode->hasNode('parameters') ?
-            $argsNode->getNode('parameters') :
-            ($argsNode->hasNode('1') ? $argsNode->getNode('1') : null);
+        if ($argsNode->hasNode('parameters')) {
+            $paramsNode = $argsNode->getNode('parameters');
+        } elseif ($argsNode->hasNode('1')) {
+            $paramsNode = $argsNode->getNode('1');
+        } else {
+            $paramsNode = null;
+        }
 
         if (
-            null === $paramsNode || $paramsNode instanceof ArrayExpression && \count($paramsNode) <= 2 &&
-            (!$paramsNode->hasNode('1') || $paramsNode->getNode('1') instanceof ConstantExpression)
+            !$paramsNode instanceof Node
+            || (
+                $paramsNode instanceof ArrayExpression
+                && \count($paramsNode) <= 2
+                && (!$paramsNode->hasNode('1') || $paramsNode->getNode('1') instanceof ConstantExpression)
+            )
         ) {
             return ['html'];
         }

@@ -26,7 +26,7 @@ use Umanit\SeoBundle\UrlHistory\UrlPool;
 
 class UrlRedirectorSubscriberTest extends TestCase
 {
-    public function testIsCalledOnKernelException()
+    public function testIsCalledOnKernelException(): void
     {
         $urlPool = $this->getMockBuilder(UrlPool::class)->disableOriginalConstructor()->getMock();
         $subscriber = new UrlRedirectorSubscriber($urlPool, 301);
@@ -46,15 +46,17 @@ class UrlRedirectorSubscriberTest extends TestCase
         self::assertEmpty($traceableEventDispatcher->getNotCalledListeners());
     }
 
-    public function testIsNotCalledOnOtherKernelEvents()
+    public function testIsNotCalledOnOtherKernelEvents(): void
     {
         $urlPool = $this->getMockBuilder(UrlPool::class)->disableOriginalConstructor()->getMock();
         $subscriber = new UrlRedirectorSubscriber($urlPool, 301);
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $requestEvent = new RequestEvent($kernel, new Request(), 1);
-        $controllerEvent = new ControllerEvent($kernel, static function () {}, new Request(), 1);
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($kernel, static function () {}, [], new Request(), 1);
+        $controllerEvent = new ControllerEvent($kernel, static function (): void {
+        }, new Request(), 1);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($kernel, static function (): void {
+        }, [], new Request(), 1);
         $viewEvent = new ViewEvent($kernel, new Request(), 1, null);
         $responseEvent = new ResponseEvent($kernel, new Request(), 1, new Response());
         $finishRequestEvent = new FinishRequestEvent($kernel, new Request(), 1);

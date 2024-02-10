@@ -27,18 +27,18 @@ class UrlHistoryWriterPass implements CompilerPassInterface
             $urlHistoryWriter = $container->getDefinition('umanit_seo.event_subscriber.url_history_writer');
 
             $urlHistoryWriter->setArgument(3, $cacheService);
-        } catch (\Throwable $e) {
-            throw new \RuntimeException(sprintf(
-                'Can not build UmanIT SEO - UrlHistoryWriter: %s',
-                $e->getMessage()
-            ));
+        } catch (\Throwable $throwable) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Can not build UmanIT SEO - UrlHistoryWriter: %s',
+                    $throwable->getMessage()
+                ), $throwable->getCode(), $throwable
+            );
         }
     }
 
     private function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
-        $processor = new Processor();
-
-        return $processor->processConfiguration($configuration, $configs);
+        return (new Processor())->processConfiguration($configuration, $configs);
     }
 }

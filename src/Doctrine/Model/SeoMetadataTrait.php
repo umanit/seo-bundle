@@ -11,31 +11,17 @@ use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 trait SeoMetadataTrait
 {
     /**
-     * @var SeoMetadata
-     *
      * @ORM\Embedded(class="Umanit\SeoBundle\Entity\SeoMetadata", columnPrefix="seo_meta_")
      */
     #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: 'seo_meta_')]
-    protected $seoMetadata;
+    protected ?SeoMetadata $seoMetadata = null;
 
-    /**
-     * Get the value of Seo Metadata.
-     *
-     * @return SeoMetadata
-     */
     public function getSeoMetadata(): ?SeoMetadata
     {
         return $this->seoMetadata;
     }
 
-    /**
-     * Set the value of Seo Metadata.
-     *
-     * @param SeoMetadata $seoMetadata
-     *
-     * @return HasSeoMetadataInterface
-     */
-    public function setSeoMetadata(SeoMetadata $seoMetadata): HasSeoMetadataInterface
+    public function setSeoMetadata(?SeoMetadata $seoMetadata): HasSeoMetadataInterface
     {
         $this->seoMetadata = $seoMetadata;
 

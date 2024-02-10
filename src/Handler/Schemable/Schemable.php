@@ -9,12 +9,10 @@ use Umanit\SeoBundle\Model\SchemableModelInterface;
 
 class Schemable implements SchemableInterface
 {
-    /** @var SchemableHandlerInterface[] */
-    private $handlers;
-
-    public function __construct(iterable $handlers)
-    {
-        $this->handlers = $handlers;
+    public function __construct(
+        /** @var SchemableHandlerInterface[] */
+        private readonly iterable $handlers
+    ) {
     }
 
     public function handle(SchemableModelInterface $entity): BaseType
@@ -25,6 +23,6 @@ class Schemable implements SchemableInterface
             }
         }
 
-        throw new \LogicException(sprintf('Can not determine the schema.org of the entity %s', \get_class($entity)));
+        throw new \LogicException(sprintf('Can not determine the schema.org of the entity %s', $entity::class));
     }
 }

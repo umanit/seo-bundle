@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Form\Type;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -15,29 +14,17 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Umanit\SeoBundle\Entity\SeoMetadata;
-use Umanit\SeoBundle\Entity\UrlHistory;
 use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
+use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 class SeoMetadataType extends AbstractType
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var SeoMetadataResolver */
-    private $seoMetadataResolver;
-
-    /** @var bool */
-    private $injectCodePrettify;
-
     public function __construct(
-        SeoMetadataResolver $seoMetadataResolver,
-        EntityManagerInterface $em,
-        bool $injectCodePrettify
+        private readonly SeoMetadataResolver $seoMetadataResolver,
+        private readonly UrlHistoryRepository $urlHistoryRepository,
+        private readonly bool $injectCodePrettify,
     ) {
-        $this->seoMetadataResolver = $seoMetadataResolver;
-        $this->em = $em;
-        $this->injectCodePrettify = $injectCodePrettify;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -56,8 +43,8 @@ class SeoMetadataType extends AbstractType
         ;
 
         // Add placeholders to seo fields.
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            if (null === $event->getData() || null === $event->getForm()->getParent()) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            if (null === $event->getData() || !$event->getForm()->getParent() instanceof FormInterface) {
                 return;
             }
 
@@ -92,16 +79,16 @@ class SeoMetadataType extends AbstractType
 
         $parent = $form->getParent();
 
-        if (null === $parent) {
+        if (!$parent instanceof FormInterface) {
             return;
         }
 
         $entity = $parent->getData();
 
         if ($entity instanceof HistorizableUrlModelInterface && $entity->getUrlReference()) {
-            $view->vars['url_history'] = $this->em
-                ->getRepository(UrlHistory::class)
-                ->findBy(['seoUuid' => $entity->getUrlReference()->getSeoUuid()], ['id' => 'ASC'])
+            $view->vars['url_history'] = $this
+                ->urlHistoryRepository
+                ->findBySeoUuid($entity->getUrlReference()->getSeoUuid())
             ;
         }
     }
@@ -125,7 +112,7 @@ class SeoMetadataType extends AbstractType
 
         $parentForm->add(
             $childName,
-            \get_class($parentForm->get($childName)->getConfig()->getType()->getInnerType()),
+            $parentForm->get($childName)->getConfig()->getType()->getInnerType()::class,
             $options
         );
     }

@@ -11,8 +11,6 @@ interface EntityParserInterface
      *
      * @param object $entity The object from which the excerpt is generated.
      * @param int    $length The max length of the excerpt.
-     *
-     * @return ?string
      */
-    public function fromEntity(object $entity, $length = 150): ?string;
+    public function fromEntity(object $entity, int $length = 150): ?string;
 }

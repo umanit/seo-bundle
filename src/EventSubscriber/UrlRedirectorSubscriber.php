@@ -14,21 +14,15 @@ use Umanit\SeoBundle\UrlHistory\UrlPool;
 
 class UrlRedirectorSubscriber implements EventSubscriberInterface
 {
-    /** @var UrlPool */
-    private $pool;
-
-    /** @var int */
-    private $httpRedirectCode;
-
     public static function getSubscribedEvents(): array
     {
         return [KernelEvents::EXCEPTION => ['onKernelException']];
     }
 
-    public function __construct(UrlPool $pool, int $httpRedirectCode)
-    {
-        $this->pool = $pool;
-        $this->httpRedirectCode = $httpRedirectCode;
+    public function __construct(
+        private readonly UrlPool $pool,
+        private readonly int $httpRedirectCode,
+    ) {
     }
 
     public function onKernelException(ExceptionEvent $event): void

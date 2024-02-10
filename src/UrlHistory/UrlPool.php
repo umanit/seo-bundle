@@ -12,28 +12,15 @@ use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 
 class UrlPool
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var RoutableInterface */
-    private $routableHandler;
-
-    /** @var string */
-    private $defaultLocale;
-
-    public function __construct(EntityManagerInterface $em, RoutableInterface $routableHandler, string $defaultLocale)
-    {
-        $this->em = $em;
-        $this->routableHandler = $routableHandler;
-        $this->defaultLocale = $defaultLocale;
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly RoutableInterface $routableHandler,
+        private readonly string $defaultLocale,
+    ) {
     }
 
     /**
      * Add a set to the history.
-     *
-     * @param string                        $oldPath
-     * @param string                        $newPath
-     * @param HistorizableUrlModelInterface $entity
      */
     public function add(string $oldPath, string $newPath, HistorizableUrlModelInterface $entity): void
     {
@@ -65,13 +52,8 @@ class UrlPool
 
     /**
      * Gets an item from db.
-     *
-     * @param string      $path
-     * @param string|null $locale
-     *
-     * @return UrlHistory|null
      */
-    public function get(string $path, string $locale = null): ?UrlHistory
+    public function get(string $path, ?string $locale = null): ?UrlHistory
     {
         return $this->getUrlHistoryRepository()->findOneBy(['oldPath' => $path, 'locale' => $locale]);
     }

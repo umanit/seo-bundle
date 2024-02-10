@@ -15,10 +15,11 @@ use Twig\Loader\FilesystemLoader;
 use Umanit\SeoBundle\Breadcrumb\BreadcrumbBuilder;
 use Umanit\SeoBundle\Handler\Breadcrumbable\Breadcrumbable;
 use Umanit\SeoBundle\Model\Breadcrumb;
+use Umanit\SeoBundle\Routing\Canonical;
 
 class BreadcrumbBuilderTest extends TestCase
 {
-    public function testWithoutHandlerMustThrowLogicException()
+    public function testWithoutHandlerMustThrowLogicException(): void
     {
         $builder = $this->getBuilder(new Breadcrumbable([]));
         $entity = new WithoutHandlerEntity();
@@ -28,7 +29,7 @@ class BreadcrumbBuilderTest extends TestCase
         $builder->buildBreadcrumb($entity);
     }
 
-    public function testMicrodata()
+    public function testMicrodata(): void
     {
         $builder = $this->getBuilder(new Breadcrumbable([new BreadcrumbableWithHandlerHandler()]));
         $entity = new WithHandlerEntity();
@@ -36,12 +37,15 @@ class BreadcrumbBuilderTest extends TestCase
         $result = $builder->buildBreadcrumb($entity);
 
         self::assertStringContainsString('<ol itemscope itemtype="https://schema.org/BreadcrumbList">', $result);
-        self::assertStringContainsString('<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">', $result);
+        self::assertStringContainsString(
+            '<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">',
+            $result
+        );
         self::assertStringContainsString('<span itemprop="name">Hello World!</span>', $result);
         self::assertStringContainsString('<meta itemprop="position" content="1" />', $result);
     }
 
-    public function testJsonLd()
+    public function testJsonLd(): void
     {
         $builder = $this->getBuilder(new Breadcrumbable([new BreadcrumbableWithHandlerHandler()]));
         $entity = new WithHandlerEntity();
@@ -54,7 +58,7 @@ class BreadcrumbBuilderTest extends TestCase
         self::assertStringContainsString('"position": 1', $result);
     }
 
-    public function testRdfa()
+    public function testRdfa(): void
     {
         $builder = $this->getBuilder(new Breadcrumbable([new BreadcrumbableWithHandlerHandler()]));
         $entity = new WithHandlerEntity();
@@ -67,17 +71,21 @@ class BreadcrumbBuilderTest extends TestCase
         self::assertStringContainsString('<meta property="position" content="1" />', $result);
     }
 
-    public function testWithMultipleLevels()
+    public function testWithMultipleLevels(): void
     {
         $builder = $this->getBuilder(new Breadcrumbable([new BreadcrumbableWithHandlerMultipleLevelsHandler()]));
         $entity = new WithHandlerMultipleLevelsEntity();
 
         $result = json_decode(str_replace([
-            '<script type="application/ld+json">', '</script>',
+            '<script type="application/ld+json">',
+            '</script>',
         ],
             '',
             $builder->buildBreadcrumb($entity, Breadcrumb::FORMAT_JSON_LD)
-        ), true);
+        ),
+            true,
+            512,
+            JSON_THROW_ON_ERROR);
 
         self::assertCount(3, $result['itemListElement']);
         self::assertArrayHasKey('item', $result['itemListElement'][1]);
@@ -87,11 +95,12 @@ class BreadcrumbBuilderTest extends TestCase
     private function getBuilder(Breadcrumbable $breadcrumbable): BreadcrumbBuilder
     {
         $loader = new FilesystemLoader();
-        $loader->setPaths(__DIR__.'/../../src/Resources/views/', 'UmanitSeo');
+        $loader->setPaths(__DIR__ . '/../../src/Resources/views/', 'UmanitSeo');
+
         $twig = new Environment($loader);
 
         $canonical = $this
-            ->getMockBuilder('Umanit\SeoBundle\Routing\Canonical')
+            ->getMockBuilder(Canonical::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;

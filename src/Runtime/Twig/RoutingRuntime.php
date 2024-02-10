@@ -11,16 +11,10 @@ use Umanit\SeoBundle\Routing\Canonical;
 
 class RoutingRuntime implements RuntimeExtensionInterface
 {
-    /** @var BaseRoutingExtension */
-    private $decorated;
-
-    /** @var Canonical */
-    private $canonical;
-
-    public function __construct(BaseRoutingExtension $decorated, Canonical $canonical)
-    {
-        $this->decorated = $decorated;
-        $this->canonical = $canonical;
+    public function __construct(
+        private readonly BaseRoutingExtension $decorated,
+        private readonly Canonical $canonical,
+    ) {
     }
 
     public function getPath($name, $parameters = [], $relative = false): ?string

@@ -10,7 +10,7 @@ use Umanit\SeoBundle\Handler\Breadcrumbable\Breadcrumbable;
 
 class BreadcrumbableTest extends TestCase
 {
-    public function testThrowLogicExceptionIfEntityNotSupported()
+    public function testThrowLogicExceptionIfEntityNotSupported(): void
     {
         $breadcrumbable = new Breadcrumbable([]);
 

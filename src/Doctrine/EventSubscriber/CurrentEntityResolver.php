@@ -17,20 +17,11 @@ use Umanit\SeoBundle\Runtime\CurrentSeoEntity;
  */
 class CurrentEntityResolver implements EventSubscriber
 {
-    /** @var CurrentSeoEntity */
-    private $currentSeoEntity;
-
-    /** @var Canonical */
-    private $canonical;
-
-    /** @var RequestStack */
-    private $requestStack;
-
-    public function __construct(CurrentSeoEntity $currentSeoEntity, Canonical $canonical, RequestStack $requestStack)
-    {
-        $this->currentSeoEntity = $currentSeoEntity;
-        $this->canonical = $canonical;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private readonly CurrentSeoEntity $currentSeoEntity,
+        private readonly Canonical $canonical,
+        private readonly RequestStack $requestStack,
+    ) {
     }
 
     public function getSubscribedEvents(): array
@@ -52,8 +43,14 @@ class CurrentEntityResolver implements EventSubscriber
             return;
         }
 
-        if (null === $this->currentSeoEntity->get() && $this->canonical->path($entity) === $request->getPathInfo()) {
-            $this->currentSeoEntity->set($entity);
+        if (null !== $this->currentSeoEntity->get()) {
+            return;
         }
+
+        if ($this->canonical->path($entity) !== $request->getPathInfo()) {
+            return;
+        }
+
+        $this->currentSeoEntity->set($entity);
     }
 }

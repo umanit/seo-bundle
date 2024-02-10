@@ -7,9 +7,7 @@ namespace Umanit\SeoBundle\Sonata\AdminExtension;
 use Sonata\AdminBundle\Admin\AbstractAdminExtension;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\ListMapper;
-use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\AdminBundle\Templating\MutableTemplateRegistryInterface;
 
 class SeoAdminExtension extends AbstractAdminExtension
 {

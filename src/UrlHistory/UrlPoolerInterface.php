@@ -10,9 +10,6 @@ interface UrlPoolerInterface
 {
     /**
      * Process the update of an entity to historize URLs changes.
-     *
-     * @param HistorizableUrlModelInterface $newEntity
-     * @param HistorizableUrlModelInterface $oldEntity
      */
     public function processEntityUpdate(
         HistorizableUrlModelInterface $newEntity,
@@ -21,10 +18,6 @@ interface UrlPoolerInterface
 
     /**
      * Process the dependency of an updated entity to historize URLs changes.
-     *
-     * @param HistorizableUrlModelInterface $dependency
-     *
-     * @return bool
      */
     public function processEntityDependency(HistorizableUrlModelInterface $dependency): bool;
 }

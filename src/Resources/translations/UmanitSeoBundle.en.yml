@@ -1,7 +1,7 @@
 seo.title: 'Title'
 seo.description: 'Description'
 seo.metadata: 'Metadata'
-seo.metatitle.help: "The metatitle will be displayed as such: %meta_title%"
+seo.metatitle.help: 'The metatitle will be displayed as such: %meta_title%'
 seo.breadcrumb: 'Breadcrumb'
 seo.microdata: 'Microdata'
 seo.form.url: 'URL'

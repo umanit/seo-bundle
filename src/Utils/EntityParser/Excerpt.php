@@ -41,12 +41,9 @@ class Excerpt implements EntityParserInterface
         'introduction',
     ];
 
-    /** @var PropertyAccessorInterface */
-    private $accessor;
-
-    public function __construct(PropertyAccessorInterface $accessor)
-    {
-        $this->accessor = $accessor;
+    public function __construct(
+        private readonly PropertyAccessorInterface $accessor,
+    ) {
     }
 
     /**
@@ -54,20 +51,19 @@ class Excerpt implements EntityParserInterface
      *
      * @param object $entity The object from which the excerpt is generated.
      * @param int    $length The max length of the excerpt.
-     *
-     * @return ?string
      */
-    public function fromEntity(object $entity, $length = 150): ?string
+    public function fromEntity(object $entity, int $length = 150): ?string
     {
         $values = '';
         $refl = new \ReflectionClass($entity);
         $properties = $refl->getProperties();
 
         // Consider favourite keys first
-        uasort($properties, function (\ReflectionProperty $a, \ReflectionProperty $b) {
+        uasort($properties, function (\ReflectionProperty $a, \ReflectionProperty $b): int {
             if (\in_array($a->getName(), $this::FAV_KEYS, true)) {
                 return -1;
             }
+
             if (\in_array($b->getName(), $this::FAV_KEYS, true)) {
                 return 1;
             }
@@ -85,7 +81,7 @@ class Excerpt implements EntityParserInterface
             // Get the value
             try {
                 $value = $this->accessor->getValue($entity, $property->getName());
-            } catch (AccessException $e) {
+            } catch (AccessException) {
                 continue;
             }
 
@@ -106,7 +102,7 @@ class Excerpt implements EntityParserInterface
 
             // If no field matches the favKeys, build-up an
             // array of strings that'll be used as the excerpt.
-            $values .= ' '.$value;
+            $values .= ' ' . $value;
         }
 
         $trim = Html::trimText($values, $length);

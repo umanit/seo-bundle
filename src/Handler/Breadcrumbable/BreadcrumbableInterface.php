@@ -9,10 +9,5 @@ use Umanit\SeoBundle\Model\BreadcrumbableModelInterface;
 
 interface BreadcrumbableInterface
 {
-    /**
-     * @param BreadcrumbableModelInterface $entity
-     *
-     * @return Breadcrumb
-     */
     public function handle(BreadcrumbableModelInterface $entity): Breadcrumb;
 }

@@ -26,33 +26,13 @@ class UrlHistoryWriter implements EventSubscriber
 {
     public const ENTITY_DEPENDENCY_CACHE_KEY = 'seo.entity_dependencies';
 
-    /** @var UrlPoolerInterface */
-    private $urlPooler;
-
-    /** @var Routable */
-    private $routableHandler;
-
-    /** @var Canonical */
-    private $canonical;
-
-    /** @var CacheInterface */
-    private $cache;
-
-    /** @var string */
-    private $defaultLocale;
-
     public function __construct(
-        UrlPoolerInterface $urlPooler,
-        Routable $routableHandler,
-        Canonical $canonical,
-        CacheInterface $cache,
-        string $defaultLocale
+        private readonly UrlPoolerInterface $urlPooler,
+        private readonly Routable $routableHandler,
+        private readonly Canonical $canonical,
+        private readonly CacheInterface $cache,
+        private readonly string $defaultLocale,
     ) {
-        $this->routableHandler = $routableHandler;
-        $this->canonical = $canonical;
-        $this->cache = $cache;
-        $this->urlPooler = $urlPooler;
-        $this->defaultLocale = $defaultLocale;
     }
 
     public function getSubscribedEvents(): array
@@ -78,7 +58,7 @@ class UrlHistoryWriter implements EventSubscriber
         }
 
         // Loops through each entity associations
-        foreach ($args->getClassMetadata()->getAssociationMappings() as $fieldName => $mappingData) {
+        foreach ($args->getClassMetadata()->getAssociationMappings() as $mappingData) {
             if (!\array_key_exists('targetEntity', $mappingData)) {
                 continue;
             }
@@ -87,7 +67,7 @@ class UrlHistoryWriter implements EventSubscriber
             try {
                 $targetEntityClass = $mappingData['targetEntity'];
                 $targetReflectionEntity = new \ReflectionClass($targetEntityClass);
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 continue;
             }
 
@@ -97,13 +77,15 @@ class UrlHistoryWriter implements EventSubscriber
 
             $this->cache->get(
                 $this->getCacheKey($reflectionEntity->name),
-                static function (ItemInterface $item) use ($targetEntityClass) {
+                static function (ItemInterface $item) use ($targetEntityClass): array {
                     $cacheValue = $item->get() ?? [];
 
-                    return array_unique(array_merge(
-                        $cacheValue,
-                        [$targetEntityClass]
-                    ));
+                    return array_unique(
+                        array_merge(
+                            $cacheValue,
+                            [$targetEntityClass]
+                        )
+                    );
                 },
                 INF // We use INF to forces immediate expiration.
             );
@@ -140,7 +122,7 @@ class UrlHistoryWriter implements EventSubscriber
             return;
         }
 
-        if (null === $entity->getUrlReference()) {
+        if (!$entity->getUrlReference() instanceof UrlReference) {
             // Associate a fresh UrlReference to an entity
             $urlReference = (new UrlReference())
                 ->setSeoUuid(Uuid::uuid4()->toString())
@@ -159,9 +141,6 @@ class UrlHistoryWriter implements EventSubscriber
     /**
      * We use on flush rather than prePersist and postUpdate so the history works with DoctrineExtensions Sluggable.
      *
-     * @param OnFlushEventArgs $args
-     *
-     * @return void
      * @throws InvalidArgumentException
      */
     public function onFlush(OnFlushEventArgs $args): void
@@ -178,7 +157,7 @@ class UrlHistoryWriter implements EventSubscriber
 
             $urlReference = $entity->getUrlReference();
 
-            if (null === $urlReference) {
+            if (!$urlReference instanceof UrlReference) {
                 continue;
             }
 
@@ -196,7 +175,7 @@ class UrlHistoryWriter implements EventSubscriber
             if ($entity instanceof HistorizableUrlModelInterface) {
                 $urlReference = $entity->getUrlReference();
 
-                if (null === $urlReference) {
+                if (!$urlReference instanceof UrlReference) {
                     continue;
                 }
 
@@ -213,9 +192,7 @@ class UrlHistoryWriter implements EventSubscriber
             }
 
             // Look inside the cache if any dependent entity has to be historised
-            $dependencies = $this->cache->get($this->getCacheKey($entity), static function (ItemInterface $item) {
-                return [];
-            });
+            $dependencies = $this->cache->get($this->getCacheKey($entity), static fn(ItemInterface $item): array => []);
 
             foreach ($dependencies as $dependantEntityClass) {
                 // Fetches the current url of the entities
@@ -243,34 +220,30 @@ class UrlHistoryWriter implements EventSubscriber
 
     private function getClass(object $object): string
     {
-        return $object instanceof Proxy ? get_parent_class($object) : \get_class($object);
+        return $object instanceof Proxy ? get_parent_class($object) : $object::class;
     }
 
-    /**
-     * @param object|string $entity
-     *
-     * @return string
-     */
-    private function getCacheKey($entity): string
+    private function getCacheKey(object|string $entity): string
     {
         $entityClass = \is_object($entity) ? $this->getClass($entity) : $entity;
 
-        return self::ENTITY_DEPENDENCY_CACHE_KEY.'.'.str_replace('\\', '-', $entityClass);
+        return self::ENTITY_DEPENDENCY_CACHE_KEY . '.' . str_replace('\\', '-', $entityClass);
     }
 
-    private function getOldEntity(HistorizableUrlModelInterface $entity, array $oldValues): HistorizableUrlModelInterface
-    {
+    private function getOldEntity(
+        HistorizableUrlModelInterface $entity,
+        array $oldValues
+    ): HistorizableUrlModelInterface {
         $oldEntity = clone $entity;
         $oldEntityReflection = new \ReflectionClass($oldEntity);
 
         foreach ($oldValues as $key => $value) {
             try {
                 $property = $oldEntityReflection->getProperty($key);
-            } catch (\ReflectionException $e) {
+            } catch (\ReflectionException) {
                 continue;
             }
 
-            $property->setAccessible(true);
             $property->setValue($oldEntity, $value);
         }
 

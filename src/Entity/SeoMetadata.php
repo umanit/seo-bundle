@@ -13,20 +13,16 @@ use Doctrine\ORM\Mapping as ORM;
 class SeoMetadata
 {
     /**
-     * @var string
-     *
      * @ORM\Column(nullable=true)
      */
     #[ORM\Column(nullable: true)]
-    protected $title;
+    protected ?string $title = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(type="text", nullable=true)
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    protected $description;
+    protected ?string $description = null;
 
     public function getTitle(): ?string
     {

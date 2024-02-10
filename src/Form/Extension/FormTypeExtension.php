@@ -11,17 +11,14 @@ use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 
 class FormTypeExtension extends AbstractTypeExtension
 {
-    /** @var string */
-    private $formTypeFqcn;
-
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
     }
 
-    public function __construct(string $formTypeFqcn)
-    {
-        $this->formTypeFqcn = $formTypeFqcn;
+    public function __construct(
+        private readonly string $formTypeFqcn,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

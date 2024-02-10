@@ -11,19 +11,11 @@ interface SchemableHandlerInterface
 {
     /**
      * Does the handler supports this entity?
-     *
-     * @param SchemableModelInterface $entity
-     *
-     * @return bool
      */
     public function supports(SchemableModelInterface $entity): bool;
 
     /**
-     * Should returns a BaseType object for the entity.
-     *
-     * @param SchemableModelInterface $entity
-     *
-     * @return BaseType
+     * Should return a BaseType object for the entity.
      */
     public function process(SchemableModelInterface $entity): BaseType;
 }

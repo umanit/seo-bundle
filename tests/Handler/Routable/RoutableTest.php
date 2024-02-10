@@ -10,7 +10,7 @@ use Umanit\SeoBundle\Handler\Routable\Routable;
 
 class RoutableTest extends TestCase
 {
-    public function testThrowLogicExceptionIfEntityNotSupported()
+    public function testThrowLogicExceptionIfEntityNotSupported(): void
     {
         $routable = new Routable([]);
 

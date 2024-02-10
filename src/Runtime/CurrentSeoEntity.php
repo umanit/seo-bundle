@@ -8,8 +8,7 @@ use Umanit\SeoBundle\Model\RoutableModelInterface;
 
 class CurrentSeoEntity
 {
-    /** @var RoutableModelInterface|null */
-    private $value;
+    private ?RoutableModelInterface $value = null;
 
     public function get(): ?RoutableModelInterface
     {
