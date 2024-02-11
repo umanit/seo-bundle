@@ -134,6 +134,7 @@ services:
         arguments:
             - '@doctrine'
             - 'Umanit\SeoBundle\Entity\UrlHistory'
+        tags: [doctrine.repository_service]
 
     # Forms
     umanit_seo.form_extension.form_type:
