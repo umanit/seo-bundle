@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Umanit\SeoBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 
 /**
  * @ORM\Table(name="umanit_seo_url_reference", indexes={
  *     @ORM\Index(name="umanit_seo_url_ref_search_idx", columns={"seo_uuid"}),
  * })
- * @ORM\Entity(repositoryClass="Umanit\SeoBundle\Repository\UrlHistoryRepository")
+ * @ORM\Entity
  * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
  */
-#[ORM\Entity(repositoryClass: UrlHistoryRepository::class)]
+#[ORM\Entity]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ORM\Table(name: 'umanit_seo_url_reference')]
 #[ORM\Index(columns: ['seo_uuid'], name: 'umanit_seo_url_ref_search_idx')]

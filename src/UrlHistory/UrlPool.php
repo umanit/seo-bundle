@@ -8,12 +8,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Umanit\SeoBundle\Entity\UrlHistory;
 use Umanit\SeoBundle\Handler\Routable\RoutableInterface;
 use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
-use Umanit\SeoBundle\Repository\UrlHistoryRepository;
+use Umanit\SeoBundle\Repository\UrlHistoryRepositoryInterface;
 
 class UrlPool
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly UrlHistoryRepositoryInterface $urlHistoryRepository,
         private readonly RoutableInterface $routableHandler,
         private readonly string $defaultLocale,
     ) {
@@ -25,13 +26,8 @@ class UrlPool
     public function add(string $oldPath, string $newPath, HistorizableUrlModelInterface $entity): void
     {
         $locale = method_exists($entity, 'getLocale') ? $entity->getLocale() : $this->defaultLocale;
-        $urlHistory = $this
-            ->getUrlHistoryRepository()
-            ->findOneBy([
-                'oldPath' => $oldPath,
-                'locale'  => $locale,
-                'seoUuid' => $entity->getUrlReference()->getSeoUuid(),
-            ])
+        $urlHistory = $this->urlHistoryRepository
+            ->findOneByOldPathAndSeoUuid($oldPath, $entity->getUrlReference()->getSeoUuid(), $locale)
         ;
 
         if (null === $urlHistory) {
@@ -55,12 +51,7 @@ class UrlPool
      */
     public function get(string $path, ?string $locale = null): ?UrlHistory
     {
-        return $this->getUrlHistoryRepository()->findOneBy(['oldPath' => $path, 'locale' => $locale]);
-    }
-
-    private function getUrlHistoryRepository(): UrlHistoryRepository
-    {
-        return $this->em->getRepository(UrlHistory::class);
+        return $this->urlHistoryRepository->findOneByOldPath($path, $locale);
     }
 
     private function resolveRouteFromEntity(HistorizableUrlModelInterface $entity): string

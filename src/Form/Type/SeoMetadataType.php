@@ -15,14 +15,14 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Umanit\SeoBundle\Entity\SeoMetadata;
 use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
-use Umanit\SeoBundle\Repository\UrlHistoryRepository;
+use Umanit\SeoBundle\Repository\UrlHistoryRepositoryInterface;
 use Umanit\SeoBundle\Utils\SeoMetadataResolver;
 
 class SeoMetadataType extends AbstractType
 {
     public function __construct(
         private readonly SeoMetadataResolver $seoMetadataResolver,
-        private readonly UrlHistoryRepository $urlHistoryRepository,
+        private readonly UrlHistoryRepositoryInterface $urlHistoryRepository,
         private readonly bool $injectCodePrettify,
     ) {
     }

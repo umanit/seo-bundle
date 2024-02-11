@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Missing tag on repository
+- Add interface on repository
 
 ## [3.0.1] - 2024-02-10
 
