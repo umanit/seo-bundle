@@ -70,8 +70,10 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
             'orm' => [
                 'entity_managers' => [
                     'umanit_seo' => [
-                        'connection' => 'default',
-                        'mappings'   => [
+                        'connection'                   => 'default',
+                        'report_fields_where_declared' => true,
+                        'validate_xml_mapping'         => true,
+                        'mappings'                     => [
                             'UmanitSeo' => [
                                 'is_bundle' => false,
                                 'type'      => $mappingType,
