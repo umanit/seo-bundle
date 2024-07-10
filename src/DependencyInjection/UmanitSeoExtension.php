@@ -66,9 +66,20 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
 
         $mappingType = class_exists(Annotation::class) ? 'annotation' : 'attribute';
 
+        $defaultEntityManager = 'default';
+
+        foreach ($container->getExtensionConfig('doctrine') as $config) {
+            if (isset($config['orm']['default_entity_manager'])) {
+                $defaultEntityManager = $config['orm']['default_entity_manager'];
+
+                break;
+            }
+        }
+
         $container->prependExtensionConfig('doctrine', [
             'orm' => [
-                'entity_managers' => [
+                'default_entity_manager' => $defaultEntityManager,
+                'entity_managers'        => [
                     'umanit_seo' => [
                         'connection'                   => 'default',
                         'report_fields_where_declared' => true,

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Set default entity manager if not exists
+
 ## [3.0.3] - 2024-02-11
 
 ### Fixed
