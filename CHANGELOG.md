@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.5] - 2024-12-11
+
+### Added
+
+- doctrine/orm v3 support
+
 ## [3.0.4] - 2024-07-10
 
 ### Fixed
