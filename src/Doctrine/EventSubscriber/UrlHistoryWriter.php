@@ -53,7 +53,7 @@ class UrlHistoryWriter
 
         // Loops through each entity associations
         foreach ($args->getClassMetadata()->getAssociationMappings() as $mappingData) {
-            if (!\array_key_exists('targetEntity', $mappingData)) {
+            if (\is_array($mappingData) && !\array_key_exists('targetEntity', $mappingData)) {
                 continue;
             }
 
