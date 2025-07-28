@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.6] - 2025-07-28
+
+### Fixed
+
+- Bad check on `$mappingData` in `UrlHistoryWriter`
+
 ## [3.0.5] - 2024-12-11
 
 ### Added
@@ -177,7 +183,11 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/3.0.4...HEAD
+[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/3.0.6...HEAD
+
+[3.0.6]: https://github.com/umanit/block-collection-bundle/compare/3.0.5...3.0.6
+
+[3.0.5]: https://github.com/umanit/block-collection-bundle/compare/3.0.4...3.0.5
 
 [3.0.4]: https://github.com/umanit/block-collection-bundle/compare/3.0.3...3.0.4
 
