@@ -183,54 +183,54 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/block-collection-bundle/compare/3.0.6...HEAD
+[Unreleased]: https://github.com/umanit/seo-bundle/compare/3.0.6...HEAD
 
-[3.0.6]: https://github.com/umanit/block-collection-bundle/compare/3.0.5...3.0.6
+[3.0.6]: https://github.com/umanit/seo-bundle/compare/3.0.5...3.0.6
 
-[3.0.5]: https://github.com/umanit/block-collection-bundle/compare/3.0.4...3.0.5
+[3.0.5]: https://github.com/umanit/seo-bundle/compare/3.0.4...3.0.5
 
-[3.0.4]: https://github.com/umanit/block-collection-bundle/compare/3.0.3...3.0.4
+[3.0.4]: https://github.com/umanit/seo-bundle/compare/3.0.3...3.0.4
 
-[3.0.3]: https://github.com/umanit/block-collection-bundle/compare/3.0.2...3.0.3
+[3.0.3]: https://github.com/umanit/seo-bundle/compare/3.0.2...3.0.3
 
-[3.0.2]: https://github.com/umanit/block-collection-bundle/compare/3.0.1...3.0.2
+[3.0.2]: https://github.com/umanit/seo-bundle/compare/3.0.1...3.0.2
 
-[3.0.1]: https://github.com/umanit/block-collection-bundle/compare/3.0.0...3.0.1
+[3.0.1]: https://github.com/umanit/seo-bundle/compare/3.0.0...3.0.1
 
-[3.0.0]: https://github.com/umanit/block-collection-bundle/compare/2.2.1...3.0.0
+[3.0.0]: https://github.com/umanit/seo-bundle/compare/2.2.1...3.0.0
 
-[2.2.1]: https://github.com/umanit/block-collection-bundle/compare/2.2.0...2.2.1
+[2.2.1]: https://github.com/umanit/seo-bundle/compare/2.2.0...2.2.1
 
-[2.2.0]: https://github.com/umanit/block-collection-bundle/compare/2.1.5...2.2.0
+[2.2.0]: https://github.com/umanit/seo-bundle/compare/2.1.5...2.2.0
 
-[2.1.5]: https://github.com/umanit/block-collection-bundle/compare/2.1.4...2.1.5
+[2.1.5]: https://github.com/umanit/seo-bundle/compare/2.1.4...2.1.5
 
-[2.1.4]: https://github.com/umanit/block-collection-bundle/compare/2.1.3...2.1.4
+[2.1.4]: https://github.com/umanit/seo-bundle/compare/2.1.3...2.1.4
 
-[2.1.3]: https://github.com/umanit/block-collection-bundle/compare/2.1.2...2.1.3
+[2.1.3]: https://github.com/umanit/seo-bundle/compare/2.1.2...2.1.3
 
-[2.1.2]: https://github.com/umanit/block-collection-bundle/compare/2.1.1...2.1.2
+[2.1.2]: https://github.com/umanit/seo-bundle/compare/2.1.1...2.1.2
 
-[2.1.1]: https://github.com/umanit/block-collection-bundle/compare/2.1.0...2.1.1
+[2.1.1]: https://github.com/umanit/seo-bundle/compare/2.1.0...2.1.1
 
-[2.1.0]: https://github.com/umanit/block-collection-bundle/compare/2.0.8...2.1.0
+[2.1.0]: https://github.com/umanit/seo-bundle/compare/2.0.8...2.1.0
 
-[2.0.8]: https://github.com/umanit/block-collection-bundle/compare/2.0.7...2.0.8
+[2.0.8]: https://github.com/umanit/seo-bundle/compare/2.0.7...2.0.8
 
-[2.0.7]: https://github.com/umanit/block-collection-bundle/compare/2.0.6...2.0.7
+[2.0.7]: https://github.com/umanit/seo-bundle/compare/2.0.6...2.0.7
 
-[2.0.6]: https://github.com/umanit/block-collection-bundle/compare/2.0.5...2.0.6
+[2.0.6]: https://github.com/umanit/seo-bundle/compare/2.0.5...2.0.6
 
-[2.0.5]: https://github.com/umanit/block-collection-bundle/compare/2.0.4...2.0.5
+[2.0.5]: https://github.com/umanit/seo-bundle/compare/2.0.4...2.0.5
 
-[2.0.4]: https://github.com/umanit/block-collection-bundle/compare/2.0.3...2.0.4
+[2.0.4]: https://github.com/umanit/seo-bundle/compare/2.0.3...2.0.4
 
-[2.0.3]: https://github.com/umanit/block-collection-bundle/compare/2.0.2...2.0.3
+[2.0.3]: https://github.com/umanit/seo-bundle/compare/2.0.2...2.0.3
 
-[2.0.2]: https://github.com/umanit/block-collection-bundle/compare/2.0.1...2.0.2
+[2.0.2]: https://github.com/umanit/seo-bundle/compare/2.0.1...2.0.2
 
-[2.0.1]: https://github.com/umanit/block-collection-bundle/compare/2.0.0...2.0.1
+[2.0.1]: https://github.com/umanit/seo-bundle/compare/2.0.0...2.0.1
 
-[2.0.0]: https://github.com/umanit/block-collection-bundle/releases/tag/2.0.0
+[2.0.0]: https://github.com/umanit/seo-bundle/releases/tag/2.0.0
 
-[1.2.6]: https://github.com/umanit/block-collection-bundle/releases/tag/1.2.6
+[1.2.6]: https://github.com/umanit/seo-bundle/releases/tag/1.2.6
