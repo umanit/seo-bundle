@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\DependencyInjection;
 
-use Doctrine\Common\Annotations\Annotation;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -64,8 +63,6 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
             $loader->load('sonata_admin.yaml');
         }
 
-        $mappingType = class_exists(Annotation::class) ? 'annotation' : 'attribute';
-
         $defaultEntityManager = 'default';
 
         foreach ($container->getExtensionConfig('doctrine') as $config) {
@@ -81,13 +78,12 @@ class UmanitSeoExtension extends ConfigurableExtension implements PrependExtensi
                 'default_entity_manager' => $defaultEntityManager,
                 'entity_managers'        => [
                     'umanit_seo' => [
-                        'connection'                   => 'default',
-                        'report_fields_where_declared' => true,
-                        'validate_xml_mapping'         => true,
-                        'mappings'                     => [
+                        'connection'           => 'default',
+                        'validate_xml_mapping' => true,
+                        'mappings'             => [
                             'UmanitSeo' => [
                                 'is_bundle' => false,
-                                'type'      => $mappingType,
+                                'type'      => 'attribute',
                                 'dir'       => \dirname(__DIR__) . '/Entity',
                                 'prefix'    => 'Umanit\SeoBundle\Entity',
                             ],

@@ -10,10 +10,6 @@ use Umanit\SeoBundle\Model\HistorizableUrlModelInterface;
 
 trait HistorizableUrlTrait
 {
-    /**
-     * @ORM\OneToOne(targetEntity="Umanit\SeoBundle\Entity\UrlReference", cascade={"all"}, orphanRemoval=true)
-     * @ORM\JoinColumn(name="seo_url_reference", nullable=false)
-     */
     #[ORM\OneToOne(targetEntity: UrlReference::class, cascade: ['all'], orphanRemoval: true)]
     #[ORM\JoinColumn(name: 'seo_url_reference', nullable: false)]
     protected ?UrlReference $urlReference = null;

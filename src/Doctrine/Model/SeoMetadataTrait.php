@@ -10,9 +10,6 @@ use Umanit\SeoBundle\Model\HasSeoMetadataInterface;
 
 trait SeoMetadataTrait
 {
-    /**
-     * @ORM\Embedded(class="Umanit\SeoBundle\Entity\SeoMetadata", columnPrefix="seo_meta_")
-     */
     #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: 'seo_meta_')]
     protected ?SeoMetadata $seoMetadata = null;
 

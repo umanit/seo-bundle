@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Symfony 8 support
+- DoctrineBundle 3 and doctrine/doctrine-migrations-bundle 4 support
+- spatie/schema-org v4 support
+
+### Changed
+
+- **BC break**: minimum PHP version is now 8.2
+- **BC break**: minimum doctrine/orm version is now 2.20
+- **BC break**: `UrlHistoryRepositoryInterface::findOneByOldPath()` now accepts a nullable `$locale`, matching what
+  `UrlPool::get()` has always been able to pass
+- The `umanit_seo` entity manager mapping is now always declared as `attribute`; the `annotation` driver no longer
+  exists in DoctrineBundle 3
+
+### Fixed
+
+- `UrlHistoryWriter` resolved proxy classes through `Doctrine\Common\Proxy\Proxy` and `get_parent_class()`, which
+  silently returns the wrong class with doctrine/orm 3 native lazy objects, feeding wrong metadata to
+  `recomputeSingleEntityChangeSet()`. It now uses `DefaultProxyClassNameResolver`.
+- The `umanit_seo` entity manager no longer prepends `report_fields_where_declared`, a key removed in DoctrineBundle 3
+  that made container compilation fail
+
+### Removed
+
+- Symfony < 5.0 compatibility branch in `UrlRedirectorSubscriber`
+- Dead `@ORM\*` annotation docblocks left over next to the PHP 8 attributes
+
 ## [3.0.6] - 2025-07-28
 
 ### Fixed

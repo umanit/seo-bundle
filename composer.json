@@ -16,22 +16,22 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
-        "spatie/schema-org": "^3.2",
+        "spatie/schema-org": "^3.2|^4.0",
         "ramsey/uuid": "^4.1",
-        "symfony/twig-bundle": "^6.4|^7.0",
+        "symfony/twig-bundle": "^6.4|^7.0|^8.0",
         "twig/extra-bundle": "^3.0",
-        "twig/twig": "^3.0",
-        "doctrine/doctrine-bundle": "^2.0",
-        "doctrine/doctrine-migrations-bundle": "^3.0",
-        "doctrine/orm": "^2.7|^3.0",
-        "symfony/form": "^6.4|^7.0"
+        "twig/twig": "^3.12",
+        "doctrine/doctrine-bundle": "^2.13|^3.0",
+        "doctrine/doctrine-migrations-bundle": "^3.0|^4.0",
+        "doctrine/orm": "^2.20|^3.0",
+        "symfony/form": "^6.4|^7.0|^8.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^5.1|^5.2",
-        "phpunit/phpunit": "^7.5|^9.5",
-        "rector/rector": "^1.0"
+        "symfony/phpunit-bridge": "^7.0|^8.0",
+        "phpunit/phpunit": "^11.5",
+        "rector/rector": "^2.0"
     },
     "minimum-stability": "stable",
     "autoload": {

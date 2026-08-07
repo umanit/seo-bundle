@@ -4,24 +4,16 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Embeddable
- */
 #[ORM\Embeddable]
 class SeoMetadata
 {
-    /**
-     * @ORM\Column(nullable=true)
-     */
     #[ORM\Column(nullable: true)]
     protected ?string $title = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $description = null;
 
     public function getTitle(): ?string
