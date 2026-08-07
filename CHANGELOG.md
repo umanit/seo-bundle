@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-08-07
+
 ### Added
 
 - Symfony 8 support
@@ -211,7 +213,9 @@ Initial release for the v2.
 
 Last release of the v1.
 
-[Unreleased]: https://github.com/umanit/seo-bundle/compare/3.0.6...HEAD
+[Unreleased]: https://github.com/umanit/seo-bundle/compare/4.0.0...HEAD
+
+[4.0.0]: https://github.com/umanit/seo-bundle/compare/3.0.6...4.0.0
 
 [3.0.6]: https://github.com/umanit/seo-bundle/compare/3.0.5...3.0.6
 
