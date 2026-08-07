@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Umanit\SeoBundle\Doctrine\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
-use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -214,7 +214,7 @@ class UrlHistoryWriter
 
     private function getClass(object $object): string
     {
-        return $object instanceof Proxy ? get_parent_class($object) : $object::class;
+        return DefaultProxyClassNameResolver::getClass($object);
     }
 
     private function getCacheKey(object|string $entity): string

@@ -14,7 +14,7 @@ class UrlHistoryRepository extends ServiceEntityRepository implements UrlHistory
         return $this->findBy(['seoUuid' => $seoUuid], ['id' => 'ASC']);
     }
 
-    public function findOneByOldPath(string $oldPath, string $locale): ?UrlHistory
+    public function findOneByOldPath(string $oldPath, ?string $locale): ?UrlHistory
     {
         return $this->findOneBy(['oldPath' => $oldPath, 'locale' => $locale]);
     }

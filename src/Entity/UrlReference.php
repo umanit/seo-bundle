@@ -4,53 +4,30 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="umanit_seo_url_reference", indexes={
- *     @ORM\Index(name="umanit_seo_url_ref_search_idx", columns={"seo_uuid"}),
- * })
- * @ORM\Entity
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- */
 #[ORM\Entity]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ORM\Table(name: 'umanit_seo_url_reference')]
 #[ORM\Index(columns: ['seo_uuid'], name: 'umanit_seo_url_ref_search_idx')]
 class UrlReference
 {
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(name="route", type="string", length=255, nullable=false)
-     */
-    #[ORM\Column(name: 'route', type: 'string', length: 255, nullable: false)]
+    #[ORM\Column(name: 'route', type: Types::STRING, length: 255, nullable: false)]
     private ?string $route = null;
 
-    /**
-     * @ORM\Column(name="url", nullable=false, length=512)
-     */
     #[ORM\Column(name: 'url', length: 512, nullable: false)]
     private ?string $url = null;
 
-    /**
-     * @ORM\Column(name="locale", type="string", length=10, nullable=true)
-     */
-    #[ORM\Column(name: 'locale', type: 'string', length: 10, nullable: true)]
+    #[ORM\Column(name: 'locale', type: Types::STRING, length: 10, nullable: true)]
     private ?string $locale = null;
 
-    /**
-     * @ORM\Column(name="seo_uuid", type="guid", unique=true)
-     */
-    #[ORM\Column(name: 'seo_uuid', type: 'guid', unique: true)]
+    #[ORM\Column(name: 'seo_uuid', type: Types::GUID, unique: true)]
     private ?string $seoUuid = null;
 
     public function getId(): ?int

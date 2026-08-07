@@ -4,60 +4,34 @@ declare(strict_types=1);
 
 namespace Umanit\SeoBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Umanit\SeoBundle\Repository\UrlHistoryRepository;
 
-/**
- * @ORM\Table(name="umanit_seo_url_history", indexes={
- *     @ORM\Index(name="umanit_seo_history_search_idx", columns={"old_path", "locale"}),
- * })
- * @ORM\Entity(repositoryClass="Umanit\SeoBundle\Repository\UrlHistoryRepository")
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- */
 #[ORM\Entity(repositoryClass: UrlHistoryRepository::class)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ORM\Table(name: 'umanit_seo_url_history')]
 #[ORM\Index(columns: ['old_path', 'locale'], name: 'umanit_seo_history_search_idx')]
 class UrlHistory
 {
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(name="route", type="string", length=255, nullable=false)
-     */
-    #[ORM\Column(name: 'route', type: 'string', length: 255, nullable: false)]
+    #[ORM\Column(name: 'route', type: Types::STRING, length: 255, nullable: false)]
     private ?string $route = null;
 
-    /**
-     * @ORM\Column(name="old_path", nullable=false, length=512)
-     */
     #[ORM\Column(name: 'old_path', length: 512, nullable: false)]
     private ?string $oldPath = null;
 
-    /**
-     * @ORM\Column(name="new_path", nullable=false, length=512)
-     */
     #[ORM\Column(name: 'new_path', length: 512, nullable: false)]
     private ?string $newPath = null;
 
-    /**
-     * @ORM\Column(name="locale", type="string", length=10, nullable=true)
-     */
-    #[ORM\Column(name: 'locale', type: 'string', length: 10, nullable: true)]
+    #[ORM\Column(name: 'locale', type: Types::STRING, length: 10, nullable: true)]
     private ?string $locale = null;
 
-    /**
-     * @ORM\Column(name="seo_uuid", type="guid", unique=false)
-     */
-    #[ORM\Column(name: 'seo_uuid', type: 'guid', unique: false)]
+    #[ORM\Column(name: 'seo_uuid', type: Types::GUID, unique: false)]
     private ?string $seoUuid = null;
 
     public function getId(): ?int
