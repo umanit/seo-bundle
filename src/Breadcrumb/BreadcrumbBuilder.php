@@ -21,7 +21,7 @@ class BreadcrumbBuilder
     ) {
     }
 
-    public function buildBreadcrumb(BreadcrumbableModelInterface $entity, string $format = null): string
+    public function buildBreadcrumb(BreadcrumbableModelInterface $entity, ?string $format = null): string
     {
         if (null !== $format && !\in_array(strtolower($format), Breadcrumb::FORMATS, true)) {
             throw new \ErrorException(
