@@ -1,0 +1,48 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1793015021,
+        "narHash": "sha256-Ee5BWo8sh3pGt70QUdRajnaginqFmWvrtdBc4gJzhks=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "718f670e845328e9c2cecdd832835712b2cbd065",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-26.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "php-dev-shell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792239361,
+        "narHash": "sha256-Pl1zp0RGem0KUy3GGZWYH2n7Lljvbr8d3HfHfDd05r8=",
+        "owner": "DjLeChuck",
+        "repo": "php-dev-shell",
+        "rev": "6efd4f0f8b8f54477c3d3f5ad8d5ffccc9b77ee5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "DjLeChuck",
+        "repo": "php-dev-shell",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "php-dev-shell": "php-dev-shell"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
